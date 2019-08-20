@@ -1,0 +1,6 @@
+matplotlib==3.1.1
+networkx==2.3
+dm-sonnet==1.34
+numpy==1.16.4
+tensorflow==1.14
+six==1.12
