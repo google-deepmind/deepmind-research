@@ -3,8 +3,7 @@ dm-sonnet==1.34
 numpy
 pycolab
 six
-dm-sonnet
 trfl
-tensorflow==1.13.0
+tensorflow==1.13.2
 tensorflow-probability==0.6.0
-tensorflow-gpu==1.13.0  # GPU version of TensorFlow.
+tensorflow-gpu==1.0.1  # GPU version of TensorFlow.
