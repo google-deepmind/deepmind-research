@@ -6,4 +6,3 @@ six
 trfl
 tensorflow==1.13.2
 tensorflow-probability==0.6.0
-tensorflow-gpu==1.0.1  # GPU version of TensorFlow.
