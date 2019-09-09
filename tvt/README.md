@@ -5,7 +5,13 @@ the paper [Optimizing Agent Behavior over Long Time Scales by Transporting Value
 
 ## Installation
 
-TVT package installation and training can run using: `tvt/run.sh`.
+TVT package installation and training can run using: `tvt/run.sh`. This will use
+all default flag values for the training script `tvt/main.py`. See the section
+on running experiments below for launching with non-default flags.
+
+Note that the default installation uses tensorflow without gpu. Replace
+`tensoflow` by `tensorflow-gpu` in `tvt/requirements.txt` to use tensorflow with
+gpu.
 
 ## Differences between this implementation and the paper
 
