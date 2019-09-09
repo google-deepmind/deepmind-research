@@ -4,7 +4,6 @@ This repository contains the trained model and dataset used for Unsupervised
 Adversarial Training (UAT) from the paper
 [Are Labels Required for Improving Adversarial Robustness?](https://arxiv.org/abs/1905.13725)
 
-This is not an official Google product.
 
 ## Contents
 
@@ -66,3 +65,7 @@ If you use this code in your work, please cite the accompanying paper:
   year={2019}
 }
 ```
+
+## Disclaimer
+
+This is not an official Google product.
