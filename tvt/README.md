@@ -10,8 +10,8 @@ all default flag values for the training script `tvt/main.py`. See the section
 on running experiments below for launching with non-default flags.
 
 Note that the default installation uses tensorflow without gpu. Replace
-`tensoflow` by `tensorflow-gpu` in `tvt/requirements.txt` to use tensorflow with
-gpu.
+`tensorflow` by `tensorflow-gpu` in `tvt/requirements.txt` to use tensorflow
+with gpu.
 
 ## Differences between this implementation and the paper
 
@@ -47,6 +47,7 @@ README.
 To start an experiment, run:
 
 ```
+source tvt_venv/bin/activate
 python3 -m tvt.main
 ```
 
@@ -54,8 +55,10 @@ This will launch a default setup that uses the RMA agent on the 'Key To Door'
 Pycolab task.
 
 ### Important flags
-All the default hyperparameters are tuned for the TVT-RMA agent to solve both
-`key_to_door` and `active_visual_match` Pycolab tasks.
+`tvt.main` accepts many flags.
+
+Note that all the default hyperparameters are tuned for the TVT-RMA agent to
+solve both `key_to_door` and `active_visual_match` Pycolab tasks.
 
 #### Information logging:
 `logging_frequency`: frequency of logging in console and tensorboard. <br>
