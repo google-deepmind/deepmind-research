@@ -59,7 +59,7 @@ If you use this code in your work, please cite the accompanying paper:
 ```
 @inproceedings{uat2019,
   title={Are Labels Required for Improving Adversarial Robustness?},
-  author={Jonathan Uesato and Jean-Baptiste Alayrac and Po-Sen Huang,
+  author={Jonathan Uesato and Jean-Baptiste Alayrac and Po-Sen Huang and
   Robert Stanforth and Alhussein Fawzi and Pushmeet Kohli},
   booktitle={Advances in Neural Information Processing Systems},
   year={2019}
