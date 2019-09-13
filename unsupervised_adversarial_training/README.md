@@ -57,11 +57,11 @@ This will save the first 100 images to the directory
 If you use this code in your work, please cite the accompanying paper:
 
 ```
-@article{uat2019,
+@inproceedings{uat2019,
   title={Are Labels Required for Improving Adversarial Robustness?},
-  author={Uesato, Jonathan and Alayrac, Jean-Baptiste, and Huang, Po-Sen and
-  Stanforth, Robert and Fawzi, Alhussein and Kohli, Pushmeet},
-  journal={arXiv preprint arXiv:1905.13725},
+  author={Jonathan Uesato and Jean-Baptiste Alayrac and Po-Sen Huang,
+  Robert Stanforth and Alhussein Fawzi and Pushmeet Kohli},
+  booktitle={Advances in Neural Information Processing Systems},
   year={2019}
 }
 ```
