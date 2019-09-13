@@ -13,98 +13,55 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Sonnet implementation of the Transporter architecture."""
+"""Transporter architecture in Sonnet/TF 1: https://arxiv.org/abs/1906.11883."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from pytflib import nest
+import functools
+
 import sonnet as snt
 import tensorflow as tf
 
+nest = tf.contrib.framework.nest
 
-class SpatialTransporter(snt.AbstractModule):
-  """Sonnet module implementing the Spatial Transporter architecture."""
+# Paper submission used BatchNorm, but we have since found that Layer & Instance
+# norm can be quite a lot more stable.
+_NORMALIZATION_CTORS = {
+    "layer": snt.LayerNorm,
+    "instance": functools.partial(snt.LayerNorm, axis=[1, 2]),
+    "batch": snt.BatchNormV2,
+}
 
-  def __init__(self, encoder, keypointer, decoder, name="spatial_transporter"):
-    """Initialize the Spatial Transporter module.
 
-    Args:
-      encoder: `snt.AbstractModule` mapping images to features (see `Encoder`)
-      keypointer: `snt.AbstractModule` mapping images to keypoint masks (see
-        `KeyPointer`)
-      decoder: `snt.AbstractModule` decoding features to images (see `Decoder`)
-      name: `str` module name
-    """
-    super(SpatialTransporter, self).__init__(name=name)
-
-    self._encoder = encoder
-    self._decoder = decoder
-    self._keypointer = keypointer
-
-  def _build(self, image_a, image_b, is_training):
-    """Reconstructs image_b using spatial feature transport from image_a.
-
-    Args:
-      image_a: Tensor of shape [N, H, W, C] containing a batch of images.
-      image_b: Tensor of shape [N, H, W, C] containing a batch of images.
-      is_training: `bool` indication whether the model is in training mode.
-
-    Returns:
-      A dict containing keys:
-        'reconstructed_image_b': Reconstruction of image_b, with the same shape.
-        'keypoints_a': The result of the keypointer module on image_a, with stop
-          gradients applied.
-        'keypoints_b': The result of the keypointer module on image_b.
-    """
-    # Process images, stopping gradients to image a keypoints only. Because
-    # this variant does not run the encoder at all on image_b, we don't need to
-    # stop gradients to image_a_features.
-    image_a_features = self._encoder(image_a, is_training=is_training)
-    image_a_keypoints = nest.map_structure(
-        tf.stop_gradient, self._keypointer(image_a, is_training=is_training))
-    image_b_keypoints = self._keypointer(image_b, is_training=is_training)
-
-    _, height, width, num_keypoints = (
-        image_a_keypoints["heatmaps"].shape.as_list())
-
-    # Transport features usig spatial transport
-    transported_features = image_a_features
-    for k in range(num_keypoints):
-      # None indexing adds a trailing singleton dimension, like tf.expand_dims.
-      mask_a = image_a_keypoints["heatmaps"][Ellipsis, k, None]
-      mask_b = image_b_keypoints["heatmaps"][Ellipsis, k, None]
-
-      feature_vector = tf.reduce_mean(
-          mask_a * image_a_features, axis=[1, 2], keepdims=True)
-      tiled_feature_vector = tf.tile(feature_vector, [1, height, width, 1])
-
-      # spatially transport features
-      transported_features = ((1 - mask_a) * (1 - mask_b) *
-                              transported_features)
-      transported_features += mask_b * tiled_feature_vector
-
-    reconstructed_image_b = self._decoder(
-        transported_features, is_training=is_training)
-
-    return {
-        "reconstructed_image_b": reconstructed_image_b,
-        "keypoints_a": image_a_keypoints,
-        "keypoints_b": image_b_keypoints,
-    }
+def _connect_module_with_kwarg_if_supported(module,
+                                            input_tensor,
+                                            kwarg_name,
+                                            kwarg_value):
+  """Connects a module to some input, plus a kwarg= if supported by module."""
+  if snt.supports_kwargs(module, kwarg_name) == "supported":
+    kwargs = {kwarg_name: kwarg_value}
+  else:
+    kwargs = {}
+  return module(input_tensor, **kwargs)
 
 
 class Transporter(snt.AbstractModule):
   """Sonnet module implementing the Transporter architecture."""
 
-  def __init__(self, encoder, keypointer, decoder, name="transporter"):
+  def __init__(
+      self,
+      encoder,
+      keypointer,
+      decoder,
+      name="transporter"):
     """Initialize the Transporter module.
 
     Args:
       encoder: `snt.AbstractModule` mapping images to features (see `Encoder`)
       keypointer: `snt.AbstractModule` mapping images to keypoint masks (see
-        `KeyPointer`)
+          `KeyPointer`)
       decoder: `snt.AbstractModule` decoding features to images (see `Decoder`)
       name: `str` module name
     """
@@ -120,13 +77,17 @@ class Transporter(snt.AbstractModule):
     This approaches matches the NeurIPS submission.
 
     Args:
-      image_a: Tensor of shape [N, H, W, C] containing a batch of images.
-      image_b: Tensor of shape [N, H, W, C] containing a batch of images.
+      image_a: Tensor of shape [B, H, W, C] containing a batch of images.
+      image_b: Tensor of shape [B, H, W, C] containing a batch of images.
       is_training: `bool` indication whether the model is in training mode.
 
     Returns:
       A dict containing keys:
         'reconstructed_image_b': Reconstruction of image_b, with the same shape.
+        'features_a': Tensor of shape [B, F_h, F_w, N] of the extracted features
+            for `image_a`.
+        'features_b': Tensor of shape [B, F_h, F_w, N] of the extracted features
+            for `image_b`.
         'keypoints_a': The result of the keypointer module on image_a, with stop
           gradients applied.
         'keypoints_b': The result of the keypointer module on image_b.
@@ -148,8 +109,8 @@ class Transporter(snt.AbstractModule):
       mask_b = image_b_keypoints["heatmaps"][Ellipsis, k, None]
 
       # suppress features from image a, around both keypoint locations.
-      transported_features = ((1 - mask_a) * (1 - mask_b) *
-                              transported_features)
+      transported_features = (
+          (1 - mask_a) * (1 - mask_b) * transported_features)
 
       # copy features from image b around keypoints for image b.
       transported_features += (mask_b * image_b_features)
@@ -159,6 +120,8 @@ class Transporter(snt.AbstractModule):
 
     return {
         "reconstructed_image_b": reconstructed_image_b,
+        "features_a": image_a_features,
+        "features_b": image_b_features,
         "keypoints_a": image_a_keypoints,
         "keypoints_b": image_b_keypoints,
     }
@@ -190,18 +153,21 @@ class Encoder(snt.AbstractModule):
   The encoder is a standard convolutional network with ReLu activations.
   """
 
-  def __init__(self,
-               filters=(16, 16, 32, 32),
-               kernel_sizes=(7, 3, 3, 3),
-               strides=(1, 1, 2, 1),
-               name="encoder"):
+  def __init__(
+      self,
+      filters=(16, 16, 32, 32),
+      kernel_sizes=(7, 3, 3, 3),
+      strides=(1, 1, 2, 1),
+      norm_type="batch",
+      name="encoder"):
     """Initialize the Encoder.
 
     Args:
-      filters: tuple of `int`. The ith layer of the encoder will consist of
-        `filters[i]` filters.
+      filters: tuple of `int`. The ith layer of the encoder will
+        consist of `filters[i]` filters.
       kernel_sizes: tuple of `int` kernel sizes for each layer
       strides: tuple of `int` strides for each layer
+      norm_type: string, one of 'instance', 'layer', 'batch'.
       name: `str` name of the module.
     """
     super(Encoder, self).__init__(name=name)
@@ -211,6 +177,7 @@ class Encoder(snt.AbstractModule):
     self._filters = filters
     self._kernels = kernel_sizes
     self._strides = strides
+    self._norm_ctor = _NORMALIZATION_CTORS[norm_type]
 
   def _build(self, image, is_training):
     """Connect the Encoder.
@@ -234,11 +201,12 @@ class Encoder(snt.AbstractModule):
             self._strides[l],
             padding=snt.SAME,
             regularizers=regularizers,
-            name="conv_{}".format(l + 1))
-        bn = snt.BatchNormV2(name="batch_normalization")
+            name="conv_{}".format(l+1))
+        norm_module = self._norm_ctor(name="normalization")
 
       features = conv(features)
-      features = bn(features, is_training=is_training)
+      features = _connect_module_with_kwarg_if_supported(
+          norm_module, features, "is_training", is_training)
       features = tf.nn.relu(features)
 
     return features
@@ -261,8 +229,9 @@ class KeyPointer(snt.AbstractModule):
         normalized to the range [-1, 1]
       keypoint_encoder: sonnet Module which produces a feature map. Must accept
         an is_training kwarg. When used in the Transporter, the output spatial
-        resolution of this encoder should match the output spatial resolution of
-        the other encoder, although these two encoders should not share weights.
+        resolution of this encoder should match the output spatial resolution
+        of the other encoder, although these two encoders should not share
+        weights.
       custom_getter: optional custom getter for variables in this module.
       name: `str` name of the module
     """
@@ -294,8 +263,8 @@ class KeyPointer(snt.AbstractModule):
 
     image_features = self._keypoint_encoder(image, is_training=is_training)
     keypoint_features = conv(image_features)
-    return get_keypoint_data_from_feature_map(keypoint_features,
-                                              self._gauss_std)
+    return get_keypoint_data_from_feature_map(
+        keypoint_features, self._gauss_std)
 
 
 def get_keypoint_data_from_feature_map(feature_map, gauss_std):
@@ -335,9 +304,9 @@ def _get_keypoint_mus(keypoint_features):
       center point are in the range [-1, 1]^2. Note: the first element is the y
       coordinate, the second is the x coordinate.
   """
-  gauss_x = _get_coord(keypoint_features, 1)
-  gauss_y = _get_coord(keypoint_features, 2)
-  gauss_mu = tf.stack([gauss_x, gauss_y], axis=2)
+  gauss_y = _get_coord(keypoint_features, 1)
+  gauss_x = _get_coord(keypoint_features, 2)
+  gauss_mu = tf.stack([gauss_y, gauss_x], axis=2)
   return gauss_mu
 
 
@@ -347,8 +316,7 @@ def _get_coord(features, axis):
   Args:
     features: A tensor of shape [B, F_h, F_w, K] where K is the number of
       keypoints to extract.
-    axis: `int` which axis to extract the coordinate for. Has to be the first or
-      second axis.
+    axis: `int` which axis to extract the coordinate for. Has to be axis 1 or 2.
 
   Returns:
     A tensor of shape [B, K] containing the keypoint centers along the given
@@ -399,10 +367,9 @@ class Decoder(snt.AbstractModule):
   The decoder is a standard convolutional network with ReLu activations.
   """
 
-  def __init__(self,
-               initial_filters,
-               output_size,
+  def __init__(self, initial_filters, output_size,
                output_channels=3,
+               norm_type="batch",
                name="decoder"):
     """Initialize the decoder.
 
@@ -410,6 +377,7 @@ class Decoder(snt.AbstractModule):
       initial_filters: `int` number of initial filters used in the decoder
       output_size: tuple of `int` height and width of the reconstructed image
       output_channels: `int` number of output channels, for RGB use 3 (default)
+      norm_type: string, one of 'instance', 'layer', 'batch'.
       name: `str` name of the module
     """
     super(Decoder, self).__init__(name=name)
@@ -417,6 +385,7 @@ class Decoder(snt.AbstractModule):
     self._output_height = output_size[0]
     self._output_width = output_size[1]
     self._output_channels = output_channels
+    self._norm_ctor = _NORMALIZATION_CTORS[norm_type]
 
   def _build(self, features, is_training):
     """Connect the Decoder.
@@ -440,21 +409,24 @@ class Decoder(snt.AbstractModule):
       layer += 1
       with tf.variable_scope("conv_{}".format(layer)):
         conv1 = snt.Conv2D(
-            filters, [3, 3],
+            filters,
+            [3, 3],
             stride=1,
             regularizers=regularizers,
             name="conv_{}".format(layer))
-        batch_norm_layer = snt.BatchNormV2(name="batch_normalization")
+        norm_module = self._norm_ctor(name="normalization")
 
       features = conv1(features)
-      features = batch_norm_layer(features, is_training=is_training)
+      features = _connect_module_with_kwarg_if_supported(
+          norm_module, features, "is_training", is_training)
       features = tf.nn.relu(features)
 
       if height == self._output_height:
         layer += 1
         with tf.variable_scope("conv_{}".format(layer)):
           conv2 = snt.Conv2D(
-              self._output_channels, [3, 3],
+              self._output_channels,
+              [3, 3],
               stride=1,
               regularizers=regularizers,
               name="conv_{}".format(layer))
@@ -464,14 +436,16 @@ class Decoder(snt.AbstractModule):
         layer += 1
         with tf.variable_scope("conv_{}".format(layer)):
           conv2 = snt.Conv2D(
-              filters, [3, 3],
+              filters,
+              [3, 3],
               stride=1,
               regularizers=regularizers,
               name="conv_{}".format(layer))
-          batch_norm_layer = snt.BatchNormV2(name="batch_normalization")
+          norm_module = self._norm_ctor(name="normalization")
 
         features = conv2(features)
-        features = batch_norm_layer(features, is_training=is_training)
+        features = _connect_module_with_kwarg_if_supported(
+            norm_module, features, "is_training", is_training)
         features = tf.nn.relu(features)
 
       height *= 2
@@ -485,3 +459,4 @@ class Decoder(snt.AbstractModule):
     assert width == self._output_width
 
     return features
+

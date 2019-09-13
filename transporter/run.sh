@@ -16,6 +16,6 @@
 
 python3 -m venv transporter-venv
 source transporter-venv/bin/activate
-pip install -r transporter/requirements.txt
-
-# TODO(diegolascasas): Find a runnable task for the transporter.
+pip install -r requirements.txt
+python3 transporter_test.py
+deactivate
