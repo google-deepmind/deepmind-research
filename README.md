@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [PrediNet Architecture and Relations Game Datasets](PrediNet)
 *   [Unsupervised Adversarial Training](unsupervised_adversarial_training)
 *   [Graph Matching Networks for Learning the Similarity of Graph Structured
     Objects](graph_matching_networks), ICML 2019
