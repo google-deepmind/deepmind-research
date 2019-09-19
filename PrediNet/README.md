@@ -28,7 +28,7 @@ for hexominoes and stripes - can be found [here](https://console.cloud.google.co
 ## Running the experiments
 
 The easiest way to run the code is using the publicly available [Colab](https://colab.research.google.com) kernel.
-You can run simply by clicking on [PrediNet Notebook](https://colab.research.google.com/github/deepmind/deepmind-research/PrediNet/blob/master/PrediNet.ipynb)
+You can run simply by clicking on [PrediNet Notebook](https://colab.research.google.com/github/deepmind/deepmind-research/blob/master/PrediNet/PrediNet.ipynb)
 
 Colaboratory is a free Jupyter notebook environment provided by Google that requires no setup and runs entirely in the cloud.
 You will need the following dependencies to run the code, with instructions on how to install them.
