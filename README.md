@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Deep Compressed Sensing](cs_gan), ICML 2019
 *   [Side Effects Penalties](side_effects_penalties)
 *   [PrediNet Architecture and Relations Game Datasets](PrediNet)
 *   [Unsupervised Adversarial Training](unsupervised_adversarial_training)
