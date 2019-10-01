@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Side Effects Penalties](side_effects_penalties)
 *   [PrediNet Architecture and Relations Game Datasets](PrediNet)
 *   [Unsupervised Adversarial Training](unsupervised_adversarial_training)
 *   [Graph Matching Networks for Learning the Similarity of Graph Structured
