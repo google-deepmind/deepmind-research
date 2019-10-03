@@ -28,7 +28,7 @@ https://deepmind.com/research/publications/
 *   [Deep Compressed Sensing](cs_gan), ICML 2019
 *   [Side Effects Penalties](side_effects_penalties)
 *   [PrediNet Architecture and Relations Game Datasets](PrediNet)
-*   [Unsupervised Adversarial Training](unsupervised_adversarial_training)
+*   [Unsupervised Adversarial Training](unsupervised_adversarial_training), NeurIPS 2019
 *   [Graph Matching Networks for Learning the Similarity of Graph Structured
     Objects](graph_matching_networks), ICML 2019
 *   [REGAL: Transfer Learning for Fast Optimization of Computation Graphs](regal)
