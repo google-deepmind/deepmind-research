@@ -8,8 +8,7 @@ python:
   - "3.6"
 env:
   matrix:
-    - PROJECT="regal"
-    - PROJECT="graph_matching_networks"
+    - PROJECT="cs_gan"
 before_script:
   - sudo apt-get update -qq
   - pip install --upgrade pip
