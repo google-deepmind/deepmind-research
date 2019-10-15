@@ -36,7 +36,7 @@ def combine_logged_values(*logged_values_dicts):
   for logged_values in logged_values_dicts:
     for k, v in six.iteritems(logged_values):
       if k in combined_dict:
-        raise ValueError('Key "%s" is repeated in loss logging.')
+        raise ValueError('Key "%s" is repeated in loss logging.' % k)
       combined_dict[k] = v
   return combined_dict
 
