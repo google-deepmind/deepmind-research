@@ -39,7 +39,7 @@ def main(unused_argv):
       train_supervised=True,
       blend_classes=False,
       n_steps=100000,
-      report_interval=100000,
+      report_interval=10000,
       knn_values=[],
       random_seed=1,
       encoder_kwargs={

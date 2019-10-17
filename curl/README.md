@@ -18,10 +18,15 @@ to the terminal, and other quantities can be accessed from training.py
 We recommend running these scripts in a Python
 [virtual environment](https://docs.python.org/3/tutorial/venv.html):
 
+(Assuming python3-dev is installed in your system)
+
 ```console
-python3 -m venv curl_venv
-source curl_venv/bin/activate
+python3 -m venv .curl_venv
+source .curl_venv/bin/activate
+pip install wheel
 pip install -r requirements.txt
 
-python train_main.py --dataset='mnist'
+PYTHONPATH=`pwd`/..:$PYTHONPATH python3 train_main.py --dataset='mnist'
+
+Run `deactivate` to exit the virtual environment.
 ```

@@ -49,7 +49,7 @@ def main(unused_argv):
       blend_classes=False,
       train_supervised=False,
       n_steps=100000,
-      report_interval=100000,
+      report_interval=10000,
       knn_values=[3, 5, 10],
       random_seed=1,
       encoder_kwargs={

@@ -26,7 +26,7 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 import tensorflow_probability as tfp
 
-from curl import curl
+from curl import model
 from curl import utils
 
 tfc = tf.compat.v1
@@ -46,7 +46,7 @@ DatasetTuple = collections.namedtuple('DatasetTuple', [
 
 
 def compute_purity(confusion):
-  return np.sum(np.max(confusion, axis=0)) / np.sum(confusion)
+  return np.sum(np.max(confusion, axis=0)).astype(float) / np.sum(confusion)
 
 
 def process_dataset(iterator,
@@ -224,7 +224,7 @@ def get_data_sources(dataset, dataset_kwargs, batch_size, test_batch_size,
                       test_iter, test_data, ds_info)
 
 
-def setup_training_and_eval_graphs(x, label, y, n_y, model,
+def setup_training_and_eval_graphs(x, label, y, n_y, curl_model,
                                    classify_with_samples, is_training, name):
   """Set up the graph and return ops for training or evaluation.
 
@@ -233,7 +233,7 @@ def setup_training_and_eval_graphs(x, label, y, n_y, model,
     label: tf placeholder for ground truth label.
     y: tf placeholder for some self-supervised label/prediction.
     n_y: int, dimensionality of discrete latent variable y.
-    model: snt.AbstractModule representing the CURL model.
+    curl_model: snt.AbstractModule representing the CURL model.
     classify_with_samples: bool, whether to *sample* latents for classification.
     is_training: bool, whether this graph is the training graph.
     name: str, graph name.
@@ -244,7 +244,7 @@ def setup_training_and_eval_graphs(x, label, y, n_y, model,
   """
   # kl_y_supervised is -log q(y=y_true | x)
   (log_p_x, kl_y, kl_z, log_p_x_supervised, kl_y_supervised,
-   kl_z_supervised) = model.log_prob_elbo_components(x, y)
+   kl_z_supervised) = curl_model.log_prob_elbo_components(x, y)
 
   ll = log_p_x - kl_y - kl_z
   elbo = -tf.reduce_mean(ll)
@@ -261,8 +261,8 @@ def setup_training_and_eval_graphs(x, label, y, n_y, model,
   kl_z_supervised = tf.reduce_mean(kl_z_supervised)
 
   # Evaluation.
-  hiddens = model.get_shared_rep(x, is_training=is_training)
-  cat = model.infer_cluster(hiddens)
+  hiddens = curl_model.get_shared_rep(x, is_training=is_training)
+  cat = curl_model.infer_cluster(hiddens)
   cat_probs = cat.probs
 
   confusion = tf.confusion_matrix(label, tf.argmax(cat_probs, axis=1),
@@ -271,10 +271,10 @@ def setup_training_and_eval_graphs(x, label, y, n_y, model,
             / tf.reduce_sum(confusion))
 
   if classify_with_samples:
-    latents = model.infer_latent(
+    latents = curl_model.infer_latent(
         hiddens=hiddens, y=tf.to_float(cat.sample())).sample()
   else:
-    latents = model.infer_latent(
+    latents = curl_model.infer_latent(
         hiddens=hiddens, y=tf.to_float(cat.mode())).mean()
 
   return MainOps(elbo, ll, log_p_x, kl_y, kl_z, elbo_supervised, ll_supervised,
@@ -637,16 +637,16 @@ def run_training(
   label_test = test_data[label_key]
 
   # Set up CURL modules.
-  shared_encoder = curl.SharedEncoder(name='shared_encoder', **encoder_kwargs)
-  latent_encoder = functools.partial(curl.latent_encoder_fn, n_y=n_y, n_z=n_z)
+  shared_encoder = model.SharedEncoder(name='shared_encoder', **encoder_kwargs)
+  latent_encoder = functools.partial(model.latent_encoder_fn, n_y=n_y, n_z=n_z)
   latent_encoder = snt.Module(latent_encoder, name='latent_encoder')
-  latent_decoder = functools.partial(curl.latent_decoder_fn, n_z=n_z)
+  latent_decoder = functools.partial(model.latent_decoder_fn, n_z=n_z)
   latent_decoder = snt.Module(latent_decoder, name='latent_decoder')
   cluster_encoder = functools.partial(
-      curl.cluster_encoder_fn, n_y_active=n_y_active, n_y=n_y)
+      model.cluster_encoder_fn, n_y_active=n_y_active, n_y=n_y)
   cluster_encoder = snt.Module(cluster_encoder, name='cluster_encoder')
   data_decoder = functools.partial(
-      curl.data_decoder_fn,
+      model.data_decoder_fn,
       output_type=output_type,
       output_shape=output_shape,
       n_x=n_x,
@@ -665,22 +665,24 @@ def run_training(
       lambda: tfp.distributions.OneHotCategorical(probs=prior_test_probs),
       name='prior_unconditional_test')
 
-  model_train = curl.Curl(
+  model_train = model.Curl(
       prior_train,
       latent_decoder,
       data_decoder,
       shared_encoder,
       cluster_encoder,
       latent_encoder,
+      n_y_active,
       is_training=True,
       name='curl_train')
-  model_eval = curl.Curl(
+  model_eval = model.Curl(
       prior_test,
       latent_decoder,
       data_decoder,
       shared_encoder,
       cluster_encoder,
       latent_encoder,
+      n_y_active,
       is_training=False,
       name='curl_test')
 
@@ -904,8 +906,15 @@ def run_training(
         # Select appropriate data source for iid or sequential setup.
         if training_data_type == 'sequential':
           current_data_period = int(
-              min(step / n_steps_per_class,
-                  len(train_data) - 1))
+              min(step / n_steps_per_class, len(train_data) - 1))
+
+          # If training supervised, set n_y_active directly based on how many
+          # classes have been seen
+          if train_supervised:
+            assert not dynamic_expansion
+            n_y_active_np = n_concurrent_classes * (
+                current_data_period // n_concurrent_classes +1)
+            n_y_active.load(n_y_active_np, sess)
 
           train_data_array = sess.run(train_data[current_data_period])
 

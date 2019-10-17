@@ -279,6 +279,7 @@ class Curl(object):
                shared_encoder,
                cluster_encoder,
                latent_encoder,
+               n_y_active,
                kly_over_batch=False,
                is_training=True,
                name='curl'):
@@ -289,6 +290,7 @@ class Curl(object):
     self._data_decoder = data_decoder
     self._cluster_encoder = cluster_encoder
     self._latent_encoder = latent_encoder
+    self._n_y_active = n_y_active
     self._kly_over_batch = kly_over_batch
     self._is_training = is_training
     self._cache = {}
@@ -392,10 +394,13 @@ class Curl(object):
       # For the next two terms, we need to marginalise over all y.
 
       # First, construct every possible y indexing (as a one hot) and repeat it
-      # for every element in the batch [n_y, B, n_y]
+      # for every element in the batch [n_y_active, B, n_y].
+      # Note that the onehot have dimension of all y, while only the codes
+      # corresponding to active components are instantiated
       bs, n_y = q_y.probs.shape
       all_y = tf.tile(
-          tf.expand_dims(tf.one_hot(tf.range(n_y), n_y), axis=1),
+          tf.expand_dims(tf.one_hot(tf.range(self._n_y_active),
+                                    n_y), axis=1),
           multiples=[1, bs, 1])
 
       # 2) Compute KL[q(z|x,y) || p(z|y)] (for all possible y), and keep z's
@@ -408,7 +413,8 @@ class Curl(object):
       kl_z_all = tf.transpose(kl_z_all, name='kl_z_all')
 
       # Now take the expectation over y (scale by q(y|x))
-      y_probs = q_y.probs  # [B, n_y]
+      y_logits = q_y.logits[:, :self._n_y_active]  # [B, n_y]
+      y_probs = q_y.probs[:, :self._n_y_active]  # [B, n_y]
       y_probs = y_probs / tf.reduce_sum(y_probs, axis=1, keepdims=True)
       kl_z = tf.reduce_sum(y_probs * kl_z_all, axis=1)
 
@@ -438,11 +444,16 @@ class Curl(object):
 
       # This is computing log p(x | z, y=true_y)], which is basically equivalent
       # to indexing into the correct element of `log_p_x_all`.
-      log_p_x_sup = tf.einsum('ij,jik->ik', self.y_label, log_p_x_all)  # [B, I]
-      kl_z_sup = tf.einsum('ij,ij->i', self.y_label, kl_z_all)  # [B]
+      log_p_x_sup = tf.einsum('ij,jik->ik',
+                              self.y_label[:, :self._n_y_active],
+                              log_p_x_all)  # [B, I]
+      kl_z_sup = tf.einsum('ij,ij->i',
+                           self.y_label[:, :self._n_y_active],
+                           kl_z_all)  # [B]
       # -log q(y=y_true | x)
       kl_y_sup = tf.nn.sparse_softmax_cross_entropy_with_logits(  # [B]
-          labels=tf.argmax(self.y_label, axis=1), logits=q_y.logits)
+          labels=tf.argmax(self.y_label[:, :self._n_y_active], axis=1),
+          logits=y_logits)
 
       # Reduce over all dimension except batch.
       dims_x = [k for k in range(1, log_p_x.shape.ndims)]
