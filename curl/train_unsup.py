@@ -65,7 +65,7 @@ def main(unused_argv):
       dynamic_expansion=False,
       ll_thresh=-0.0,
       classify_with_samples=True,
-      gen_replay_type='none',
+      gen_replay_type=None,
       use_supervised_replay=False,
       )
 

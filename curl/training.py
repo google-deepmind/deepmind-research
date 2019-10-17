@@ -525,7 +525,7 @@ def run_training(
     report_interval: int, number of steps after which to evaluate and report.
     knn_values: list of ints, k values for different k-NN classifiers to run
     (values of 3, 5, and 10 were used in different parts of the paper).
-    gen_replay_type: str, 'fixed', 'dynamic', or 'none'.
+    gen_replay_type: str, 'fixed', 'dynamic', or None.
     use_supervised_replay: str, whether to use supervised replay (aka 'SMGR').
   """
 
