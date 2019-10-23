@@ -20,10 +20,6 @@ import tensorflow as tf
 import tensorflow_gan as tfgan
 
 
-def inception_preprocess_fn(images):
-  return tfgan.eval.preprocess_image(images * 255)
-
-
 def compute_inception_score(
     images, max_classifier_batch_size=16, assert_data_ranges=True):
   """Computes the classifier score, using the given model.
@@ -62,14 +58,9 @@ def compute_inception_score(
   else:
     control_deps = []
 
-  # Do the preprocessing in the fn function to avoid having to keep all the
-  # resized data in memory.
-  def classifier_fn(images):
-    return tfgan.eval.run_inception(inception_preprocess_fn(images))
-
+  # Inception module does resizing, if necessary.
   with tf.control_dependencies(control_deps):
-    return tfgan.eval.classifier_score(
-        images, classifier_fn=classifier_fn, num_batches=num_batches)
+    return tfgan.eval.run_inception(images, num_batches=num_batches)
 
 
 def compute_fid(
@@ -113,17 +104,10 @@ def compute_fid(
   else:
     control_deps = []
 
-  # Do the preprocessing in the fn function to avoid having to keep all the
-  # resized data in memory.
-  def classifier_fn(images):
-    return tfgan.eval.run_inception(
-        inception_preprocess_fn(images),
-        output_tensor=tfgan.eval.INCEPTION_FINAL_POOL)
-
+  # Inception module does resizing, if necessary.
   with tf.control_dependencies(control_deps):
-    return tfgan.eval.frechet_classifier_distance(
-        real_images, other,
-        classifier_fn=classifier_fn, num_batches=num_batches)
+    return tfgan.eval.frechet_inception_distance(
+        real_images, other, num_batches=num_batches)
 
 
 def generate_big_batch(generator, generator_inputs, max_num_samples=100):
