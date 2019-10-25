@@ -15,6 +15,6 @@
 
 python3 -m venv transporter-venv
 source transporter-venv/bin/activate
-pip install -r requirements.txt
-python3 transporter_test.py
+pip install -r transporter/requirements.txt
+python -m transporter.transporter_test
 deactivate
