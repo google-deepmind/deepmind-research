@@ -9,6 +9,7 @@ python:
 env:
   matrix:
     - PROJECT="cs_gan"
+    - PROJECT="transporter"
 before_script:
   - sudo apt-get update -qq
   - pip install --upgrade pip
