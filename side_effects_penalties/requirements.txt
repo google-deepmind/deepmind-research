@@ -92,7 +92,7 @@ pytz==2019.2
 pyudev==0.21.0
 pyxattr==0.6.1
 pyxdg==0.25
-PyYAML==3.13
+PyYAML==5.1
 rekey==1
 reportlab==3.5.13
 requests==2.21.0
