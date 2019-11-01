@@ -64,7 +64,7 @@ pandas==0.24.2
 paramiko==2.4.2
 parse==1.6.6
 pexpect==4.6.0
-Pillow==4.3.0
+Pillow==6.2.0
 protobuf==3.6.1
 psutil==5.5.1
 pyasn1==0.4.2
