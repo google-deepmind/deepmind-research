@@ -15,6 +15,7 @@
 
 python3 -m venv cs_gan_venv
 source cs_gan_venv/bin/activate
+pip install --upgrade pip
 pip install -r cs_gan/requirements.txt
 
 python -m cs_gan.main_cs
