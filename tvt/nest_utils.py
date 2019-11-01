@@ -22,9 +22,9 @@ from __future__ import print_function
 
 import numpy as np
 from six.moves import range
-import tensorflow as tf
+from tensorflow.contrib import framework as contrib_framework
 
-nest = tf.contrib.framework.nest
+nest = contrib_framework.nest
 
 
 def _nest_apply_over_list(list_of_nests, fn):

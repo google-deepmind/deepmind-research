@@ -27,9 +27,9 @@ from pycolab import cropping
 from pycolab import things as plab_things
 from pycolab.prefab_parts import sprites as prefab_sprites
 from six.moves import zip
-import tensorflow as tf
+from tensorflow.contrib import framework as contrib_framework
 
-nest = tf.contrib.framework.nest
+nest = contrib_framework.nest
 
 # Actions.
 # Those with a negative ID are not allowed for the agent.

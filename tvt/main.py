@@ -35,8 +35,9 @@ from tvt import nest_utils
 from tvt import rma
 from tvt import tvt_rewards as tvt_module
 from tvt.pycolab import env as pycolab_env
+from tensorflow.contrib import framework as contrib_framework
 
-nest = tf.contrib.framework.nest
+nest = contrib_framework.nest
 
 FLAGS = flags.FLAGS
 

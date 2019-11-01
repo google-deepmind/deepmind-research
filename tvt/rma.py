@@ -31,8 +31,9 @@ import trfl
 
 from tvt import losses
 from tvt import memory as memory_module
+from tensorflow.contrib import framework as contrib_framework
 
-nest = tf.contrib.framework.nest
+nest = contrib_framework.nest
 
 PolicyOutputs = collections.namedtuple(
     'PolicyOutputs', ['policy', 'action', 'baseline'])

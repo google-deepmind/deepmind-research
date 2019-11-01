@@ -22,12 +22,12 @@ from __future__ import print_function
 
 import numpy as np
 from pycolab import rendering
-import tensorflow as tf
 
 from tvt.pycolab import active_visual_match
 from tvt.pycolab import key_to_door
+from tensorflow.contrib import framework as contrib_framework
 
-nest = tf.contrib.framework.nest
+nest = contrib_framework.nest
 
 
 class PycolabEnvironment(object):

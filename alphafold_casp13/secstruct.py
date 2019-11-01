@@ -19,6 +19,7 @@ import os
 from absl import logging
 import numpy as np
 import tensorflow as tf
+from tensorflow.contrib import layers as contrib_layers
 
 
 # 8-class classes (Q8)
@@ -56,8 +57,7 @@ class Secstruct(object):
     """Make the layer."""
     with tf.compat.v1.variable_scope(self.name, reuse=tf.AUTO_REUSE):
       logging.info('Creating secstruct %s', activations)
-      self.logits = tf.contrib.layers.linear(
-          activations, self._dimension)
+      self.logits = contrib_layers.linear(activations, self._dimension)
       self.ss_q8_probs = tf.nn.softmax(self.logits)
       self.ss_q3_probs = tf.matmul(
           self.ss_q8_probs, tf.constant(self.q3_map_matrix, dtype=tf.float32))
