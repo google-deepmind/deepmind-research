@@ -1,0 +1,10 @@
+absl-py==0.8.0
+dm-sonnet==1.35
+gast<0.3
+numpy==1.16.4
+scikit-learn==0.20.4
+setuptools>=41.0.0
+six==1.12.0
+tensorflow==1.14.0
+tensorflow-datasets==1.2.0
+tensorflow-probability==0.7.0
