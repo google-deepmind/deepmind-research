@@ -6,10 +6,13 @@ Continual Unsupervised Representation Learning (CURL).
 The experiments in the paper can be reproduced by running one of the three
 different training scripts:
 
+
 `train_sup.py`: to run the supervised continual learning benchmark
+
 `train_unsup.py`: to run the unsupervised i.i.d learning benchmark
+
 `train_main.py`: to run all other experiments in the paper (with details in the
-config file on what to change)
+file on what to change)
 
 In each of these cases, the cluster accuracy / purity and k-NN error are logged
 to the terminal, and other quantities can be accessed from training.py
