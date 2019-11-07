@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Trains a graph-based network to predict particle mobilities in glasses."""
+"""Applies a graph-based network to predict particle mobilities in glasses."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -31,7 +31,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string(
     'data_directory',
     '',
-    'Directory which contains the train and test datasets.')
+    'Directory which contains the train or test datasets.')
 flags.DEFINE_integer(
     'time_index',
     9,
@@ -39,25 +39,23 @@ flags.DEFINE_integer(
 flags.DEFINE_integer(
     'max_files_to_load',
     None,
-    'The maximum number of files to load from the train and test datasets.')
+    'The maximum number of files to load.')
 flags.DEFINE_string(
     'checkpoint_path',
     None,
-    'Path used to store a checkpoint of the best model.')
+    'Path used to load the model.')
 
 
 def main(argv):
   if len(argv) > 1:
     raise app.UsageError('Too many command-line arguments.')
 
-  train_file_pattern = os.path.join(FLAGS.data_directory, 'train/aggregated*')
-  test_file_pattern = os.path.join(FLAGS.data_directory, 'test/aggregated*')
-  train.train_model(
-      train_file_pattern=train_file_pattern,
-      test_file_pattern=test_file_pattern,
+  file_pattern = os.path.join(FLAGS.data_directory, 'aggregated*')
+  train.apply_model(
+      checkpoint_path=FLAGS.checkpoint_path,
+      file_pattern=file_pattern,
       max_files_to_load=FLAGS.max_files_to_load,
-      time_index=FLAGS.time_index,
-      checkpoint_path=FLAGS.checkpoint_path)
+      time_index=FLAGS.time_index)
 
 
 if __name__ == '__main__':

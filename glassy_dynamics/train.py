@@ -323,3 +323,59 @@ def train_model(train_file_pattern,
             saver.save(session.raw_session(), checkpoint_path)
 
   return best_so_far
+
+
+def apply_model(checkpoint_path,
+                file_pattern,
+                max_files_to_load = None,
+                time_index = 9):
+  """Applies trained GraphModel using tensorflow.
+
+  Args:
+    checkpoint_path: path from which the model is loaded.
+    file_pattern: pattern matching the files with the data.
+    max_files_to_load: the maximum number of files to load.
+      If None, all files will be loaded.
+    time_index: the time index (0-9) of the target mobilities.
+
+  Returns:
+    Predictions of the model for all files.
+  """
+  dataset_kwargs = dict(
+      time_index=time_index,
+      max_files_to_load=max_files_to_load)
+  data = load_data(file_pattern, **dataset_kwargs)
+
+  tf.reset_default_graph()
+  saver = tf.train.import_meta_graph(checkpoint_path + '.meta')
+  graph = tf.get_default_graph()
+
+  placeholders = GlassSimulationData(
+      positions=graph.get_tensor_by_name('Placeholder:0'),
+      targets=graph.get_tensor_by_name('Placeholder_1:0'),
+      types=graph.get_tensor_by_name('Placeholder_2:0'),
+      box=graph.get_tensor_by_name('Placeholder_3:0'))
+  prediction_tensor = graph.get_tensor_by_name('Graph_1/Squeeze:0')
+  correlation_tensor = graph.get_tensor_by_name('Squeeze:0')
+
+  dataset_handle = graph.get_tensor_by_name('Placeholder_4:0')
+  test_initalizer = graph.get_operation_by_name('MakeIterator_1')
+  test_string_handle = graph.get_tensor_by_name('IteratorToStringHandle_1:0')
+
+  with tf.Session() as session:
+    saver.restore(session, checkpoint_path)
+    handle = session.run(test_string_handle)
+    feed_dict = {p: [x[i] for x in data] for i, p in enumerate(placeholders)}
+    session.run(test_initalizer, feed_dict=feed_dict)
+    predictions = []
+    correlations = []
+    for _ in range(len(data)):
+      p, c = session.run((prediction_tensor, correlation_tensor),
+                         feed_dict={dataset_handle: handle})
+      predictions.append(p)
+      correlations.append(c)
+
+  logging.info('Correlation: %.4f +/- %.4f',
+               np.mean(correlations),
+               np.std(correlations))
+  return predictions
