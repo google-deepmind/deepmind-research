@@ -41,7 +41,7 @@ class TrainTest(tf.test.TestCase):
 
   def test_load_data(self):
     file_pattern = os.path.join(os.path.dirname(__file__), 'testdata',
-                                '*.pickle')
+                                'test_small.pickle')
 
     with self.subTest('ContentAndShapesAreAsExpected'):
       data = train.load_data(file_pattern, 0)
@@ -91,7 +91,7 @@ class TensorflowTrainTest(tf.test.TestCase):
   def test_train_model(self):
     """Tests if we can overfit to a small test dataset."""
     file_pattern = os.path.join(os.path.dirname(__file__), 'testdata',
-                                '*.pickle')
+                                'test_small.pickle')
     best_correlation_value = train.train_model(
         train_file_pattern=file_pattern,
         test_file_pattern=file_pattern,
@@ -106,6 +106,21 @@ class TensorflowTrainTest(tf.test.TestCase):
     # Therefore we expect the model to be able to memorize the targets perfectly
     # if the model works correctly.
     self.assertGreater(best_correlation_value, 0.99)
+
+  def test_apply_model(self):
+    """Tests if we can apply a model to a small test dataset."""
+    checkpoint_path = os.path.join(os.path.dirname(__file__), 'checkpoints',
+                                   't044_s09.ckpt')
+    file_pattern = os.path.join(os.path.dirname(__file__), 'testdata',
+                                'test_large.pickle')
+    predictions = train.apply_model(checkpoint_path=checkpoint_path,
+                                    file_pattern=file_pattern,
+                                    time_index=0)
+    data = train.load_data(file_pattern, 0)
+    targets = data[0].targets
+    correlation_value = np.corrcoef(predictions[0], targets)[0, 1]
+    self.assertGreater(correlation_value, 0.5)
+
 
 if __name__ == '__main__':
   tf.test.main()

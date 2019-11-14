@@ -42,7 +42,7 @@ flags.DEFINE_integer(
     'The maximum number of files to load.')
 flags.DEFINE_string(
     'checkpoint_path',
-    None,
+    'checkpoints/t044_s09.ckpt',
     'Path used to load the model.')
 
 
