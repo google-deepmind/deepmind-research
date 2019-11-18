@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Continual Unsupervised Representation Learning (CURL)](curl), NeurIPS 2019
 *   [Unsupervised Learning of Object Keypoints (Transporter)](transporter), NeurIPS 2019
 *   [BigBiGAN](bigbigan), NeurIPS 2019
 *   [Deep Compressed Sensing](cs_gan), ICML 2019
