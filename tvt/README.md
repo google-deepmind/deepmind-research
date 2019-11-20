@@ -135,23 +135,31 @@ and the control agents are doing well in the apple collecting phase, which
 contributes most of the episodic rewards, but not in the last phase.
 
 ### Key-to-door
-Across multiple replicas, we found that the TVT agents get to a score of 10,
+Across 10 replicas, we found that the TVT agents get to a score of 10,
 meaning they reliably collected the key in the explore phase to open the door in
 the exploit phase.<br>
-# ![TVT_ktd](images/TVT_KtD.png)
-On ther other hand, the performance of the RMA agent without TVT is quite
-unstable, and never goes above 7.
+# ![TVT_ktd](images/ktd_tvt.png)
+For 10 replicas without TVT and with the same hyperparameters, we see consistent
+low performance.<br>
+# ![No_TVT_ktd](images/ktd_notvt.png)
+For 5 replicas with gamma equal to 1, performance of the RMA agent without TVT
+is improved, but is unstable and never goes above 7.<br>
 # ![RMA with gamma 1_ktd](images/RMA_gamma1_KtD.png)
 
 ### Active-visual-match
-Across multiple replicas, we found that the TVT agents get to a score of 10,
+Across 10 replicas, we found that the TVT agents get to a score of 10,
 meaning they reliably searched for the pixel and remembered its color in the
 explore phase, and then touched the corresponding pixel in the exploit
 phase.<br>
-# ![TVT_vm](images/TVT_im2r.png)
-On ther other hand, the performance of the RMA agent without TVT is just a
-little bit better than chance level, indicating that it is not able to actively
-seek for information in the explore phase.<br>
+# ![TVT_vm](images/avm_tvt.png)
+For 10 replicas without TVT and with the same hyperparamters, performance is
+better than chance level but not at the maximum level, indicating that it is not
+able to actively seek for information in the explore phase and instead must rely
+on randomly encountering the information.<br>
+# ![No_TVT_vm](images/avm_tvt.png)
+For 5 replicas with gamma equal to 1, performance of the RMA agent without TVT
+is considerably worse, suggesting the behavior learnt from later phases does not
+result in undirected exploration in the first phase.
 # ![RMA with gamma 1_vm](images/RMA_gamma1_im2r.png)
 
 ## Citing this work
@@ -169,15 +177,10 @@ If you use this code in your work, please cite the accompanying paper:
                Arun Ahuja and
                Greg Wayne},
   title     = {Optimizing Agent Behavior over Long Time Scales by Transporting Value},
-  journal   = {CoRR},
-  volume    = {abs/1810.06721},
-  year      = {2018},
-  url       = {http://arxiv.org/abs/1810.06721},
-  archivePrefix = {arXiv},
-  eprint    = {1810.06721},
-  timestamp = {Tue, 30 Oct 2018 20:39:56 +0100},
-  biburl    = {https://dblp.org/rec/bib/journals/corr/abs-1810-06721},
-  bibsource = {dblp computer science bibliography, https://dblp.org}
+  journal   = {Nat Commun},
+  volume    = {10},
+  year      = {2019},
+  doi       = {https://doi.org/10.1038/s41467-019-13073-w},
 }
 ```
 
