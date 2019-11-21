@@ -3,8 +3,22 @@
 This is the example code for the following NeurIPS 2019 paper. If you use the
 code here please cite this paper:
 
-> Cyprien de Masson d'Autume, Mihaela Rosca, Jack Rae, Shakir Mohamed
-  *Training Language GANs from Scratch*.  NeurIPS 2019.  [\[arXiv\]](https://arxiv.org/abs/1905.09922).
+    @article{DBLP:journals/corr/abs-1905-09922,
+      author    = {Cyprien de Masson d'Autume and
+                   Mihaela Rosca and
+                   Jack W. Rae and
+                   Shakir Mohamed},
+      title     = {Training language GANs from Scratch},
+      journal   = {CoRR},
+      volume    = {abs/1905.09922},
+      year      = {2019},
+      url       = {http://arxiv.org/abs/1905.09922},
+      archivePrefix = {arXiv},
+      eprint    = {1905.09922},
+      timestamp = {Wed, 29 May 2019 11:27:50 +0200},
+      biburl    = {https://dblp.org/rec/bib/journals/corr/abs-1905-09922},
+      bibsource = {dblp computer science bibliography, https://dblp.org}
+    }
 
 
 ## Contents
