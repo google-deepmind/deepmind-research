@@ -27,7 +27,6 @@ from tensorflow.io import gfile
 # sequences: [N, MAX_TOKENS_SEQUENCE] array of int32
 # lengths: [N, 2] array of int32, such that
 #   lengths[i, 0] is the number of non-pad tokens in sequences[i, :]
-# TODO(cyprien): handle PTB
 FILENAMES = {
     "emnlp2017": ("train.json", "valid.json", "test.json"),
 }
