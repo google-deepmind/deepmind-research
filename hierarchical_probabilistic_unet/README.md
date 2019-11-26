@@ -40,8 +40,8 @@ link to the colab.
 ## Installation
 To install the package locally run:
 ```bash
-git clone https://github.com/deepmind/hierarchical_prob_unet .
-cd hierarchical_prob_unet
+git clone https://github.com/deepmind/deepmind-research.git .
+cd deepmind-research/hierarchical_probabilistic_unet
 pip install -e .
 ```
 
