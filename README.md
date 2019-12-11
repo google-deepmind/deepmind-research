@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Unrestricted Adversarial Challenge](unrestricted_advx)
 *   [Hierarchical Probabilistic U-Net (HPU-Net)](hierarchical_probabilistic_unet)
 *   [Training Language GANs from Scratch](scratchgan), NeurIPS 2019
 *   [Temporal Value Transport](tvt), Nature Communications 2019
