@@ -22,7 +22,7 @@ import os
 
 import numpy as np
 import six.moves.cPickle as pickle
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 
 RR_FORMAT = """PFRMAT RR

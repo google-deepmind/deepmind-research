@@ -14,7 +14,7 @@
 # limitations under the License.
 """Class for predicting Accessible Surface Area."""
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from tensorflow.contrib import layers as contrib_layers
 
 

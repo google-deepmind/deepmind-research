@@ -18,7 +18,7 @@ import collections
 import enum
 import json
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 
 _ProteinDescription = collections.namedtuple(

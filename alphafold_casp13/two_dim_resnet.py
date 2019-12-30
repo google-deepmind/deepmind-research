@@ -15,7 +15,7 @@
 """2D Resnet."""
 
 from absl import logging
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from alphafold_casp13 import two_dim_convnet
 

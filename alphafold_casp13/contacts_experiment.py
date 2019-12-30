@@ -15,7 +15,7 @@
 """Contact prediction convnet experiment example."""
 
 from absl import logging
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from alphafold_casp13 import contacts_dataset
 from alphafold_casp13 import contacts_network

@@ -16,7 +16,7 @@
 
 import pickle
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 
 def distance_histogram_dict(f):
