@@ -19,8 +19,8 @@ import math
 import os
 from absl import logging
 import numpy as np
-import tensorflow as tf
-from tensorflow.io import gfile
+import tensorflow.compat.v1 as tf
+from tensorflow.compat.v1.io import gfile
 from scratchgan import reader
 
 EVAL_FILENAME = "evaluated_checkpoints.csv"

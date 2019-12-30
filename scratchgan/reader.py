@@ -22,7 +22,7 @@ import os
 
 from absl import logging
 import numpy as np
-from tensorflow.io import gfile
+from tensorflow.compat.v1.io import gfile
 
 # sequences: [N, MAX_TOKENS_SEQUENCE] array of int32
 # lengths: [N, 2] array of int32, such that

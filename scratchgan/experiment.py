@@ -22,8 +22,8 @@ from absl import app
 from absl import flags
 from absl import logging
 import numpy as np
-import tensorflow as tf
-from tensorflow.io import gfile
+import tensorflow.compat.v1 as tf
+from tensorflow.compat.v1.io import gfile
 from scratchgan import discriminator_nets
 from scratchgan import eval_metrics
 from scratchgan import generators
