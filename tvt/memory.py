@@ -23,7 +23,7 @@ from __future__ import print_function
 import collections
 
 import sonnet as snt
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 ReadInformation = collections.namedtuple(
     'ReadInformation', ('weights', 'indices', 'keys', 'strengths'))

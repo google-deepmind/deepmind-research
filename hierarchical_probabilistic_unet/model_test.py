@@ -19,7 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 from model import HierarchicalProbUNet
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 
 _NUM_CLASSES = 2

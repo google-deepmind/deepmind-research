@@ -29,7 +29,7 @@ from absl import flags
 import cleverhans
 from cleverhans import attacks
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from tensorflow.python.ops import math_grad
 import tensorflow_hub as hub
 
