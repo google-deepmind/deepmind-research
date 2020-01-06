@@ -21,7 +21,7 @@ from __future__ import division
 from __future__ import print_function
 
 import six
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 
 def sum_time_average_batch(tensor, name=None):

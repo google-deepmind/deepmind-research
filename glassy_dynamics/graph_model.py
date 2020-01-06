@@ -30,7 +30,7 @@ from graph_nets import modules as gn_modules
 from graph_nets import utils_tf
 
 import sonnet as snt
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from typing import Any, Dict, Text, Tuple, Optional
 
 

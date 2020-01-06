@@ -26,7 +26,7 @@ from absl import logging
 import enum
 import numpy as np
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import tensorflow_probability as tfp
 
 from typing import Any, Dict, List, Optional, Text, Tuple, Sequence

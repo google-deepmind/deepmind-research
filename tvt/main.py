@@ -28,7 +28,7 @@ from absl import logging
 import numpy as np
 from six.moves import range
 from six.moves import zip
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 from tvt import batch_env
 from tvt import nest_utils
