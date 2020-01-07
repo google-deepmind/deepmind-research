@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""One dim convnet for angles prediction."""
+"""Two dimensional convolutional neural net layers."""
 
 from absl import logging
 import tensorflow.compat.v1 as tf
