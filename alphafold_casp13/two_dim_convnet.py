@@ -22,12 +22,12 @@ from tensorflow.contrib import layers as contrib_layers
 def weight_variable(shape, stddev=0.01):
   """Returns the weight variable."""
   logging.vlog(1, 'weight init for shape %s', str(shape))
-  return tf.compat.v1.get_variable(
+  return tf.get_variable(
       'w', shape, initializer=tf.random_normal_initializer(stddev=stddev))
 
 
 def bias_variable(shape):
-  return tf.compat.v1.get_variable(
+  return tf.get_variable(
       'b', shape, initializer=tf.zeros_initializer())
 
 
@@ -61,12 +61,12 @@ def make_conv_sep2d_layer(input_node,
     filter_size_2 = filter_size
   logging.vlog(1, 'layer %s in %d out %d chan mult %d', layer_name, in_channels,
                out_channels, channel_multiplier)
-  with tf.compat.v1.variable_scope(layer_name):
-    with tf.compat.v1.variable_scope('depthwise'):
+  with tf.variable_scope(layer_name):
+    with tf.variable_scope('depthwise'):
       w_depthwise = weight_variable(
           [filter_size, filter_size_2, in_channels, channel_multiplier],
           stddev=stddev)
-    with tf.compat.v1.variable_scope('pointwise'):
+    with tf.variable_scope('pointwise'):
       w_pointwise = weight_variable(
           [1, 1, in_channels * channel_multiplier, out_channels], stddev=stddev)
     h_conv = tf.nn.separable_conv2d(
@@ -119,7 +119,7 @@ def make_conv_layer(input_node,
     filter_size_2 = filter_size
   logging.vlog(
       1, 'layer %s in %d out %d', layer_name, in_channels, out_channels)
-  with tf.compat.v1.variable_scope(layer_name):
+  with tf.variable_scope(layer_name):
     w_conv = weight_variable(
         [filter_size, filter_size_2, in_channels, out_channels], stddev=stddev)
     h_conv = conv2d(

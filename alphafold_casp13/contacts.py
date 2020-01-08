@@ -71,10 +71,10 @@ def evaluate(crop_size_x, crop_size_y, feature_normalization, checkpoint_path,
       normalization_exclusion=normalization_exclusion)
 
   checkpoint = snt.get_saver(experiment.model, collections=[
-      tf.compat.v1.GraphKeys.GLOBAL_VARIABLES,
-      tf.compat.v1.GraphKeys.MOVING_AVERAGE_VARIABLES])
+      tf.GraphKeys.GLOBAL_VARIABLES,
+      tf.GraphKeys.MOVING_AVERAGE_VARIABLES])
 
-  with tf.compat.v1.train.SingularMonitoredSession(hooks=[]) as sess:
+  with tf.train.SingularMonitoredSession(hooks=[]) as sess:
     logging.info('Restoring from checkpoint %s', checkpoint_path)
     checkpoint.restore(sess, checkpoint_path)
 

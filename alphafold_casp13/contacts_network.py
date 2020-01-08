@@ -41,7 +41,7 @@ def call_on_tuple(f):
 
 
 class ContactsNet(sonnet.AbstractModule):
-  """A network to go from sequence to secondary structure."""
+  """A network to go from sequence to distance histograms."""
 
   def __init__(self,
                binary_code_bits,
@@ -102,7 +102,7 @@ class ContactsNet(sonnet.AbstractModule):
       if self.asa_multiplier > 0:
         self._asa = asa_output.ASAOutputLayer()
       if self._position_specific_bias_size:
-        self._position_specific_bias = tf.compat.v1.get_variable(
+        self._position_specific_bias = tf.get_variable(
             'position_specific_bias',
             [self._position_specific_bias_size, self._num_bins or 1],
             initializer=tf.zeros_initializer())
@@ -338,7 +338,7 @@ class ContactsNet(sonnet.AbstractModule):
     layers_forward = None
     if config_2d_deep.extra_blocks:
       # Optionally put some extra double-size blocks at the beginning.
-      with tf.compat.v1.variable_scope('Deep2DExtra'):
+      with tf.variable_scope('Deep2DExtra'):
         hidden_2d = two_dim_resnet.make_two_dim_resnet(
             input_node=hidden_2d,
             num_residues=None,  # Unused
@@ -362,7 +362,7 @@ class ContactsNet(sonnet.AbstractModule):
         if features_forward is not None:
           hidden_2d = tf.concat([hidden_2d, features_forward], 1
                                 if data_format == 'NCHW' else 3)
-    with tf.compat.v1.variable_scope('Deep2D'):
+    with tf.variable_scope('Deep2D'):
       logging.info('2d hidden shape is %s', str(hidden_2d.shape.as_list()))
       contact_pre_logits = two_dim_resnet.make_two_dim_resnet(
           input_node=hidden_2d,
