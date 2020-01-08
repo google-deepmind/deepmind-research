@@ -167,7 +167,7 @@ def parse_tfexample(raw_data, features):
   for k, v in parsed_features.items():
     new_shape = shape(feature_name=k, num_residues=num_residues)
     # Make sure the feature we are reshaping is not empty.
-    assert_non_empty = tf.compat.v1.assert_greater(
+    assert_non_empty = tf.assert_greater(
         tf.size(v), 0, name='assert_%s_non_empty' % k,
         message='The feature %s is not set in the tf.Example. Either do not '
         'request the feature or use a tf.Example that has the feature set.' % k)
@@ -245,7 +245,7 @@ def normalize_from_stats_file(
       train_mean = tf.cast(norm_stats['mean'][key], dtype=tf.float32)
       train_range = tf.sqrt(tf.cast(norm_stats['var'][key], dtype=tf.float32))
       value -= train_mean
-      value = tf.compat.v1.where(
+      value = tf.where(
           train_range > range_epsilon, value / train_range, value)
       features[key] = value
     else:

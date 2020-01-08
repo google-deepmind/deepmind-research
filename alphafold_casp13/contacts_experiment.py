@@ -22,12 +22,12 @@ from alphafold_casp13 import contacts_network
 
 
 def _int_ph(shape, name):
-  return tf.compat.v1.placeholder(
+  return tf.placeholder(
       dtype=tf.int32, shape=shape, name=('%s_placeholder' % name))
 
 
 def _float_ph(shape, name):
-  return tf.compat.v1.placeholder(
+  return tf.placeholder(
       dtype=tf.float32, shape=shape, name=('%s_placeholder' % name))
 
 
@@ -102,7 +102,7 @@ class Contacts(object):
       dataset = dataset.batch(1)
 
       # Get a batch of tensors in the legacy ProteinsDataset format.
-      iterator = tf.compat.v1.data.make_one_shot_iterator(dataset)
+      iterator = tf.data.make_one_shot_iterator(dataset)
       self._input_batch = iterator.get_next()
 
       self.num_eval_examples = sum(

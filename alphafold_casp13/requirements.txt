@@ -1,6 +1,7 @@
-absl-py>=0.8.0
-numpy>=1.16
-six>=1.12
-dm-sonnet>=1.35
+setuptools==41.0.0
+absl-py==0.8.1
+numpy==1.16
+six==1.12
+dm-sonnet==1.35
 tensorflow==1.14
 tensorflow-probability==0.7.0

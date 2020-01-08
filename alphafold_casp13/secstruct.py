@@ -55,7 +55,7 @@ class Secstruct(object):
 
   def make_layer_new(self, activations):
     """Make the layer."""
-    with tf.compat.v1.variable_scope(self.name, reuse=tf.AUTO_REUSE):
+    with tf.variable_scope(self.name, reuse=tf.AUTO_REUSE):
       logging.info('Creating secstruct %s', activations)
       self.logits = contrib_layers.linear(activations, self._dimension)
       self.ss_q8_probs = tf.nn.softmax(self.logits)
