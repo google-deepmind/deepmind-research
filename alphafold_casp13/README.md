@@ -15,10 +15,11 @@ Pushmeet Kohli, David T. Jones, David Silver, Koray Kavukcuoglu, Demis Hassabis.
 ### Dependencies
 
 *   Python 3.6+.
-*   [Abseil 0.8.0+](https://github.com/abseil/abseil-py)
-*   [Numpy 1.16+](https://numpy.org)
-*   [Six 1.12+](https://pypi.org/project/six/)
-*   [Sonnet 1.35+](https://github.com/deepmind/sonnet)
+*   [Abseil 0.8.0](https://github.com/abseil/abseil-py)
+*   [Numpy 1.16](https://numpy.org)
+*   [Six 1.12](https://pypi.org/project/six/)
+*   [Setuptools 41.0.0](https://setuptools.readthedocs.io/en/latest/)
+*   [Sonnet 1.35](https://github.com/deepmind/sonnet)
 *   [TensorFlow 1.14](https://tensorflow.org). Not compatible with TensorFlow
     2.0+.
 *   [TensorFlow Probability 0.7.0](https://www.tensorflow.org/probability)
@@ -34,10 +35,10 @@ pip install -r alphafold_casp13/requirements.txt
 
 ### Input data
 
-The dataset can be downloaded from
+The dataset to reproduce AlphaFold's CASP13 results can be downloaded from
 [Google Cloud Storage](https://console.cloud.google.com/storage/browser/alphafold_casp13_data).
 
-Download it e.g. using `wget`:
+Download it e.g. using `wget` (the file is about 43.5 GB):
 
 ```shell
 wget https://storage.googleapis.com/alphafold_casp13_data/casp13_data.zip
@@ -69,7 +70,7 @@ targets to get the contact map.
 The model checkpoints can be downloaded from
 [Google Cloud Storage](https://console.cloud.google.com/storage/browser/alphafold_casp13_data).
 
-Download them e.g. using `wget`:
+Download them e.g. using `wget` (the file is about 210 MB):
 
 ```shell
 wget https://storage.googleapis.com/alphafold_casp13_data/alphafold_casp13_weights.zip
