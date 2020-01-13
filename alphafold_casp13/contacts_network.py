@@ -16,13 +16,12 @@
 
 from absl import logging
 import sonnet
-import tensorflow.compat.v1 as tf
+import tensorflow as tf  # pylint: disable=g-explicit-tensorflow-version-import
 
 from alphafold_casp13 import asa_output
 from alphafold_casp13 import secstruct
 from alphafold_casp13 import two_dim_convnet
 from alphafold_casp13 import two_dim_resnet
-from tensorflow.contrib import layers as contrib_layers
 
 
 def call_on_tuple(f):
@@ -194,27 +193,23 @@ class ContactsNet(sonnet.AbstractModule):
                      axis=join_dim)],
           axis=collapse_dim)  # Join the two crops together.
       if self._collapsed_batch_norm:
-        embedding_1d = contrib_layers.batch_norm(
-            embedding_1d,
-            is_training=use_on_the_fly_stats,
-            fused=True,
-            decay=0.999,
-            scope='collapsed_batch_norm',
+        embedding_1d = tf.contrib.layers.batch_norm(
+            embedding_1d, is_training=use_on_the_fly_stats,
+            fused=True, decay=0.999, scope='collapsed_batch_norm',
             data_format='NHWC')
       for i, nfil in enumerate(self._filters_1d):
-        embedding_1d = contrib_layers.fully_connected(
+        embedding_1d = tf.contrib.layers.fully_connected(
             embedding_1d,
             num_outputs=nfil,
-            normalizer_fn=(contrib_layers.batch_norm
-                           if self._collapsed_batch_norm else None),
-            normalizer_params={
-                'is_training': use_on_the_fly_stats,
-                'updates_collections': None
-            },
+            normalizer_fn=(
+                tf.contrib.layers.batch_norm if self._collapsed_batch_norm
+                else None),
+            normalizer_params={'is_training': use_on_the_fly_stats,
+                               'updates_collections': None},
             scope='collapsed_embed_%d' % i)
 
       if self.torsion_multiplier > 0:
-        self.torsion_logits = contrib_layers.fully_connected(
+        self.torsion_logits = tf.contrib.layers.fully_connected(
             embedding_1d,
             num_outputs=self._torsion_bins * self._torsion_bins,
             activation_fn=None,
