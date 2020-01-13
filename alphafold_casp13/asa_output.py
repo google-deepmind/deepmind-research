@@ -14,8 +14,7 @@
 # limitations under the License.
 """Class for predicting Accessible Surface Area."""
 
-import tensorflow.compat.v1 as tf
-from tensorflow.contrib import layers as contrib_layers
+import tensorflow as tf  # pylint: disable=g-explicit-tensorflow-version-import
 
 
 class ASAOutputLayer(object):
@@ -26,9 +25,8 @@ class ASAOutputLayer(object):
 
   def compute_asa_output(self, activations):
     """Just compute the logits and outputs given activations."""
-    asa_logits = contrib_layers.linear(
-        activations,
-        1,
+    asa_logits = tf.contrib.layers.linear(
+        activations, 1,
         weights_initializer=tf.random_uniform_initializer(-0.01, 0.01),
         scope='ASALogits')
     self.asa_output = tf.nn.relu(asa_logits, name='ASA_output_relu')

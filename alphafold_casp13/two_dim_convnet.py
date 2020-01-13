@@ -15,8 +15,7 @@
 """Two dimensional convolutional neural net layers."""
 
 from absl import logging
-import tensorflow.compat.v1 as tf
-from tensorflow.contrib import layers as contrib_layers
+import tensorflow as tf  # pylint: disable=g-explicit-tensorflow-version-import
 
 
 def weight_variable(shape, stddev=0.01):
@@ -92,7 +91,7 @@ def make_conv_sep2d_layer(input_node,
 def batch_norm_layer(h_conv, layer_name, is_training=True, data_format='NCHW'):
   """Batch norm layer."""
   logging.vlog(1, 'batch norm for layer %s', layer_name)
-  return contrib_layers.batch_norm(
+  return tf.contrib.layers.batch_norm(
       h_conv,
       is_training=is_training,
       fused=True,
