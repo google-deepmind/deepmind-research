@@ -55,7 +55,6 @@ class ContactsNet(sonnet.AbstractModule):
                resolution_noise_scale,
                scalars,
                targets,
-               network_2d,
                network_2d_deep,
                torsion_bins=None,
                skip_connect=0,
@@ -88,7 +87,6 @@ class ContactsNet(sonnet.AbstractModule):
     self._torsion_bins = torsion_bins
     self._skip_connect = skip_connect
     self._targets = targets
-    self._network_2d = network_2d
     self._network_2d_deep = network_2d_deep
 
     self.asa_multiplier = asa_multiplier
