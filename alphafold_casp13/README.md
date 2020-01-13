@@ -30,8 +30,25 @@ forked `deepmind_research` repository using:
 ```shell
 python3 -m venv alphafold_venv
 source alphafold_venv/bin/activate
+pip install wheel
 pip install -r alphafold_casp13/requirements.txt
 ```
+
+## Data
+
+While the code is licensed under the Apache License, the AlphaFold weights and
+data are made available for non-commercial use only under the terms of the
+Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
+license. You can find details at:
+https://creativecommons.org/licenses/by-nc/4.0/legalcode
+
+In order to download the AlphaFold weights and data, you will need to request
+access using the
+[request form](https://docs.google.com/forms/d/1yrZXhQfSlwYnouDujrL2RkZKVBjF5AjomyF_RJ95dew/).
+
+Once you have obtained access, you can download the data from
+[Google Cloud Storage](https://console.cloud.google.com/storage/browser/alphafold_casp13_data).
+
 
 ### Input data
 
