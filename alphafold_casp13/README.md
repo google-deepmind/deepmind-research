@@ -34,6 +34,10 @@ pip install wheel
 pip install -r alphafold_casp13/requirements.txt
 ```
 
+Alternatively, you can just use the `run_eval.sh` script provided which runs
+these commands for you, see the section on running the system below for more
+details.
+
 ## Data
 
 While the code is licensed under the Apache License, the AlphaFold weights and
@@ -54,12 +58,7 @@ Once you have obtained access, you can download the data from
 
 The dataset to reproduce AlphaFold's CASP13 results can be downloaded from
 [Google Cloud Storage](https://console.cloud.google.com/storage/browser/alphafold_casp13_data).
-
-Download it e.g. using `wget` (the file is about 43.5 GB):
-
-```shell
-wget https://storage.googleapis.com/alphafold_casp13_data/casp13_data.zip
-```
+The dataset is in a file called `casp13_data.zip` which has about **43.5 GB**.
 
 The zip file contains 1 directory for each CASP13 target and a `LICENSE.md`
 file. Each target directory contains the following files:
@@ -86,12 +85,8 @@ targets to get the contact map.
 
 The model checkpoints can be downloaded from
 [Google Cloud Storage](https://console.cloud.google.com/storage/browser/alphafold_casp13_data).
-
-Download them e.g. using `wget` (the file is about 210 MB):
-
-```shell
-wget https://storage.googleapis.com/alphafold_casp13_data/alphafold_casp13_weights.zip
-```
+The model checkpoints are in a file called `alphafold_casp13_weights.zip` which
+has about **210 MB**.
 
 The zip file contains:
 
