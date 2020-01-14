@@ -27,6 +27,7 @@ TARGET_PATH="alphafold_casp13/${TARGET}"  # Path to the directory with the targe
 # Set up the virtual environment and install dependencies.
 python3 -m venv alphafold_venv
 source alphafold_venv/bin/activate
+pip install wheel
 pip install -r alphafold_casp13/requirements.txt
 
 # Create the output directory.
