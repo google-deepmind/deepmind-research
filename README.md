@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [AlphaFold CASP13](alphafold_casp13), Nature 2020
 *   [Unrestricted Adversarial Challenge](unrestricted_advx)
 *   [Hierarchical Probabilistic U-Net (HPU-Net)](hierarchical_probabilistic_unet)
 *   [Training Language GANs from Scratch](scratchgan), NeurIPS 2019
