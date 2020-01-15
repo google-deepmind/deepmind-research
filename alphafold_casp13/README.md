@@ -4,11 +4,14 @@ This package provides an implementation of the contact prediction network,
 associated model weights and CASP13 dataset as published in Nature.
 
 Any publication that discloses findings arising from using this source code must
-cite *AlphaFold: Protein structure prediction using potentials from deep
-learning* by Andrew W. Senior, Richard Evans, John Jumper, James Kirkpatrick,
-Laurent Sifre, Tim Green, Chongli Qin, Augustin Žídek, Alexander W. R. Nelson,
-Alex Bridgland, Hugo Penedones, Stig Petersen, Karen Simonyan, Steve Crossan,
+cite *Improved protein structure prediction using potentials from deep learning*
+by Andrew W. Senior, Richard Evans, John Jumper, James Kirkpatrick, Laurent
+Sifre, Tim Green, Chongli Qin, Augustin Žídek, Alexander W. R. Nelson, Alex
+Bridgland, Hugo Penedones, Stig Petersen, Karen Simonyan, Steve Crossan,
 Pushmeet Kohli, David T. Jones, David Silver, Koray Kavukcuoglu, Demis Hassabis.
+
+The paper is available at https://www.nature.com/articles/s41586-019-1923-7 (DOI
+10.1038/s41586-019-1923-7).
 
 ## Setup
 
@@ -24,8 +27,9 @@ Pushmeet Kohli, David T. Jones, David Silver, Koray Kavukcuoglu, Demis Hassabis.
     2.0+.
 *   [TensorFlow Probability 0.7.0](https://www.tensorflow.org/probability)
 
-You can set up Python virtual environment with these dependencies inside the
-forked `deepmind_research` repository using:
+You can set up Python virtual environment (you might need to install the
+`python3-venv` package first) with all needed dependencies inside the forked
+`deepmind_research` repository using:
 
 ```shell
 python3 -m venv alphafold_venv
@@ -34,33 +38,32 @@ pip install wheel
 pip install -r alphafold_casp13/requirements.txt
 ```
 
-Alternatively, you can just use the `run_eval.sh` script provided which runs
-these commands for you, see the section on running the system below for more
+Alternatively, you can just use the `run_eval.sh` script provided which will run
+these commands for you. See the section on running the system below for more
 details.
 
 ## Data
 
-While the code is licensed under the Apache License, the AlphaFold weights and
-data are made available for non-commercial use only under the terms of the
+While the code is licensed under the Apache 2.0 License, the AlphaFold weights
+and data are made available for non-commercial use only under the terms of the
 Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
 license. You can find details at:
 https://creativecommons.org/licenses/by-nc/4.0/legalcode
 
-In order to download the AlphaFold weights and data, you will need to request
-access using the
-[request form](https://docs.google.com/forms/d/1yrZXhQfSlwYnouDujrL2RkZKVBjF5AjomyF_RJ95dew/).
+You can download the data from:
 
-Once you have obtained access, you can download the data from
-[Google Cloud Storage](https://console.cloud.google.com/storage/browser/alphafold_casp13_data).
-
+*   http://bit.ly/alphafold-data-license: The data license file.
+*   http://bit.ly/alphafold-data-casp13: The dataset to reproduce AlphaFold's
+    CASP13 results.
+*   http://bit.ly/alphafold-data-weights: The model checkpoints.
 
 ### Input data
 
 The dataset to reproduce AlphaFold's CASP13 results can be downloaded from
-[Google Cloud Storage](https://console.cloud.google.com/storage/browser/alphafold_casp13_data).
-The dataset is in a file called `casp13_data.zip` which has about **43.5 GB**.
+http://bit.ly/alphafold-data-casp13. The dataset is in a single zip file called
+`casp13_data.zip` which has about **43.5 GB**.
 
-The zip file contains 1 directory for each CASP13 target and a `LICENSE.md`
+The zip file contains 1 directory for each CASP13 target and a `LICENSE.txt`
 file. Each target directory contains the following files:
 
 1.  `TARGET.tfrec` file. This is a
@@ -84,9 +87,8 @@ targets to get the contact map.
 ### Model checkpoints
 
 The model checkpoints can be downloaded from
-[Google Cloud Storage](https://console.cloud.google.com/storage/browser/alphafold_casp13_data).
-The model checkpoints are in a file called `alphafold_casp13_weights.zip` which
-has about **210 MB**.
+http://bit.ly/alphafold-data-weights. The model checkpoints are in a zip file
+called `alphafold_casp13_weights.zip` which has about **210 MB**.
 
 The zip file contains:
 
@@ -94,7 +96,7 @@ The zip file contains:
 1.  A directory `916425`. This contains the weights for the background distogram
     model.
 1.  A directory `941521`. This contains the weights for the torsion model.
-1.  `LICENSE.md`. The model checkpoints have a non-commercial license which is
+1.  `LICENSE.txt`. The model checkpoints have a non-commercial license which is
     defined in this file.
 
 Each directory with model weights contains a number of different model
@@ -109,15 +111,18 @@ used for feature normalization specific to that model.
 You can use the `run_eval.sh` script to run the entire Distogram prediction
 system. There are a few steps you need to start with:
 
-1.  Download the input data as described above. Unpack the data in the
-    directory with the code.
+1.  Download the input data as described above. Unpack the data in the directory
+    with the code.
 1.  Download the model checkpoints as described above. Unpack the data.
 1.  In `run_eval.sh` set the following:
     *   `DISTOGRAM_MODEL` to the path to the directory with the distogram model.
     *   `BACKGROUND_MODEL` to the path to the directory with the background
         model.
     *   `TORSION_MODEL` to the path to the directory with the torsion model.
-    *   `TARGET` to the path to the directory with the target input data.
+    *   `TARGET` to the name of the target.
+    *   `TARGET_PATH` to the path to the directory with the target input data.
+    *   `OUTPUT_DIR` is by default set to a new directory with a timestamp
+        within your home directory.
 
 Then run `alphafold_casp13/run_eval.sh` from the `deepmind_research` parent
 directory (you will get errors if you try running `run_eval.sh` directly from
@@ -133,8 +138,8 @@ The contact prediction works in the following way:
 1.  1 replica is launched to predict the torsions.
 1.  The predictions from the different replicas are averaged together using
     `ensemble_contact_maps.py`.
-1.  The predictions for the 64 × 64 distogram crops are pasted together using
-    `paste_contact_maps.py`.
+1.  The predictions for the 64 × 64, 128 × 128 and 256 × 256 distogram crops are
+    pasted together using `paste_contact_maps.py`.
 
 When running `run_eval.sh` the output has the following directory structure:
 
@@ -149,7 +154,8 @@ When running `run_eval.sh` the output has the following directory structure:
 *   **torsion/**: Contains 1 subfolder as there was only a single replica. This
     folder contains contains the predicted ASA, secondary structure, backbone
     torsions and a pickle file with the distogram for each crop. It also
-    contains an `ensemble` directory with the ensembled torsions.
+    contains an `ensemble` directory, which contains a copy of the predicted
+    output as there is only a single replica in this case.
 *   **pasted/**: Contains distograms obtained from the ensembled distograms by
     pasting. An RR contact map file is computed from this pasted distogram.
     **This is the final distogram that was used in the subsequent AlphaFold
@@ -159,6 +165,7 @@ When running `run_eval.sh` the output has the following directory structure:
 
 We used a version of [PDB](https://www.rcsb.org/) downloaded on 2018-03-15. The
 train/test split can be found in the `train_domains.txt` and `test_domains.txt`
-files.
+files in this repository. The split is based on the
+[CATH 2018-03-16](https://www.cathdb.info/) database.
 
 Disclaimer: This is not an official Google product.
