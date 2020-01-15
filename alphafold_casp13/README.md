@@ -52,15 +52,15 @@ https://creativecommons.org/licenses/by-nc/4.0/legalcode
 
 You can download the data from:
 
-*   http://bit.ly/alphafold-data-license: The data license file.
-*   http://bit.ly/alphafold-data-casp13: The dataset to reproduce AlphaFold's
+*   http://bit.ly/alphafold-casp13-data-license: The data license file.
+*   http://bit.ly/alphafold-casp13-data: The dataset to reproduce AlphaFold's
     CASP13 results.
-*   http://bit.ly/alphafold-data-weights: The model checkpoints.
+*   http://bit.ly/alphafold-casp13-weights: The model checkpoints.
 
 ### Input data
 
 The dataset to reproduce AlphaFold's CASP13 results can be downloaded from
-http://bit.ly/alphafold-data-casp13. The dataset is in a single zip file called
+http://bit.ly/alphafold-casp13-data. The dataset is in a single zip file called
 `casp13_data.zip` which has about **43.5 GB**.
 
 The zip file contains 1 directory for each CASP13 target and a `LICENSE.txt`
@@ -87,7 +87,7 @@ targets to get the contact map.
 ### Model checkpoints
 
 The model checkpoints can be downloaded from
-http://bit.ly/alphafold-data-weights. The model checkpoints are in a zip file
+http://bit.ly/alphafold-casp13-weights. The model checkpoints are in a zip file
 called `alphafold_casp13_weights.zip` which has about **210 MB**.
 
 The zip file contains:
