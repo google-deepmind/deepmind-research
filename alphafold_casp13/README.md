@@ -10,8 +10,9 @@ Sifre, Tim Green, Chongli Qin, Augustin Žídek, Alexander W. R. Nelson, Alex
 Bridgland, Hugo Penedones, Stig Petersen, Karen Simonyan, Steve Crossan,
 Pushmeet Kohli, David T. Jones, David Silver, Koray Kavukcuoglu, Demis Hassabis.
 
-The paper is available at https://www.nature.com/articles/s41586-019-1923-7 (DOI
-10.1038/s41586-019-1923-7).
+The paper abstract can be found on Nature's site
+[10.1038/s41586-019-1923-7](https://www.nature.com/articles/s41586-019-1923-7)
+and the full text can be accessed directly at https://rdcu.be/b0mtx.
 
 ## Setup
 
