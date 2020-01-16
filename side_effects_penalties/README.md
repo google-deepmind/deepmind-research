@@ -1,11 +1,6 @@
 # Side effects penalties
 
-This is the code for the paper [Penalizing side effects using stepwise relative
-reachability](https://arxiv.org/abs/1806.01186) by Krakovna et al (2019). It
-implements a tabular Q-learning agent with different penalties for side effects.
-Each side effects penalty consists of a deviation measure (none, unreachability,
-relative reachability, or attainable utility) and a baseline (starting state,
-inaction, or stepwise inaction).
+Side effects are unnecessary disruptions to the agent's environment while completing a task. Instead of trying to explicitly penalize all possible side effects, we give the agent a general penalty for impacting the environment, defined as a deviation from some baseline state. For example, a reversibility penalty measures unreachability (deviation) of the starting state (baseline). This code implements a tabular Q-learning agent with different impact penalties. Each penalty consists of a deviation measure (none, unreachability, relative reachability, or attainable utility), a baseline (starting state, inaction, or stepwise inaction), and some other design choices. This is the code for the paper [Penalizing side effects using stepwise relative reachability](https://arxiv.org/abs/1806.01186) by Krakovna et al (2019).
 
 ## Instructions
 
