@@ -99,11 +99,11 @@ engines such as <a href="https://g.co/datasetsearch">Google Dataset Search</a>.
   </tr>
   <tr>
     <td>url</td>
-    <td><code itemprop="url">https://github.com/deepmind/deepmind_research/regal</code></td>
+    <td><code itemprop="url">https://github.com/deepmind/deepmind-research/tree/master/regal</code></td>
   </tr>
   <tr>
     <td>sameAs</td>
-    <td><code itemprop="sameAs">https://github.com/deepmind/deepmind_research/regal</code></td>
+    <td><code itemprop="sameAs">https://github.com/deepmind/deepmind-research/tree/master/regal</code></td>
   </tr>
   <tr>
     <td>description</td>
