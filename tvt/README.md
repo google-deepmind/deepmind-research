@@ -142,9 +142,10 @@ the exploit phase.<br>
 For 10 replicas without TVT and with the same hyperparameters, we see consistent
 low performance.<br>
 # ![No_TVT_ktd](images/ktd_notvt.png)
-For 5 replicas with gamma equal to 1, performance of the RMA agent without TVT
-is improved, but is unstable and never goes above 7.<br>
-# ![RMA with gamma 1_ktd](images/RMA_gamma1_KtD.png)
+For 10 replicas without TVT and with gamma equal to 1, performance of the RMA
+agent without TVT is improved, but is unstable and never consistently goes above
+6.<br>
+# ![No_TVT_ktd_gamma1](images/ktd_no_tvt_gamma1.png)
 
 ### Active-visual-match
 Across 10 replicas, we found that the TVT agents get to a score of 10,
@@ -156,11 +157,12 @@ For 10 replicas without TVT and with the same hyperparamters, performance is
 better than chance level but not at the maximum level, indicating that it is not
 able to actively seek for information in the explore phase and instead must rely
 on randomly encountering the information.<br>
-# ![No_TVT_vm](images/avm_tvt.png)
-For 5 replicas with gamma equal to 1, performance of the RMA agent without TVT
+# ![No_TVT_vm](images/avm_notvt.png)
+For 10 replicas wihtout TVT and with gamma equal to 1, performance of the RMA
+agent without TVT
 is considerably worse, suggesting the behavior learnt from later phases does not
 result in undirected exploration in the first phase.
-# ![RMA with gamma 1_vm](images/RMA_gamma1_im2r.png)
+# ![No_TVT_vm_gamma_1](images/avm_no_tvt_gamma1.png)
 
 ## Citing this work
 
