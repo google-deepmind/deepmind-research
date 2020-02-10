@@ -145,7 +145,7 @@ low performance.<br>
 For 10 replicas without TVT and with gamma equal to 1, performance of the RMA
 agent without TVT is improved, but is unstable and never consistently goes above
 6.<br>
-# ![No_TVT_ktd_gamma1](images/ktd_no_tvt_gamma1.png)
+# ![No_TVT_ktd_gamma1](images/ktd_notvt_gamma1.png)
 
 ### Active-visual-match
 Across 10 replicas, we found that the TVT agents get to a score of 10,
@@ -162,7 +162,7 @@ For 10 replicas wihtout TVT and with gamma equal to 1, performance of the RMA
 agent without TVT
 is considerably worse, suggesting the behavior learnt from later phases does not
 result in undirected exploration in the first phase.
-# ![No_TVT_vm_gamma_1](images/avm_no_tvt_gamma1.png)
+# ![No_TVT_vm_gamma_1](images/avm_notvt_gamma1.png)
 
 ## Citing this work
 
