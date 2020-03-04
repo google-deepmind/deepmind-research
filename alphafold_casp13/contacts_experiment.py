@@ -15,7 +15,7 @@
 """Contact prediction convnet experiment example."""
 
 from absl import logging
-import tensorflow.compat.v1 as tf  # pylint: disable=g-explicit-tensorflow-version-import
+import tensorflow as tf  # pylint: disable=g-explicit-tensorflow-version-import
 
 from alphafold_casp13 import contacts_dataset
 from alphafold_casp13 import contacts_network
