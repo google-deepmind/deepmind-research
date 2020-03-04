@@ -248,14 +248,26 @@ def sequence_to_onehot(sequence):
 
 #### `deletion_probability`
 
-The fraction of sequences that had a deletion (denoteby by a lowercase letter
-in the A3M format) at this position. Example:
+The fraction of sequences that had an insert state (denoted by a lowercase
+letter in the A3M format) at this position. We used the following code to
+compute it from the HHBlits MSA in the A3M format:
 
-```
-MSA = A c r k
-      A C r k
-      A C R k
-deletion_probability = [[0], [1/3], [2/3], [1]]
+```python
+deletion_matrix = []
+for msa_sequence in hhblits_a3m_sequences:
+  deletion_vec = []
+  deletion_count = 0
+  for j in msa_sequence:
+    if j.islower():
+      deletion_count += 1
+    else:
+      deletion_vec.append(deletion_count)
+      deletion_count = 0
+  deletion_matrix.append(deletion_vec)
+
+deletion_matrix = np.array(deletion_matrix)
+deletion_matrix[deletion_matrix != 0] = 1.0
+deletion_probability = deletion_matrix.sum(axis=0) / len(deletion_matrix)
 ```
 
 #### `gap_matrix`
