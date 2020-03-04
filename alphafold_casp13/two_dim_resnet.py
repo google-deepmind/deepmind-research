@@ -15,7 +15,7 @@
 """2D Resnet."""
 
 from absl import logging
-import tensorflow.compat.v1 as tf  # pylint: disable=g-explicit-tensorflow-version-import
+import tensorflow as tf  # pylint: disable=g-explicit-tensorflow-version-import
 
 from alphafold_casp13 import two_dim_convnet
 

@@ -16,7 +16,7 @@
 
 import pickle
 
-import tensorflow.compat.v1 as tf  # pylint: disable=g-explicit-tensorflow-version-import
+import tensorflow as tf  # pylint: disable=g-explicit-tensorflow-version-import
 
 
 def distance_histogram_dict(f):

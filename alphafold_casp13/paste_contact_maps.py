@@ -21,7 +21,7 @@ from absl import flags
 from absl import logging
 import numpy as np
 import six
-import tensorflow.compat.v1 as tf  # pylint: disable=g-explicit-tensorflow-version-import
+import tensorflow as tf  # pylint: disable=g-explicit-tensorflow-version-import
 
 from alphafold_casp13 import distogram_io
 from alphafold_casp13 import parsers

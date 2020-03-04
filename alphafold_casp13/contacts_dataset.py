@@ -18,7 +18,7 @@ import collections
 import enum
 import json
 
-import tensorflow.compat.v1 as tf  # pylint: disable=g-explicit-tensorflow-version-import
+import tensorflow as tf  # pylint: disable=g-explicit-tensorflow-version-import
 
 
 _ProteinDescription = collections.namedtuple(

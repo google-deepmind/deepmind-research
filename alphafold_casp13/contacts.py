@@ -24,7 +24,7 @@ from absl import logging
 import numpy as np
 import six
 import sonnet as snt
-import tensorflow.compat.v1 as tf  # pylint: disable=g-explicit-tensorflow-version-import
+import tensorflow as tf  # pylint: disable=g-explicit-tensorflow-version-import
 
 from alphafold_casp13 import config_dict
 from alphafold_casp13 import contacts_experiment

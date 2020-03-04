@@ -22,7 +22,7 @@ import os
 
 import numpy as np
 import six.moves.cPickle as pickle
-import tensorflow.compat.v1 as tf  # pylint: disable=g-explicit-tensorflow-version-import
+import tensorflow as tf  # pylint: disable=g-explicit-tensorflow-version-import
 
 
 RR_FORMAT = """PFRMAT RR
