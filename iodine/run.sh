@@ -34,7 +34,3 @@ python3 -m iodine.main \
   n_z=4 \
   num_components=3 \
   stop_after_steps=11
-
-# Cleanup
-deactivate
-
