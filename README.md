@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Multi-Object Representation Learning with Iterative Variational Inference (IODINE)](iodine)
 *   [AlphaFold CASP13](alphafold_casp13), Nature 2020
 *   [Unrestricted Adversarial Challenge](unrestricted_advx)
 *   [Hierarchical Probabilistic U-Net (HPU-Net)](hierarchical_probabilistic_unet)
