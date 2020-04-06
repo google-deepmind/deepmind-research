@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Unveiling the predictive power of static structure in glassy systems](glassy_dynamics), Nature Physics 2020
 *   [Multi-Object Representation Learning with Iterative Variational Inference (IODINE)](iodine)
 *   [AlphaFold CASP13](alphafold_casp13), Nature 2020
 *   [Unrestricted Adversarial Challenge](unrestricted_advx)
