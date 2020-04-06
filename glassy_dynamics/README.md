@@ -1,7 +1,8 @@
 # Unveiling the predictive power of static structure in glassy systems
 
 This repository contains an open source implementation of the graph neural
-network model described in our paper.
+network model described in our
+[paper](http://dx.doi.org/10.1038/s41567-020-0842-8).
 The model can be trained using the training binary included in this repository,
 and the dataset published with our paper.
 
@@ -9,18 +10,18 @@ and the dataset published with our paper.
 ## Abstract
 
 Despite decades of theoretical studies, the nature of the glass transition
-remains elusive and debated, while the existence of structural predictors of the
+remains elusive and debated, while the existence of structural predictors of its
 dynamics is a major open question. Recent approaches propose inferring
 predictors from a variety of human-defined features using machine learning.
-We learn the long time evolution of a glassy system solely from the initial
-particle positions and without any hand-crafted features, using a powerful
-model: graph neural networks. We show that this method strongly outperforms
-state-of-the-art methods, generalizing over a wide range of temperatures,
-pressures, and densities. In shear experiments, it predicts the location of
-rearranging particles. The structural predictors learned by our network unveil a
-correlation length which increases with larger timescales to reach the size of
-our system. Beyond glasses, our method could apply to many other physical
-systems that map to a graph of local interactions.
+Here we determine the long time evolution of a glassy system solely from the
+initial particle positions and without any hand-crafted features, using graph
+neural networks as a powerful model. We show that this method outperforms
+current state-of-the-art methods, generalizing over a wide range of
+temperatures, pressures, and densities. In shear experiments, it predicts the
+locations of rearranging particles. The structural predictors learned by our
+network exhibit a correlation length which increases with larger timescales to
+reach the size of our system. Beyond glasses, our method could apply to many
+other physical systems that map to a graph of local interaction.
 
 
 ## Dataset
@@ -70,9 +71,9 @@ crossed a periodic boundary during the simulation.
 If this repository is helpful for your research please cite the following
 publication:
 
-Unveiling the predictive power of static structure in glassysystems
-V. Bapst, T. Keck, A. Grabska-Barwinska, C. Donner, E. D. Cubuk,
-S. S. Schoenholz, A.Obika, A. W. R. Nelson, T. Back, D. Hassabis and P. Kohli
+[Unveiling the predictive power of static structure in glassy systems](http://dx.doi.org/10.1038/s41567-020-0842-8)
+V. Bapst, T. Keck, A. Grabska-Barwińska, C. Donner, E. D. Cubuk,
+S. S. Schoenholz, A. Obika, A. W. R. Nelson, T. Back, D. Hassabis and P. Kohli
 
 
 ## Disclaimer
