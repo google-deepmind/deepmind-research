@@ -20,6 +20,7 @@ from absl import app
 from absl import flags
 
 import numpy as np
+import tensorflow.compat.v1 as tf
 
 from option_keyboard import configs
 from option_keyboard import dqn_agent
@@ -103,4 +104,5 @@ def main(argv):
 
 
 if __name__ == "__main__":
+  tf.disable_v2_behavior()
   app.run(main)

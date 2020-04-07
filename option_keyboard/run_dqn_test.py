@@ -19,6 +19,8 @@
 from absl import flags
 from absl.testing import absltest
 
+import tensorflow.compat.v1 as tf
+
 from option_keyboard import run_dqn
 
 FLAGS = flags.FLAGS
@@ -32,4 +34,5 @@ class RunDQNTest(absltest.TestCase):
 
 
 if __name__ == '__main__':
+  tf.disable_v2_behavior()
   absltest.main()
