@@ -200,7 +200,7 @@ thorough explanation are explained in the section below the table. Note that
 | `hhblits_profile`                 | ❌     | float32  | `(NR, 22)`      | A profile (probability distribution over amino acid types) computed using HHBlits MSA. Encoding: 20 amino acids + 'X' + '-'. |
 | `hmm_profile`                     | ✔️      | float32  | `(NR, 30)`      | The HHBlits HHM profile (from the `-ohhm` HHBlits output file). Asterisks in the output are replaced by 0.0. See below.      |
 | `key`                             | ❌     | string   | `(1)`           | The unique id of the protein.                                                                                                |
-| `mutual_information`              | ✔️      | float32  | `(NR, NR, 1)`   | The average product corrected mutual information. See https://doi.org/10.1093/bioinformatics/btm604.                         |
+| `mutual_information`              | ❌      | float32  | `(NR, NR, 1)`   | The average product corrected mutual information. See https://doi.org/10.1093/bioinformatics/btm604.                         |
 | `non_gapped_profile`              | ✔️      | float32  | `(NR, 21)`      | A profile from amino acids only (discounting gaps). See below.                                                               |
 | `num_alignments`                  | ✔️      | int64    | `(NR, 1)`       | The number of HHBlits multiple sequence alignments. Has to be repeated `NR` times. See below.                                |
 | `num_effective_alignments`        | ❌     | float32  | `(1)`           | The number of effective alignments (neff at 62 % sequence similarity).                                                       |
