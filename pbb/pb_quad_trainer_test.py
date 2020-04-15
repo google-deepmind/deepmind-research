@@ -18,7 +18,7 @@ from __future__ import division
 from __future__ import print_function
 
 import tensorflow.compat.v1 as tf
-from tensorflow_datasets import testing
+import tensorflow_datasets as tfds
 from pbb import pb_quad
 
 
@@ -26,7 +26,7 @@ class PBQuadTrainerTest(tf.test.TestCase):
 
   def testTrain(self):
     with tf.Graph().as_default():
-      with testing.mock_data():
+      with tfds.testing.mock_data():
         layer_spec = (("mlp", (600, 600, 600, 10,), False),)
         trainer = pb_quad.PBQuad(layer_spec=layer_spec)
         trainer.build_train_ops()
