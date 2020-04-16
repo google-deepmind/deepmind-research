@@ -6,6 +6,9 @@ network model described in our
 The model can be trained using the training binary included in this repository,
 and the dataset published with our paper.
 
+Pretrained model checkpoints and the dataset are available via the
+[google cloud platform](https://console.cloud.google.com/storage/browser/deepmind-research-glassy-dynamics).
+
 
 ## Abstract
 
@@ -26,13 +29,19 @@ other physical systems that map to a graph of local interaction.
 
 ## Dataset
 
-### System description
-
 The dataset was generated with the LAMMPS molecular dynamics package.
 The simulated system has periodic boundaries and is a binary mixture of 4096
 large (A) and small (B) particles that interact via a 6-12 Lennard-Jones
 potential.
 The interaction coefficients are set for a typical Kob-Andersen configuration.
+
+### Download
+
+The dataset (and model checkpoints) can be downloaded using [gsutil](https://cloud.google.com/storage/docs/downloading-objects).
+To download the entire GCP bucket (~100GB) use:
+> gsutil -m cp -R gs://deepmind-research-glassy-dynamics .
+
+
 
 ### Data format
 
