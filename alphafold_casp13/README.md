@@ -16,6 +16,14 @@ and the full text can be accessed directly at https://rdcu.be/b0mtx.
 
 ## Setup
 
+**This code can't be used to predict structure of an arbitrary protein sequence.
+It can be used to predict structure only on the CASP13 dataset (links below).**
+The feature generation code is tightly coupled to our internal infrastructure as
+well as external tools, hence we are unable to open-source it. We give guide as
+to the features used for those accustomed to computing them below. See also
+[issue #18](https://github.com/deepmind/deepmind-research/issues/28) for more
+details.
+
 ### Dependencies
 
 *   Python 3.6+.
