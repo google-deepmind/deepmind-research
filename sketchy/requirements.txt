@@ -19,7 +19,6 @@ matplotlib==3.1.2
 numpy==1.18.1
 oauthlib==3.1.0
 opt-einsum==3.1.0
-pkg-resources==0.0.0
 protobuf==3.11.2
 pyasn1==0.4.8
 pyasn1-modules==0.2.7
