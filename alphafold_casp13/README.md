@@ -154,8 +154,8 @@ When running `run_eval.sh` the output has the following directory structure:
 
 *   **distogram/**: Contains 4 subfolders, one for each replica. Each of these
     contain the predicted ASA, secondary structure and a pickle file with the
-    distogram for each crop. It also contains an `ensemble` directory with the
-    ensembled distograms.
+    distogram for each crop (see below for more details). It also contains an
+    `ensemble` directory with the ensembled distograms.
 *   **background_distogram/**: Contains 4 subfolders, one for each replica. Each
     of these contain a pickle file with the background distogram for each crop.
     It also contains an `ensemble` directory with the ensembled background
@@ -169,6 +169,27 @@ When running `run_eval.sh` the output has the following directory structure:
     pasting. An RR contact map file is computed from this pasted distogram.
     **This is the final distogram that was used in the subsequent AlphaFold
     folding pipeline in CASP13.**
+
+### Distogram output format
+
+The distogram is a Python pickle file with a dictionary containing the following
+fields:
+
+*   `min_range`: The minimum range in Angstroms to consider in distograms.
+*   `max_range`: The range in Angstroms to consider in distograms, see
+    `num_bins` below for clarification. The upper end of the distogram is
+    `min_range + max_range`.
+*   `num_bins`: The number of bins in the distance histogram being predicted. We
+    divide the interval from `min_range` to `min_range + max_range` into this
+    many bins. The distograms were trained so that distances lower than
+    `min_range` were counted in the lowest bin and distances higher than
+    `min_range + max_range` were added to the final bin. The `num_bins - 1`
+    boundaries between bins are thus `np.linspace(0, max_range, num_bins + 1,
+    endpoint=True)[1:-1] + min_range`.
+*   `sequence`: The target sequence of amino acids of length `L`.
+*   `target`: The name of the target.
+*   `domain`: The name of the target including the domain name.
+*   `probs`: The distogram as a Numpy array of shape `[L, L, num_bins]`.
 
 ## Data splits
 
