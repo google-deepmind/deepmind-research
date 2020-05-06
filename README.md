@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [The Option Keyboard: Combining Skills in Reinforcement Learning](option_keyboard), NeurIPS 2019
 *   [VISR - Fast Task Inference with Variational Intrinsic Successor Features](visr), ICLR 2020
 *   [Unveiling the predictive power of static structure in glassy systems](glassy_dynamics), Nature Physics 2020
 *   [Multi-Object Representation Learning with Iterative Variational Inference (IODINE)](iodine)

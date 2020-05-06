@@ -1,0 +1,6 @@
+absl-py
+dm-env==1.2
+dm-sonnet==1.34
+numpy==1.16.4
+tensorflow==1.13.2
+tensorflow_probability==0.6.0
