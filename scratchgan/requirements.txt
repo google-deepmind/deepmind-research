@@ -1,7 +1,7 @@
 absl-py==0.7.1
 dm-sonnet==1.34
 numpy==1.16.4
-tensorflow==1.14
+tensorflow==1.15.2
 tensorflow-probability==0.7.0
 tensorflow-gan == 1.0.0.dev0
 tensorflow-hub == 0.6.0
