@@ -4,5 +4,5 @@ numpy
 pycolab
 six
 trfl
-tensorflow==1.13.2
+tensorflow==1.15.2
 tensorflow-probability==0.6.0
