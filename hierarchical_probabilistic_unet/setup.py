@@ -22,7 +22,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 
-REQUIRED_PACKAGES = ['numpy', 'dm-sonnet==1.35', 'tensorflow==1.14',
+REQUIRED_PACKAGES = ['numpy', 'dm-sonnet==1.35', 'tensorflow==1.15.2',
                      'tensorflow-probability==0.7.0']
 
 setup(
