@@ -236,7 +236,7 @@ thorough explanation are explained in the section below the table. Note that
 | `phi_angles`                      | ❌     | float32  | `(NR, 1)`       | The phi angles.                                                                                                              |
 | `phi_mask`                        | ❌     | int64    | `(NR, 1)`       | Mask for `phi_angles`.                                                                                                       |
 | `profile`                         | ❌     | float32  | `(NR, 21)`      | A profile (probability distribution over amino acid types) computed using PSI-BLAST. Equivalent to the output of ChkParse.   |
-| `profile_with_prior`              | ✔️      | float32  | `(NR, 22)`      | Profile which takes into account priors and Blosum matrix. See equation 5 in https://doi.org/10.1093/nar/25.17.3389.         |
+| `profile_with_prior`              | ✔️      | float32  | `(NR, 22)`      | A profile computed using HHBlits which takes into account priors and Blosum matrix. See equation 5 in https://doi.org/10.1093/nar/25.17.3389.         |
 | `profile_with_prior_without_gaps` | ✔️      | float32  | `(NR, 21)`      | Same as `profile_with_prior` but without gaps included.                                                                      |
 | `pseudo_bias`                     | ✔️      | float32  | `(NR, 22)`      | The bias computed in the MSA pseudolikelihood computation.                                                                   |
 | `pseudo_frob`                     | ✔️      | float32  | `(NR, NR, 1)`   | Frobenius norm of `pseudolikelihood` (gaps not included). Similar to the output of CCMPred.                                  |
