@@ -1,3 +1,4 @@
+# Lint as: python3
 # Copyright 2019 DeepMind Technologies Limited and Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -67,9 +68,9 @@ def reinforce_loss(disc_logits, gen_logprobs, gamma, decay):
   # Compute cumulative rewards.
   rewards_list = tf.unstack(rewards, axis=1)
   cumulative_rewards = []
-  for t in xrange(sequence_length):
+  for t in range(sequence_length):
     cum_value = tf.zeros(shape=[batch_size])
-    for s in xrange(t, sequence_length):
+    for s in range(t, sequence_length):
       cum_value += np.power(gamma, (s - t)) * rewards_list[s]
     cumulative_rewards.append(cum_value)
   cumulative_rewards = tf.stack(cumulative_rewards, axis=1)

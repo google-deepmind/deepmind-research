@@ -1,3 +1,4 @@
+# Lint as: python3
 # Copyright 2019 DeepMind Technologies Limited and Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -109,7 +110,7 @@ def train(config):
   raw_data = reader.get_raw_data(
       data_path=config.data_dir, dataset=config.dataset)
   train_data, valid_data, word_to_id = raw_data
-  id_to_word = {v: k for k, v in word_to_id.iteritems()}
+  id_to_word = {v: k for k, v in word_to_id.items()}
   vocab_size = len(word_to_id)
   max_length = reader.MAX_TOKENS_SEQUENCE[config.dataset]
   logging.info("Vocabulary size: %d", vocab_size)
@@ -124,8 +125,8 @@ def train(config):
       name="real_sequence")
   real_sequence_length = tf.placeholder(
       dtype=tf.int32, shape=[config.batch_size], name="real_sequence_length")
-  first_batch_np = iterator.next()
-  valid_batch_np = iterator_valid.next()
+  first_batch_np = next(iterator)
+  valid_batch_np = next(iterator_valid)
 
   test_real_batch = {k: tf.constant(v) for k, v in first_batch_np.items()}
   test_fake_batch = {
@@ -146,7 +147,7 @@ def train(config):
     embedding_source = utils.get_embedding_path(config.data_dir, config.dataset)
     vocab_file = "/tmp/vocab.txt"
     with gfile.GFile(vocab_file, "w") as f:
-      for i in xrange(len(id_to_word)):
+      for i in range(len(id_to_word)):
         f.write(id_to_word[i] + "\n")
     logging.info("Temporary vocab file: %s", vocab_file)
   else:
@@ -263,17 +264,17 @@ def train(config):
     if latest_ckpt:
       saver.restore(sess, latest_ckpt)
 
-    for step in xrange(config.num_steps):
-      real_data_np = iterator.next()
+    for step in range(config.num_steps):
+      real_data_np = next(iterator)
       train_feed = {
           real_sequence: real_data_np["sequence"],
           real_sequence_length: real_data_np["sequence_length"],
       }
 
       # Update generator and discriminator.
-      for _ in xrange(config.num_disc_updates):
+      for _ in range(config.num_disc_updates):
         sess.run(disc_update, feed_dict=train_feed)
-      for _ in xrange(config.num_gen_updates):
+      for _ in range(config.num_gen_updates):
         sess.run(gen_update, feed_dict=train_feed)
 
       # Reporting
@@ -325,7 +326,7 @@ def evaluate_pair(config, batch_size, checkpoint_path, data_dir, dataset,
   # Build graph.
   train_data, valid_data, word_to_id = reader.get_raw_data(
       data_dir, dataset=dataset)
-  id_to_word = {v: k for k, v in word_to_id.iteritems()}
+  id_to_word = {v: k for k, v in word_to_id.items()}
   vocab_size = len(word_to_id)
   train_iterator = reader.iterator(raw_data=train_data, batch_size=batch_size)
   valid_iterator = reader.iterator(raw_data=valid_data, batch_size=batch_size)
@@ -353,7 +354,7 @@ def evaluate_pair(config, batch_size, checkpoint_path, data_dir, dataset,
     embedding_source = utils.get_embedding_path(config.data_dir, config.dataset)
     vocab_file = "/tmp/vocab.txt"
     with gfile.GFile(vocab_file, "w") as f:
-      for i in xrange(len(id_to_word)):
+      for i in range(len(id_to_word)):
         f.write(id_to_word[i] + "\n")
     logging.info("Temporary vocab file: %s", vocab_file)
   else:
@@ -431,10 +432,10 @@ def evaluate_pair(config, batch_size, checkpoint_path, data_dir, dataset,
     logging.info("Restoring variables.")
     saver.restore(sess, checkpoint_path)
 
-    for i in xrange(num_batches):
+    for i in range(num_batches):
       logging.info("Batch %d / %d", i, num_batches)
-      train_data_np = train_iterator.next()
-      valid_data_np = valid_iterator.next()
+      train_data_np = next(train_iterator)
+      valid_data_np = next(valid_iterator)
       feed_dict = {
           train_sequence: train_data_np["sequence"],
           train_sequence_length: train_data_np["sequence_length"],
