@@ -26,7 +26,7 @@ fi
 
 DOWNLOAD_FOLDER="$1"
 NUM_PARALLEL_DOWNLOADS="4"  # set the number of download workers
-DATA_URL="https://storage.cloud.google.com/sketchy-data"
+DATA_URL="https://storage.googleapis.com/sketchy-data"
 
 function download_shards {
   # Usage: download_shards prefix num_shards
