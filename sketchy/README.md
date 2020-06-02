@@ -13,7 +13,7 @@ If you use this dataset in your research please cite
     Ksenia Konyushkova and
     Scott Reed and
     Rae Jeong and
-    Konrad {\.Z}o\l{}na and
+    Konrad Zolna and
     Yusuf Aytar and
     David Budden and
     Mel Vecerik and
@@ -99,7 +99,7 @@ sqlite3 metadata.sqlite <<< .schema
 ### Episodes
 
 - `EpisodeId`: A string of digits that uniquely identifies the episode.
-- `TaskId``: A human readable name for the task corresponding to the behavior
+- `TaskId`: A human readable name for the task corresponding to the behavior
   that generated the episode.
 - `DataPath`: The name of the episode file holding the data for this episode.
 - `EpisodeType`: A string describing the type of policy that generated the
@@ -176,11 +176,11 @@ engines such as <a href="https://g.co/datasetsearch">Google Dataset Search</a>.
   </tr>
   <tr>
     <td>url</td>
-    <td><code itemprop="url">https://github.com/deepmind/deepmind_research/sketchy</code></td>
+    <td><code itemprop="url">https://github.com/deepmind/deepmind-research/tree/master/sketchy</code></td>
   </tr>
   <tr>
     <td>sameAs</td>
-    <td><code itemprop="sameAs">https://github.com/deepmind/deepmind_research/sketchy</code></td>
+    <td><code itemprop="sameAs">https://github.com/deepmind/deepmind-research/tree/master/sketchy</code></td>
   </tr>
   <tr>
     <td>description</td>
