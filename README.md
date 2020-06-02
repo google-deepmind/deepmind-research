@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Scaling data-driven robotics with reward sketching and batch reinforcement learning](sketchy), RSS 2020
 *   [The Option Keyboard: Combining Skills in Reinforcement Learning](option_keyboard), NeurIPS 2019
 *   [VISR - Fast Task Inference with Variational Intrinsic Successor Features](visr), ICLR 2020
 *   [Unveiling the predictive power of static structure in glassy systems](glassy_dynamics), Nature Physics 2020
