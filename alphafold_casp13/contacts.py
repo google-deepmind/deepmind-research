@@ -74,7 +74,7 @@ def evaluate(crop_size_x, crop_size_y, feature_normalization, checkpoint_path,
       tf.GraphKeys.GLOBAL_VARIABLES,
       tf.GraphKeys.MOVING_AVERAGE_VARIABLES])
 
-  with tf.train.SingularMonitoredSession(hooks=[]) as sess:
+  with tf.compat.v1.train.SingularMonitoredSession(hooks=[]) as sess:
     logging.info('Restoring from checkpoint %s', checkpoint_path)
     checkpoint.restore(sess, checkpoint_path)
 

@@ -17,12 +17,12 @@ set -e
 
 # We assume the script is being run from the deepmind_research parent directory.
 
-DISTOGRAM_MODEL="alphafold_casp13/873731"  # Path to the directory with the distogram model.
-BACKGROUND_MODEL="alphafold_casp13/916425"  # Path to the directory with the background model.
-TORSION_MODEL="alphafold_casp13/941521"  # Path to the directory with the torsion model.
+DISTOGRAM_MODEL="alphafold_casp13_weights/873731"  # Path to the directory with the distogram model.
+BACKGROUND_MODEL="alphafold_casp13_weights/916425"  # Path to the directory with the background model.
+TORSION_MODEL="alphafold_casp13_weights/941521"  # Path to the directory with the torsion model.
 
 TARGET="T1019s2"  # The name of the target.
-TARGET_PATH="alphafold_casp13/${TARGET}"  # Path to the directory with the target input data.
+TARGET_PATH="alphafold_casp13/data/${TARGET}"  # Path to the directory with the target input data.
 
 # Set up the virtual environment and install dependencies.
 python3 -m venv alphafold_venv
