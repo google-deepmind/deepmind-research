@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Disentangling by Subspace Diffusion (GEOMANCER)](geomancer)
 *   [What can I do here? A theory of affordances in reinforcmenet learning](affordances_theory), ICML 2020
 *   [Scaling data-driven robotics with reward sketching and batch reinforcement learning](sketchy), RSS 2020
 *   [The Option Keyboard: Combining Skills in Reinforcement Learning](option_keyboard), NeurIPS 2019
