@@ -1,7 +1,7 @@
 # Geometric Manifold Component Estimator (GEOMANCER)
 
 This package provides an implementation of the Geometric Manifold Component
-Estimator, or GEOMANCER, as published in [Disentangling by Subspace Diffusion
+Estimator, or GEOMANCER, as described in [Disentangling by Subspace Diffusion
 (2020)](https://arxiv.org/abs/2006.12982). GEOMANCER is a nonparametric
 algorithm for disentangling, somewhat similar in spirit to Laplacian Eigenmaps
 or Vector Diffusion Maps, except instead of producing an embedding for the data,
