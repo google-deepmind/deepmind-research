@@ -196,7 +196,6 @@ def train(config):
                                                      targets_real)
     loss_fake = losses.sequential_cross_entropy_loss(disc_logits_fake,
                                                      targets_fake)
-    disc_loss = 0.5 * loss_real + 0.5 * loss_fake
 
   # Loss of the generator.
   gen_loss, cumulative_rewards, baseline = losses.reinforce_loss(
