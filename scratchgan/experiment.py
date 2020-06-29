@@ -216,8 +216,10 @@ def train(config):
   gen_vars = gen.get_all_variables()
   l2_disc = tf.reduce_sum(tf.add_n([tf.nn.l2_loss(v) for v in disc_vars]))
   l2_gen = tf.reduce_sum(tf.add_n([tf.nn.l2_loss(v) for v in gen_vars]))
-  scalar_disc_loss = tf.reduce_mean(disc_loss) + config.l2_disc * l2_disc
-  scalar_gen_loss = tf.reduce_mean(gen_loss) + config.l2_gen * l2_gen
+  scalar_loss_real = tf.reduce_sum(loss_real) / tf.reduce_sum(real_sentence_length)
+  scalar_loss_fake = tf.reduce_sum(loss_fake) / tf.reduce_sum(gen_outputs["sequence_length"])
+  scalar_disc_loss = 0.5 * scalar_loss_real + 0.5 * scalar_loss_fake + config.l2_disc * l2_disc
+  scalar_gen_loss = tf.reduce_sum(gen_loss) / tf.reduce_sum(gen_outputs["sequence_length"]) + config.l2_gen * l2_gen
 
   # Update ops.
   global_step = tf.train.get_or_create_global_step()
