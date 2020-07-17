@@ -26,8 +26,6 @@ In this suite of benchmarks, we try to focus on the following problems:
 The data is available under
 [RL Unplugged GCP bucket](https://console.cloud.google.com/storage/browser/rl_unplugged).
 
-Data loading code and examples will be available soon.
-
 ## Atari Dataset
 
 We are releasing a large and diverse dataset of gameplay following the protocol
@@ -40,7 +38,7 @@ transition include stacks of four frames to be able to do frame-stacking with
 our baselines. We release datasets for 46 Atari games. For details on how the
 dataset was generated, please refer to the paper.
 
-## Deepmind Locomotion Dataset
+## DeepMind Locomotion Dataset
 
 These tasks are made up of the corridor locomotion tasks involving the CMU
 Humanoid, for which prior efforts have either used motion capture data [Merel et
@@ -51,7 +49,7 @@ Locomotion tasks feature the combination of challenging high-DoF continuous
 control along with perception from rich egocentric observations. For details on
 how the dataset was generated, please refer to the paper.
 
-## Deepmind Control Suite Dataset
+## DeepMind Control Suite Dataset
 
 DeepMind Control Suite [Tassa et al., 2018] is a set of control tasks
 implemented in MuJoCo [Todorov et al., 2012]. We consider a subset of the tasks
@@ -72,6 +70,29 @@ partially online trained agent as described in
 We release 8 datasets in total -- with no combined challenge and easy combined
 challenge on the cartpole, walker, quadruped, and humanoid tasks. For details on
 how the dataset was generated, please refer to the paper.
+
+## Running the code
+
+### Installation
+
+* Install dependencies: `pip install requirements.txt`
+* (Optional) Setup MuJoCo license key for DM Control environments
+([instructions](https://github.com/deepmind/dm_control#requirements-and-installation)).
+* (Optional) Install
+[realworldrl_suite](https://github.com/google-research/realworldrl_suite#installation).
+
+### Atari example
+
+```
+mkdir -p /tmp/dataset/Asterix
+gsutil cp gs://rl_unplugged/atari/Asterix/run_1-00000-of-00100 \
+    /tmp/dataset/Asterix/run_1-00000-of-00001
+python atari_example.py --path=/tmp/dataset --game=Asterix
+```
+
+This copies a single shard from one of the Asterix datasets from GCP to a local
+folder, and then runs a script that loads a single example and runs a step on
+the Atari environment.
 
 ## Citation
 
