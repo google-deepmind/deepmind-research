@@ -21,7 +21,7 @@ def get_task_config():
   return dict(
       arena_size=11,
       num_channels=2,
-      max_num_steps=50,  # 5o for the actual task.
+      max_num_steps=50,  # 50 for the actual task.
       num_init_objects=10,
       object_priors=[0.5, 0.5],
       egocentric=True,
@@ -38,4 +38,28 @@ def get_pretrain_config():
       object_priors=[0.5, 0.5],
       egocentric=True,
       default_w=(1, 1),
+  )
+
+
+def get_fig4_task_config():
+  return dict(
+      arena_size=11,
+      num_channels=2,
+      max_num_steps=50,  # 50 for the actual task.
+      num_init_objects=10,
+      object_priors=[0.5, 0.5],
+      egocentric=True,
+      default_w=(1, -1),
+  )
+
+
+def get_fig5_task_config(default_w):
+  return dict(
+      arena_size=11,
+      num_channels=2,
+      max_num_steps=50,  # 50 for the actual task.
+      num_init_objects=10,
+      object_priors=[0.5, 0.5],
+      egocentric=True,
+      default_w=default_w,
   )

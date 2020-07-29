@@ -16,9 +16,13 @@
 # ============================================================================
 """Keyboard agent."""
 
+import os
+
 import numpy as np
 import sonnet as snt
 import tensorflow.compat.v1 as tf
+
+from option_keyboard import smart_module
 
 
 class Agent():
@@ -51,6 +55,7 @@ class Agent():
       optimizer_kwargs: Keyword arguments for the optimizer.
     """
 
+    tf.logging.info(policy_weights)
     self._policy_weights = tf.convert_to_tensor(
         policy_weights, dtype=tf.float32)
     self._current_policy = None
@@ -61,13 +66,16 @@ class Agent():
 
     self._n_actions = action_spec.num_values
     self._n_policies, self._n_cumulants = policy_weights.shape
-    self._network = OptionValueNet(
-        self._n_policies,
-        self._n_cumulants,
-        self._n_actions,
-        network_kwargs=network_kwargs,
-    )
 
+    def create_network():
+      return OptionValueNet(
+          self._n_policies,
+          self._n_cumulants,
+          self._n_actions,
+          network_kwargs=network_kwargs,
+      )
+
+    self._network = smart_module.SmartModuleExport(create_network)
     self._replay = []
 
     obs_spec = self._extract_observation(obs_spec)
@@ -102,6 +110,12 @@ class Agent():
     g = additional_discount * tf.expand_dims(d_t, axis=-1)
     td_error = tf.stop_gradient(c_t + g * qa_t) - qa_tm1
     loss = tf.reduce_sum(tf.square(td_error) / 2)
+
+    # Dummy calls to keyboard for SmartModule
+    _ = self._network.gpi(o_tm1[0], c_t[0])
+    _ = self._network.num_cumulants
+    _ = self._network.num_policies
+    _ = self._network.num_actions
 
     with tf.variable_scope("optimizer"):
       self._optimizer = getattr(tf.train, optimizer_name)(**optimizer_kwargs)
@@ -155,7 +169,9 @@ class Agent():
 
   def export(self, path):
     tf.logging.info("Exporting keyboard to %s", path)
-    self._saver.save(self._session, path)
+    self._network.export(
+        os.path.join(path, "tfhub"), self._session, overwrite=True)
+    self._saver.save(self._session, os.path.join(path, "checkpoints"))
 
 
 class OptionValueNet(snt.AbstractModule):

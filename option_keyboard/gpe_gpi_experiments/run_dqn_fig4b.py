@@ -14,63 +14,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""Run an experiment."""
+"""Run an experiment.
 
-import os
+Run a q-learning agent on task (1, -1).
+"""
 
 from absl import app
 from absl import flags
 
 import tensorflow.compat.v1 as tf
-import tensorflow_hub as hub
 
 from option_keyboard import configs
 from option_keyboard import dqn_agent
 from option_keyboard import environment_wrappers
 from option_keyboard import experiment
-from option_keyboard import keyboard_utils
 from option_keyboard import scavenger
-from option_keyboard import smart_module
 
 FLAGS = flags.FLAGS
 flags.DEFINE_integer("num_episodes", 10000, "Number of training episodes.")
-flags.DEFINE_integer("num_pretrain_episodes", 20000,
-                     "Number of pretraining episodes.")
-flags.DEFINE_string("keyboard_path", None, "Path to pretrained keyboard model.")
 
 
 def main(argv):
   del argv
 
-  # Pretrain the keyboard and save a checkpoint.
-  if FLAGS.keyboard_path:
-    keyboard_path = FLAGS.keyboard_path
-  else:
-    with tf.Graph().as_default():
-      export_path = "/tmp/option_keyboard/keyboard"
-      _ = keyboard_utils.create_and_train_keyboard(
-          num_episodes=FLAGS.num_pretrain_episodes, export_path=export_path)
-      keyboard_path = os.path.join(export_path, "tfhub")
-
-  # Load the keyboard.
-  keyboard = smart_module.SmartModuleImport(hub.Module(keyboard_path))
-
   # Create the task environment.
-  base_env_config = configs.get_task_config()
-  base_env = scavenger.Scavenger(**base_env_config)
-  base_env = environment_wrappers.EnvironmentWithLogging(base_env)
+  env_config = configs.get_fig4_task_config()
+  env = scavenger.Scavenger(**env_config)
+  env = environment_wrappers.EnvironmentWithLogging(env)
 
-  # Wrap the task environment with the keyboard.
-  additional_discount = 0.9
-  env = environment_wrappers.EnvironmentWithKeyboard(
-      env=base_env,
-      keyboard=keyboard,
-      keyboard_ckpt_path=None,
-      n_actions_per_dim=3,
-      additional_discount=additional_discount,
-      call_and_return=False)
-
-  # Create the player agent.
+  # Create the flat agent.
   agent = dqn_agent.Agent(
       obs_spec=env.observation_spec(),
       action_spec=env.action_spec(),
@@ -79,7 +51,7 @@ def main(argv):
           activate_final=True,
       ),
       epsilon=0.1,
-      additional_discount=additional_discount,
+      additional_discount=0.9,
       batch_size=10,
       optimizer_name="AdamOptimizer",
       optimizer_kwargs=dict(learning_rate=3e-4,))

@@ -24,6 +24,10 @@ import dm_env
 
 import numpy as np
 import tensorflow.compat.v1 as tf
+import tensorflow_hub as hub
+import tree
+
+from option_keyboard import smart_module
 
 
 class EnvironmentWithLogging(dm_env.Environment):
@@ -93,8 +97,9 @@ class EnvironmentWithKeyboard(dm_env.Environment):
         self._keyboard(tf.expand_dims(obs_ph, axis=0))[0], [obs_ph])
     session.run(tf.global_variables_initializer())
 
-    saver = tf.train.Saver(var_list=keyboard.variables)
-    saver.restore(session, keyboard_ckpt_path)
+    if keyboard_ckpt_path:
+      saver = tf.train.Saver(var_list=keyboard.variables)
+      saver.restore(session, keyboard_ckpt_path)
 
   def _compute_reward(self, option, obs):
     return np.sum(self._options_np[option] * obs["cumulants"])
@@ -152,6 +157,102 @@ class EnvironmentWithKeyboard(dm_env.Environment):
     return getattr(self._env, name)
 
 
+class EnvironmentWithKeyboardDirect(dm_env.Environment):
+  """Wraps an environment with a keyboard.
+
+  This is different from EnvironmentWithKeyboard as the actions space is not
+  discretized.
+
+  TODO(shaobohou) Merge the two implementations.
+  """
+
+  def __init__(self,
+               env,
+               keyboard,
+               keyboard_ckpt_path,
+               additional_discount,
+               call_and_return=False):
+    self._env = env
+    self._keyboard = keyboard
+    self._discount = additional_discount
+    self._call_and_return = call_and_return
+
+    obs_spec = self._extract_observation(env.observation_spec())
+    obs_ph = tf.placeholder(shape=obs_spec.shape, dtype=obs_spec.dtype)
+    option_ph = tf.placeholder(
+        shape=(keyboard.num_cumulants,), dtype=tf.float32)
+    gpi_action = self._keyboard.gpi(obs_ph, option_ph)
+
+    session = tf.Session()
+    self._gpi_action = session.make_callable(gpi_action, [obs_ph, option_ph])
+    self._keyboard_action = session.make_callable(
+        self._keyboard(tf.expand_dims(obs_ph, axis=0))[0], [obs_ph])
+    session.run(tf.global_variables_initializer())
+
+    if keyboard_ckpt_path:
+      saver = tf.train.Saver(var_list=keyboard.variables)
+      saver.restore(session, keyboard_ckpt_path)
+
+  def _compute_reward(self, option, obs):
+    assert option.shape == obs["cumulants"].shape
+    return np.sum(option * obs["cumulants"])
+
+  def reset(self):
+    return self._env.reset()
+
+  def step(self, option):
+    """Take a step in the keyboard, then the environment."""
+
+    step_count = 0
+    option_step = None
+    while True:
+      obs = self._extract_observation(self._env.observation())
+      action = self._gpi_action(obs, option)
+      action_step = self._env.step(action)
+      step_count += 1
+
+      if option_step is None:
+        option_step = action_step
+      else:
+        new_discount = (
+            option_step.discount * self._discount * action_step.discount)
+        new_reward = (
+            option_step.reward + new_discount * action_step.reward)
+        option_step = option_step._replace(
+            observation=action_step.observation,
+            reward=new_reward,
+            discount=new_discount,
+            step_type=action_step.step_type)
+
+      if action_step.last():
+        break
+
+      # Terminate option.
+      if self._compute_reward(option, action_step.observation) > 0:
+        break
+
+      if not self._call_and_return:
+        break
+
+    return option_step
+
+  def action_spec(self):
+    return dm_env.specs.BoundedArray(shape=(self._keyboard.num_cumulants,),
+                                     dtype=np.float32,
+                                     minimum=-1.0,
+                                     maximum=1.0,
+                                     name="action")
+
+  def _extract_observation(self, obs):
+    return obs["arena"]
+
+  def observation_spec(self):
+    return self._env.observation_spec()
+
+  def __getattr__(self, name):
+    return getattr(self._env, name)
+
+
 def _discretize_actions(num_actions_per_dim,
                         action_space_dim,
                         min_val=-1.0,
@@ -188,3 +289,71 @@ def _discretize_actions(num_actions_per_dim,
   logging.info("Discretized actions: %s", discretized_actions)
 
   return discretized_actions
+
+
+class EnvironmentWithLearnedPhi(dm_env.Environment):
+  """Wraps an environment with learned phi model."""
+
+  def __init__(self, env, model_path):
+    self._env = env
+
+    create_ph = lambda x: tf.placeholder(shape=x.shape, dtype=x.dtype)
+    add_batch = lambda x: tf.expand_dims(x, axis=0)
+
+    # Make session and callables.
+    with tf.Graph().as_default():
+      model = smart_module.SmartModuleImport(hub.Module(model_path))
+
+      obs_spec = env.observation_spec()
+      obs_ph = tree.map_structure(create_ph, obs_spec)
+      action_ph = tf.placeholder(shape=(), dtype=tf.int32)
+      phis = model(tree.map_structure(add_batch, obs_ph), add_batch(action_ph))
+
+      self.num_phis = phis.shape.as_list()[-1]
+      self._last_phis = np.zeros((self.num_phis,), dtype=np.float32)
+
+      session = tf.Session()
+      self._session = session
+      self._phis_fn = session.make_callable(
+          phis[0], tree.flatten([obs_ph, action_ph]))
+      self._session.run(tf.global_variables_initializer())
+
+  def reset(self):
+    self._last_phis = np.zeros((self.num_phis,), dtype=np.float32)
+    return self._env.reset()
+
+  def step(self, action):
+    """Take action in the environment and do some logging."""
+
+    phis = self._phis_fn(*tree.flatten([self._env.observation(), action]))
+    step = self._env.step(action)
+
+    if step.first():
+      phis = self._phis_fn(*tree.flatten([self._env.observation(), action]))
+      step = self._env.step(action)
+
+    step.observation["cumulants"] = phis
+    self._last_phis = phis
+
+    return step
+
+  def action_spec(self):
+    return self._env.action_spec()
+
+  def observation(self):
+    obs = self._env.observation()
+    obs["cumulants"] = self._last_phis
+    return obs
+
+  def observation_spec(self):
+    obs_spec = self._env.observation_spec()
+    obs_spec["cumulants"] = dm_env.specs.BoundedArray(
+        shape=(self.num_phis,),
+        dtype=np.float32,
+        minimum=-1e9,
+        maximum=1e9,
+        name="collected_resources")
+    return obs_spec
+
+  def __getattr__(self, name):
+    return getattr(self._env, name)

@@ -56,7 +56,8 @@ class Scavenger(auto_reset_environment.Base):
                num_init_objects=15,
                object_priors=None,
                egocentric=True,
-               rewarder=None):
+               rewarder=None,
+               aux_tasks_w=None):
     self._arena_size = arena_size
     self._num_channels = num_channels
     self._max_num_steps = max_num_steps
@@ -64,12 +65,13 @@ class Scavenger(auto_reset_environment.Base):
     self._egocentric = egocentric
     self._rewarder = (
         getattr(this_module, rewarder)() if rewarder is not None else None)
+    self._aux_tasks_w = aux_tasks_w
 
     if object_priors is None:
       self._object_priors = np.ones(num_channels) / num_channels
     else:
       assert len(object_priors) == num_channels
-      self._object_priors = np.array(object_priors)
+      self._object_priors = np.array(object_priors) / np.sum(object_priors)
 
     if default_w is None:
       self._default_w = np.ones(shape=(num_channels,))
@@ -203,10 +205,15 @@ class Scavenger(auto_reset_environment.Base):
 
     collected_resources = np.copy(self._prev_collected).astype(np.float32)
 
-    return dict(
+    obs = dict(
         arena=arena,
         cumulants=collected_resources,
     )
+    if self._aux_tasks_w is not None:
+      obs["aux_tasks_reward"] = np.dot(
+          np.array(self._aux_tasks_w), self._prev_collected).astype(np.float32)
+
+    return obs
 
   def observation_spec(self):
     arena = dm_env.specs.BoundedArray(
@@ -222,10 +229,19 @@ class Scavenger(auto_reset_environment.Base):
         maximum=1e9,
         name="collected_resources")
 
-    return dict(
+    obs_spec = dict(
         arena=arena,
         cumulants=collected_resources,
     )
+    if self._aux_tasks_w is not None:
+      obs_spec["aux_tasks_reward"] = dm_env.specs.BoundedArray(
+          shape=(len(self._aux_tasks_w),),
+          dtype=np.float32,
+          minimum=-1e9,
+          maximum=1e9,
+          name="aux_tasks_reward")
+
+    return obs_spec
 
   def action_spec(self):
     return dm_env.specs.DiscreteArray(num_values=len(Action), name="action")
