@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [MEMO: A Deep Network For Flexible Combination Of Episodic Memories](memo), ICLR 2020
 *   [RL Unplugged: Benchmarks for Offline Reinforcement Learning](rl_unplugged)
 *   [Disentangling by Subspace Diffusion (GEOMANCER)](geomancer)
 *   [What can I do here? A theory of affordances in reinforcmenet learning](affordances_theory), ICML 2020
