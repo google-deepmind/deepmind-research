@@ -75,7 +75,7 @@ how the dataset was generated, please refer to the paper.
 
 ### Installation
 
-* Install dependencies: `pip install requirements.txt`
+* Install dependencies: `pip install -r requirements.txt`
 * (Optional) Setup MuJoCo license key for DM Control environments
 ([instructions](https://github.com/deepmind/dm_control#requirements-and-installation)).
 * (Optional) Install

@@ -12,7 +12,7 @@ dm-env==1.2
 dm-reverb-nightly==0.1.0.dev20200616
 dm-sonnet==2.0.0
 dm-tree==0.1.5
-dopamine-rl==3.0.1
+dopamine-rl==3.1.2
 future==0.18.2
 gast==0.3.3
 gin-config==0.3.0
