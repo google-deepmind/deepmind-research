@@ -30,7 +30,7 @@ python3 train_keyboard.py --logtostderr --policy_weights_name=5
 
 Then generate the polar plot data as follows:
 
-python3 eval_keyboard_fig5a.py --logtostderr \
+python3 eval_keyboard_fig5.py --logtostderr \
   --keyboard_paths=/tmp/option_keyboard/keyboard_12/tfhub,/tmp/option_keyboard/keyboard_34/tfhub,/tmp/option_keyboard/keyboard_5/tfhub \
   --num_episodes=1000
 
@@ -57,11 +57,14 @@ Example outout:
  [ 0.099       0.349       0.055     ]]
 """
 
+import csv
+
 from absl import app
 from absl import flags
 
 import numpy as np
 import tensorflow.compat.v1 as tf
+from tensorflow.compat.v1.io import gfile
 import tensorflow_hub as hub
 
 from option_keyboard import configs
@@ -75,19 +78,11 @@ from option_keyboard.gpe_gpi_experiments import regressed_agent
 FLAGS = flags.FLAGS
 flags.DEFINE_integer("num_episodes", 1000, "Number of training episodes.")
 flags.DEFINE_list("keyboard_paths", [], "Path to keyboard model.")
+flags.DEFINE_string("output_path", None, "Path to write out returns.")
 
 
-def evaluate_keyboard(keyboard_path):
+def evaluate_keyboard(keyboard_path, weights_to_sweep):
   """Evaluate a keyboard."""
-
-  angles_to_sweep = np.deg2rad(np.linspace(-90, 180, num=19, endpoint=True))
-  weights_to_sweep = np.stack(
-      [np.cos(angles_to_sweep),
-       np.sin(angles_to_sweep)], axis=-1)
-  weights_to_sweep /= np.sum(
-      np.maximum(weights_to_sweep, 0.0), axis=-1, keepdims=True)
-  weights_to_sweep = np.clip(weights_to_sweep, -1000, 1000)
-  tf.logging.info(weights_to_sweep)
 
   # Load the keyboard.
   keyboard = smart_module.SmartModuleImport(hub.Module(keyboard_path))
@@ -124,19 +119,40 @@ def evaluate_keyboard(keyboard_path):
                     f"{FLAGS.num_episodes} episodes is {np.mean(returns)}")
     all_returns.append(returns)
 
-  return all_returns, weights_to_sweep
+  return all_returns
 
 
 def main(argv):
   del argv
 
+  angles_to_sweep = np.deg2rad(np.linspace(-90, 180, num=19, endpoint=True))
+  weights_to_sweep = np.stack(
+      [np.sin(angles_to_sweep),
+       np.cos(angles_to_sweep)], axis=-1)
+  weights_to_sweep /= np.sum(
+      np.maximum(weights_to_sweep, 0.0), axis=-1, keepdims=True)
+  weights_to_sweep = np.clip(weights_to_sweep, -1000, 1000)
+  tf.logging.info(weights_to_sweep)
+
   all_returns = []
   for keyboard_path in FLAGS.keyboard_paths:
-    returns, _ = evaluate_keyboard(keyboard_path)
+    returns = evaluate_keyboard(keyboard_path, weights_to_sweep)
     all_returns.append(returns)
 
   print("Results:")
   print(np.mean(all_returns, axis=-1).T)
+
+  if FLAGS.output_path:
+    with gfile.GFile(FLAGS.output_path, "w") as file:
+      writer = csv.writer(file, delimiter=" ", quoting=csv.QUOTE_MINIMAL)
+      writer.writerow(["angle", "return", "idx"])
+      for idx, returns in enumerate(all_returns):
+        for row in np.array(returns).T.tolist():
+          assert len(angles_to_sweep) == len(row)
+          for ang, val in zip(angles_to_sweep, row):
+            ang = "{:.4g}".format(ang)
+            val = "{:.4g}".format(val)
+            writer.writerow([ang, val, idx])
 
 
 if __name__ == "__main__":

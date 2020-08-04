@@ -135,13 +135,23 @@ class EnvironmentWithKeyboard(dm_env.Environment):
         break
 
       # Terminate option.
-      if self._compute_reward(option, action_step.observation) > 0:
+      if self._should_terminate(option, action_step.observation):
         break
 
       if not self._call_and_return:
         break
 
     return option_step
+
+  def _should_terminate(self, option, obs):
+    if self._compute_reward(option, obs) > 0:
+      return True
+    elif np.all(self._options_np[option] <= 0):
+      # TODO(shaobohou) A hack ensure option with non-positive weights
+      # terminates after one step
+      return True
+    else:
+      return False
 
   def action_spec(self):
     return dm_env.specs.DiscreteArray(
@@ -228,13 +238,23 @@ class EnvironmentWithKeyboardDirect(dm_env.Environment):
         break
 
       # Terminate option.
-      if self._compute_reward(option, action_step.observation) > 0:
+      if self._should_terminate(option, action_step.observation):
         break
 
       if not self._call_and_return:
         break
 
     return option_step
+
+  def _should_terminate(self, option, obs):
+    if self._compute_reward(option, obs) > 0:
+      return True
+    elif np.all(option <= 0):
+      # TODO(shaobohou) A hack ensure option with non-positive weights
+      # terminates after one step
+      return True
+    else:
+      return False
 
   def action_spec(self):
     return dm_env.specs.BoundedArray(shape=(self._keyboard.num_cumulants,),
@@ -280,10 +300,7 @@ def _discretize_actions(num_actions_per_dim,
 
   # Remove options with all zeros.
   non_zero_entries = np.sum(np.square(discretized_actions), axis=-1) != 0.0
-  # Remove options with no positive elements.
-  non_negative_entries = np.any(discretized_actions > 0, axis=-1)
-  discretized_actions = discretized_actions[np.logical_and(
-      non_zero_entries, non_negative_entries)]
+  discretized_actions = discretized_actions[non_zero_entries]
   logging.info("Total number of discretized actions: %s",
                len(discretized_actions))
   logging.info("Discretized actions: %s", discretized_actions)

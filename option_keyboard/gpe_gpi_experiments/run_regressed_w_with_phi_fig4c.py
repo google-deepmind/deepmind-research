@@ -35,7 +35,7 @@ python3 train_keyboard_with_phi.py -- --logtostderr \
 
 Finally, evaluate the keyboard with w by regression.
 
-python3 run_regressed_w_with_phi_fig4b.py -- --logtostderr \
+python3 run_regressed_w_with_phi_fig4c.py -- --logtostderr \
   --phi_model_path=/tmp/option_keyboard/phi_model_3d \
   --keyboard_path=/tmp/option_keyboard/keyboard_3d/tfhub
 """
@@ -56,9 +56,12 @@ from option_keyboard import smart_module
 from option_keyboard.gpe_gpi_experiments import regressed_agent
 
 FLAGS = flags.FLAGS
-flags.DEFINE_integer("num_episodes", 1000, "Number of training episodes.")
+flags.DEFINE_integer("num_episodes", 100, "Number of training episodes.")
+flags.DEFINE_integer("report_every", 1,
+                     "Frequency at which metrics are reported.")
 flags.DEFINE_string("phi_model_path", None, "Path to phi model.")
 flags.DEFINE_string("keyboard_path", None, "Path to keyboard model.")
+flags.DEFINE_string("output_path", None, "Path to write out training curves.")
 
 
 def main(argv):
@@ -88,16 +91,18 @@ def main(argv):
   agent = regressed_agent.Agent(
       batch_size=10,
       optimizer_name="AdamOptimizer",
-      optimizer_kwargs=dict(learning_rate=1e-1,),
+      optimizer_kwargs=dict(learning_rate=3e-2,),
       init_w=np.random.normal(size=keyboard.num_cumulants) * 0.1,
   )
 
-  experiment.run(
+  _, ema_returns = experiment.run(
       env,
       agent,
       num_episodes=FLAGS.num_episodes,
-      report_every=2,
+      report_every=FLAGS.report_every,
       num_eval_reps=100)
+  if FLAGS.output_path:
+    experiment.write_returns_to_file(FLAGS.output_path, ema_returns)
 
 
 if __name__ == "__main__":

@@ -16,7 +16,10 @@
 # ============================================================================
 """A simple training loop."""
 
+import csv
+
 from absl import logging
+from tensorflow.compat.v1.io import gfile
 
 
 def _ema(base, val, decay=0.995):
@@ -32,30 +35,41 @@ def run(env, agent, num_episodes, report_every=200, num_eval_reps=1):
     num_episodes: Number of episodes to train for.
     report_every: Frequency at which training progress are reported (episodes).
     num_eval_reps: Number of eval episodes to run per training episode.
+
+  Returns:
+    A list of dicts containing training and evaluation returns, and a list of
+    reported returns smoothed by EMA.
   """
 
-  train_returns = []
+  returns = []
+  logged_returns = []
   train_return_ema = 0.
-  eval_returns = []
   eval_return_ema = 0.
-  for episode_id in range(num_episodes):
+  for episode in range(num_episodes):
+    returns.append(dict(episode=episode))
+
     # Run a training episode.
     train_episode_return = run_episode(env, agent, is_training=True)
-    train_returns.append(train_episode_return)
     train_return_ema = _ema(train_return_ema, train_episode_return)
+    returns[-1]["train"] = train_episode_return
 
     # Run an evaluation episode.
+    returns[-1]["eval"] = []
     for _ in range(num_eval_reps):
       eval_episode_return = run_episode(env, agent, is_training=False)
-      eval_returns.append(eval_episode_return)
       eval_return_ema = _ema(eval_return_ema, eval_episode_return)
+      returns[-1]["eval"].append(eval_episode_return)
 
-    if ((episode_id + 1) % report_every) == 0:
+    if ((episode + 1) % report_every) == 0 or episode == 0:
+      logged_returns.append(
+          dict(episode=episode, train=train_return_ema, eval=[eval_return_ema]))
       logging.info("Episode %s, avg train return %.3f, avg eval return %.3f",
-                   episode_id + 1, train_return_ema, eval_return_ema)
+                   episode + 1, train_return_ema, eval_return_ema)
       if hasattr(agent, "get_logs"):
-        logging.info("Episode %s, agent logs: %s", episode_id + 1,
+        logging.info("Episode %s, agent logs: %s", episode + 1,
                      agent.get_logs())
+
+  return returns, logged_returns
 
 
 def run_episode(environment, agent, is_training=False):
@@ -75,3 +89,14 @@ def run_episode(environment, agent, is_training=False):
   episode_return = environment.episode_return
 
   return episode_return
+
+
+def write_returns_to_file(path, returns):
+  """Write returns to file."""
+
+  with gfile.GFile(path, "w") as file:
+    writer = csv.writer(file, delimiter=" ", quoting=csv.QUOTE_MINIMAL)
+    writer.writerow(["episode", "train"] +
+                    [f"eval_{idx}" for idx in range(len(returns[0]["eval"]))])
+    for row in returns:
+      writer.writerow([row["episode"], row["train"]] + row["eval"])

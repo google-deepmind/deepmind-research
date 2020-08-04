@@ -17,11 +17,10 @@
 """Smart module export/import utilities."""
 
 import inspect
-import os
 import pickle
-import shutil
 
 import tensorflow.compat.v1 as tf
+from tensorflow.compat.v1.io import gfile
 import tensorflow_hub as hub
 import tree as nest
 import wrapt
@@ -164,9 +163,9 @@ class SmartModuleExport(object):
         module_session.run(
             assign_ops, feed_dict=dict(zip(assign_phs, module_weights)))
 
-        if overwrite and os.path.exists(path):
-          shutil.rmtree(path)
-        os.makedirs(path)
+        if overwrite and gfile.exists(path):
+          gfile.rmtree(path)
+        gfile.makedirs(path)
         hub_module.export(path, module_session)
 
 

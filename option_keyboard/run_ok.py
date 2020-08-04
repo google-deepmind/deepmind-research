@@ -36,7 +36,10 @@ FLAGS = flags.FLAGS
 flags.DEFINE_integer("num_episodes", 10000, "Number of training episodes.")
 flags.DEFINE_integer("num_pretrain_episodes", 20000,
                      "Number of pretraining episodes.")
+flags.DEFINE_integer("report_every", 200,
+                     "Frequency at which metrics are reported.")
 flags.DEFINE_string("keyboard_path", None, "Path to pretrained keyboard model.")
+flags.DEFINE_string("output_path", None, "Path to write out training curves.")
 
 
 def main(argv):
@@ -84,7 +87,13 @@ def main(argv):
       optimizer_name="AdamOptimizer",
       optimizer_kwargs=dict(learning_rate=3e-4,))
 
-  experiment.run(env, agent, num_episodes=FLAGS.num_episodes)
+  _, ema_returns = experiment.run(
+      env,
+      agent,
+      num_episodes=FLAGS.num_episodes,
+      report_every=FLAGS.report_every)
+  if FLAGS.output_path:
+    experiment.write_returns_to_file(FLAGS.output_path, ema_returns)
 
 
 if __name__ == "__main__":

@@ -30,11 +30,14 @@ python3 run_true_w_fig4.py -- --logtostderr \
   --keyboard_path=/tmp/option_keyboard/keyboard_12/tfhub
 """
 
+import csv
+
 from absl import app
 from absl import flags
 
 import numpy as np
 import tensorflow.compat.v1 as tf
+from tensorflow.compat.v1.io import gfile
 import tensorflow_hub as hub
 
 from option_keyboard import configs
@@ -48,6 +51,7 @@ from option_keyboard.gpe_gpi_experiments import regressed_agent
 FLAGS = flags.FLAGS
 flags.DEFINE_integer("num_episodes", 1000, "Number of training episodes.")
 flags.DEFINE_string("keyboard_path", None, "Path to keyboard model.")
+flags.DEFINE_string("output_path", None, "Path to write out returns.")
 
 
 def main(argv):
@@ -85,6 +89,13 @@ def main(argv):
   tf.logging.info(
       f"Avg. return over {FLAGS.num_episodes} episodes is {np.mean(returns)}")
   tf.logging.info("#" * 80)
+
+  if FLAGS.output_path:
+    with gfile.GFile(FLAGS.output_path, "w") as file:
+      writer = csv.writer(file, delimiter=" ", quoting=csv.QUOTE_MINIMAL)
+      writer.writerow(["return"])
+      for val in returns:
+        writer.writerow([val])
 
 
 if __name__ == "__main__":
