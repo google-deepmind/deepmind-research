@@ -65,7 +65,7 @@ was generated, please refer to the paper.
 
 Examples in the dataset represent SARS transitions stored when running a
 partially online trained agent as described in
-[RWRL](https://arxiv.org/abs/1904.12901).
+[RWRL](https://arxiv.org/abs/2003.11881).
 
 We release 8 datasets in total -- with no combined challenge and easy combined
 challenge on the cartpole, walker, quadruped, and humanoid tasks. For details on
