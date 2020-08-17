@@ -111,10 +111,13 @@ If you use the code or data in this package, please cite:
     address = {New York, NY, USA},
     volume = {39},
     number = {4},
+    articleno = {39},
     numpages = {14},
     issn = {0730-0301},
     year = {2020},
     month = jul,
+    url = {https://doi.org/10.1145/3386569.3392474},
+    doi = {10.1145/3386569.3392474},
 }
 ```
 
