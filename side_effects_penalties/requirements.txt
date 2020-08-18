@@ -38,7 +38,7 @@ gpg==1.12.0
 gprof2dot==2017.9.19
 hg-evolve==9.2.0.dev0
 html5lib==1.0.1
-httplib2==0.11.3
+httplib2==0.18.0
 hyperlink==17.3.1
 idna==2.6
 incremental==16.10.1
