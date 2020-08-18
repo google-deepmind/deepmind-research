@@ -28,11 +28,11 @@ FLAGS = flags.FLAGS
 def main(unused_argv):
   if FLAGS.dataset == 'mnist':
     n_y = 25
-    n_y_active = 25
+    n_y_active = 1
     n_z = 50
   else:  # omniglot
     n_y = 100
-    n_y_active = 100
+    n_y_active = 1
     n_z = 100
 
   training.run_training(
@@ -50,7 +50,7 @@ def main(unused_argv):
       train_supervised=False,
       n_steps=100000,
       report_interval=10000,
-      knn_values=[3, 5, 10],
+      knn_values=[3],
       random_seed=1,
       encoder_kwargs={
           'encoder_type': 'multi',
@@ -62,8 +62,8 @@ def main(unused_argv):
           'n_dec': [500],
           'dec_up_strides': None,
       },
-      dynamic_expansion=False,
-      ll_thresh=-0.0,
+      dynamic_expansion=True,
+      ll_thresh=-200.0,
       classify_with_samples=True,
       gen_replay_type=None,
       use_supervised_replay=False,

@@ -16,6 +16,14 @@ and the full text can be accessed directly at https://rdcu.be/b0mtx.
 
 ## Setup
 
+**This code can't be used to predict structure of an arbitrary protein sequence.
+It can be used to predict structure only on the CASP13 dataset (links below).**
+The feature generation code is tightly coupled to our internal infrastructure as
+well as external tools, hence we are unable to open-source it. We give guide as
+to the features used for those accustomed to computing them below. See also
+[issue #18](https://github.com/deepmind/deepmind-research/issues/28) for more
+details.
+
 ### Dependencies
 
 *   Python 3.6+.
@@ -146,8 +154,8 @@ When running `run_eval.sh` the output has the following directory structure:
 
 *   **distogram/**: Contains 4 subfolders, one for each replica. Each of these
     contain the predicted ASA, secondary structure and a pickle file with the
-    distogram for each crop. It also contains an `ensemble` directory with the
-    ensembled distograms.
+    distogram for each crop (see below for more details). It also contains an
+    `ensemble` directory with the ensembled distograms.
 *   **background_distogram/**: Contains 4 subfolders, one for each replica. Each
     of these contain a pickle file with the background distogram for each crop.
     It also contains an `ensemble` directory with the ensembled background
@@ -161,6 +169,27 @@ When running `run_eval.sh` the output has the following directory structure:
     pasting. An RR contact map file is computed from this pasted distogram.
     **This is the final distogram that was used in the subsequent AlphaFold
     folding pipeline in CASP13.**
+
+### Distogram output format
+
+The distogram is a Python pickle file with a dictionary containing the following
+fields:
+
+*   `min_range`: The minimum range in Angstroms to consider in distograms.
+*   `max_range`: The range in Angstroms to consider in distograms, see
+    `num_bins` below for clarification. The upper end of the distogram is
+    `min_range + max_range`.
+*   `num_bins`: The number of bins in the distance histogram being predicted. We
+    divide the interval from `min_range` to `min_range + max_range` into this
+    many bins. The distograms were trained so that distances lower than
+    `min_range` were counted in the lowest bin and distances higher than
+    `min_range + max_range` were added to the final bin. The `num_bins - 1`
+    boundaries between bins are thus `np.linspace(0, max_range, num_bins + 1,
+    endpoint=True)[1:-1] + min_range`.
+*   `sequence`: The target sequence of amino acids of length `L`.
+*   `target`: The name of the target.
+*   `domain`: The name of the target including the domain name.
+*   `probs`: The distogram as a Numpy array of shape `[L, L, num_bins]`.
 
 ## Data splits
 
@@ -200,14 +229,14 @@ thorough explanation are explained in the section below the table. Note that
 | `hhblits_profile`                 | ❌     | float32  | `(NR, 22)`      | A profile (probability distribution over amino acid types) computed using HHBlits MSA. Encoding: 20 amino acids + 'X' + '-'. |
 | `hmm_profile`                     | ✔️      | float32  | `(NR, 30)`      | The HHBlits HHM profile (from the `-ohhm` HHBlits output file). Asterisks in the output are replaced by 0.0. See below.      |
 | `key`                             | ❌     | string   | `(1)`           | The unique id of the protein.                                                                                                |
-| `mutual_information`              | ✔️      | float32  | `(NR, NR, 1)`   | The average product corrected mutual information. See https://doi.org/10.1093/bioinformatics/btm604.                         |
+| `mutual_information`              | ❌      | float32  | `(NR, NR, 1)`   | The average product corrected mutual information. See https://doi.org/10.1093/bioinformatics/btm604.                         |
 | `non_gapped_profile`              | ✔️      | float32  | `(NR, 21)`      | A profile from amino acids only (discounting gaps). See below.                                                               |
 | `num_alignments`                  | ✔️      | int64    | `(NR, 1)`       | The number of HHBlits multiple sequence alignments. Has to be repeated `NR` times. See below.                                |
 | `num_effective_alignments`        | ❌     | float32  | `(1)`           | The number of effective alignments (neff at 62 % sequence similarity).                                                       |
 | `phi_angles`                      | ❌     | float32  | `(NR, 1)`       | The phi angles.                                                                                                              |
 | `phi_mask`                        | ❌     | int64    | `(NR, 1)`       | Mask for `phi_angles`.                                                                                                       |
 | `profile`                         | ❌     | float32  | `(NR, 21)`      | A profile (probability distribution over amino acid types) computed using PSI-BLAST. Equivalent to the output of ChkParse.   |
-| `profile_with_prior`              | ✔️      | float32  | `(NR, 22)`      | Profile which takes into account priors and Blosum matrix. See equation 5 in https://doi.org/10.1093/nar/25.17.3389.         |
+| `profile_with_prior`              | ✔️      | float32  | `(NR, 22)`      | A profile computed using HHBlits which takes into account priors and Blosum matrix. See equation 5 in https://doi.org/10.1093/nar/25.17.3389.         |
 | `profile_with_prior_without_gaps` | ✔️      | float32  | `(NR, 21)`      | Same as `profile_with_prior` but without gaps included.                                                                      |
 | `pseudo_bias`                     | ✔️      | float32  | `(NR, 22)`      | The bias computed in the MSA pseudolikelihood computation.                                                                   |
 | `pseudo_frob`                     | ✔️      | float32  | `(NR, NR, 1)`   | Frobenius norm of `pseudolikelihood` (gaps not included). Similar to the output of CCMPred.                                  |
@@ -248,14 +277,26 @@ def sequence_to_onehot(sequence):
 
 #### `deletion_probability`
 
-The fraction of sequences that had a deletion (denoteby by a lowercase letter
-in the A3M format) at this position. Example:
+The fraction of sequences that had an insert state (denoted by a lowercase
+letter in the A3M format) at this position. We used the following code to
+compute it from the HHBlits MSA in the A3M format:
 
-```
-MSA = A c r k
-      A C r k
-      A C R k
-deletion_probability = [[0], [1/3], [2/3], [1]]
+```python
+deletion_matrix = []
+for msa_sequence in hhblits_a3m_sequences:
+  deletion_vec = []
+  deletion_count = 0
+  for j in msa_sequence:
+    if j.islower():
+      deletion_count += 1
+    else:
+      deletion_vec.append(deletion_count)
+      deletion_count = 0
+  deletion_matrix.append(deletion_vec)
+
+deletion_matrix = np.array(deletion_matrix)
+deletion_matrix[deletion_matrix != 0] = 1.0
+deletion_probability = deletion_matrix.sum(axis=0) / len(deletion_matrix)
 ```
 
 #### `gap_matrix`

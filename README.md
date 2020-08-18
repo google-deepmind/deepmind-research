@@ -25,6 +25,16 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Catch & Carry: Reusable Neural Controllers for Vision-Guided Whole-Body Tasks](catch_carry), SIGGRAPH 2020
+*   [MEMO: A Deep Network For Flexible Combination Of Episodic Memories](memo), ICLR 2020
+*   [RL Unplugged: Benchmarks for Offline Reinforcement Learning](rl_unplugged)
+*   [Disentangling by Subspace Diffusion (GEOMANCER)](geomancer)
+*   [What can I do here? A theory of affordances in reinforcmenet learning](affordances_theory), ICML 2020
+*   [Scaling data-driven robotics with reward sketching and batch reinforcement learning](sketchy), RSS 2020
+*   [The Option Keyboard: Combining Skills in Reinforcement Learning](option_keyboard), NeurIPS 2019
+*   [VISR - Fast Task Inference with Variational Intrinsic Successor Features](visr), ICLR 2020
+*   [Unveiling the predictive power of static structure in glassy systems](glassy_dynamics), Nature Physics 2020
+*   [Multi-Object Representation Learning with Iterative Variational Inference (IODINE)](iodine)
 *   [AlphaFold CASP13](alphafold_casp13), Nature 2020
 *   [Unrestricted Adversarial Challenge](unrestricted_advx)
 *   [Hierarchical Probabilistic U-Net (HPU-Net)](hierarchical_probabilistic_unet)
