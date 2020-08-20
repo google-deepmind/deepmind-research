@@ -67,7 +67,11 @@ pretraining `train` worker) on the `TEST` set.
 
 Note that the default settings are set for large-scale training on Cloud TPUs,
 with a total batch size of 4096. To avoid the need to re-run the full
-experiment, we will make a pre-trained checkpoint available on GCP.
+experiment, we provide the following pre-trained checkpoints:
+
+- [ResNet-50 1x](https://storage.googleapis.com/deepmind-byol/checkpoints/pretrain_res50x1.pkl) (570 MB): should evaluate to ~74.4% top-1 accuracy.
+- [ResNet-200 2x](https://storage.googleapis.com/deepmind-byol/checkpoints/pretrain_res200x2.pkl) (4.6GB): should evaluate to ~79.6% top-1 accuracy.
+
 
 ### Linear evaluation
 Setting `--experiment_mode=linear-eval` will configure the main loop for
@@ -92,6 +96,19 @@ paper, one should run 5 instances of the linear-eval `train` worker (using only
 the `TRAIN` subset, and each using a different `checkpoint_root`), run the
 `eval` worker (using only the `VALID` subset) for each checkpoint, then run a
 final `eval` worker on the `TEST` set.
+
+
+### Note on batch normalization
+We found that using [Goyal et al.'s](https://arxiv.org/abs/1706.02677)
+initialization for the batch-normalization (i.e., initializing the scaling
+coefficient gamma to 0 in the last batchnorm of each residual block) led to
+more stable training, but slightly harms BYOL's performance for very large
+networks (e.g., `ResNet-50 (3x)`, `ResNet-200 (2x)`). We didn't observe any
+change in performance for smaller networks (`ResNet-50 (1x)` and `(2x)`).
+
+Results in the paper were obtained *without* this modified initialization, i.e.
+using Haiku's default of $\gamma = 1$. To fully reproduce, please remove the
+`scale_init` argument in Haiku's ResNet [BlockV1](https://github.com/deepmind/dm-haiku/blob/0673817149470d19d4c03de4a45e6409f214b61d/haiku/_src/nets/resnet.py#L99).
 
 
 ## Running on GCP
@@ -129,7 +146,9 @@ dataset (9469 training images with 10 classes). The following setup and
 hyperparameters can be used on a machine with a single V100 GPU:
 
 - in `utils/dataset.py`:
-  - update `Split.num_examples` with the figures from [tfds](https://www.tensorflow.org/datasets/catalog/imagenette) (with `Split.VALID: 0`)
+  - update `Split.num_examples` with the figures from
+  [tfds](https://www.tensorflow.org/datasets/catalog/imagenette)
+  (with `Split.VALID: 0`)
   - use `imagenette/160px-v2` in the call to `tfds.load`
   - use 128x128 px images (_i.e._, replace all instances of `224` by `128`)
   - it doesn't seem necessary to change the color normalization (make sure to
