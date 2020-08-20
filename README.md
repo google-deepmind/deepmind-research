@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Bootstrap Your Own Latent](byol)
 *   [Catch & Carry: Reusable Neural Controllers for Vision-Guided Whole-Body Tasks](catch_carry), SIGGRAPH 2020
 *   [MEMO: A Deep Network For Flexible Combination Of Episodic Memories](memo), ICLR 2020
 *   [RL Unplugged: Benchmarks for Offline Reinforcement Learning](rl_unplugged)
