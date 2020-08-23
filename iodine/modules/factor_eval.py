@@ -84,7 +84,7 @@ class FactorRegressor(snt.AbstractModule):
     for m in self._mapping:
       with tf.name_scope(m.name):
         assert m.name in latent, "{} not in {}".format(m.name, latent.keys())
-        pred = all_preds[Ellipsis, idx:idx + m.size]
+        pred = all_preds[..., idx:idx + m.size]
         predictions[m.name] = sg.guard(pred, "B, L, K, {}".format(m.size))
         idx += m.size
 
@@ -165,7 +165,7 @@ class FactorRegressor(snt.AbstractModule):
 
   @staticmethod
   def one_hot(f, nr_categories):
-    return tf.one_hot(tf.cast(f[Ellipsis, 0], tf.int32), depth=nr_categories)
+    return tf.one_hot(tf.cast(f[..., 0], tf.int32), depth=nr_categories)
 
   @staticmethod
   def angle_to_vector(theta):
@@ -194,7 +194,7 @@ def accuracy(labels, logits, assignment, mean_var_tot, num_vis):
   pred = tf.argmax(logits, axis=-1, output_type=tf.int32)
   labels = tf.argmax(labels, axis=-1, output_type=tf.int32)
   correct = tf.cast(tf.equal(labels, pred), tf.float32)
-  return tf.reduce_sum(correct * assignment[Ellipsis, 0]) / num_vis
+  return tf.reduce_sum(correct * assignment[..., 0]) / num_vis
 
 
 def r2(labels, pred, assignment, mean_var_tot, num_vis):

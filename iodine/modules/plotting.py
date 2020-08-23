@@ -83,7 +83,7 @@ def show_mask(m, ax):
 @optional_clean_ax
 def show_mat(m, ax, vmin=None, vmax=None, cmap="viridis"):
   return ax.matshow(
-      m[Ellipsis, 0], cmap=cmap, vmin=vmin, vmax=vmax, interpolation="nearest")
+      m[..., 0], cmap=cmap, vmin=vmin, vmax=vmax, interpolation="nearest")
 
 
 @optional_clean_ax
@@ -115,7 +115,7 @@ def example_plot(rinfo,
 
   show_img(image, ax=axes[0], color="#000000")
   show_img(recons, ax=axes[1], color="#000000")
-  show_mask(pred_mask[Ellipsis, 0], ax=axes[2], color="#000000")
+  show_mask(pred_mask[..., 0], ax=axes[2], color="#000000")
   for k in range(K):
     mask = pred_mask[k] if mask_components else None
     show_img(components[k], ax=axes[k + 3], color=colors[k], mask=mask)
@@ -145,7 +145,7 @@ def iterations_plot(rinfo, b=0, mask_components=False, size=2):
       nrows=nrows, ncols=ncols, figsize=(ncols * size, nrows * size))
   for t in range(T):
     show_img(recons[t, 0], ax=axes[t, 0])
-    show_mask(pred_mask[t, Ellipsis, 0], ax=axes[t, 1])
+    show_mask(pred_mask[t, ..., 0], ax=axes[t, 1])
     axes[t, 0].set_ylabel("iter {}".format(t))
     for k in range(K):
       mask = pred_mask[t, k] if mask_components else None
@@ -154,7 +154,7 @@ def iterations_plot(rinfo, b=0, mask_components=False, size=2):
   axes[0, 0].set_title("Reconstruction")
   axes[0, 1].set_title("Mask")
   show_img(image[0], ax=axes[T, 0])
-  show_mask(true_mask[0, Ellipsis, 0], ax=axes[T, 1])
+  show_mask(true_mask[0, ..., 0], ax=axes[T, 1])
   vmin = np.min(pred_mask_logits[T - 1])
   vmax = np.max(pred_mask_logits[T - 1])
 

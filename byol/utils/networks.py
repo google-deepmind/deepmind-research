@@ -27,17 +27,17 @@ class MLP(hk.Module):
 
   def __init__(
       self,
-      name,
-      hidden_size,
-      output_size,
-      bn_config,
+      name: Text,
+      hidden_size: int,
+      output_size: int,
+      bn_config: Mapping[Text, Any],
   ):
     super().__init__(name=name)
     self._hidden_size = hidden_size
     self._output_size = output_size
     self._bn_config = bn_config
 
-  def __call__(self, inputs, is_training):
+  def __call__(self, inputs: jnp.ndarray, is_training: bool) -> jnp.ndarray:
     out = hk.Linear(output_size=self._hidden_size, with_bias=True)(inputs)
     out = hk.BatchNorm(**self._bn_config)(out, is_training=is_training)
     out = jax.nn.relu(out)
@@ -55,15 +55,15 @@ class ResNetTorso(hk.Module):
 
   def __init__(
       self,
-      blocks_per_group,
-      num_classes = None,
-      bn_config = None,
-      resnet_v2 = False,
-      bottleneck = True,
-      channels_per_group = (256, 512, 1024, 2048),
-      use_projection = (True, True, True, True),
-      width_multiplier = 1,
-      name = None,
+      blocks_per_group: Sequence[int],
+      num_classes: int = None,
+      bn_config: Optional[Mapping[str, float]] = None,
+      resnet_v2: bool = False,
+      bottleneck: bool = True,
+      channels_per_group: Sequence[int] = (256, 512, 1024, 2048),
+      use_projection: Sequence[bool] = (True, True, True, True),
+      width_multiplier: int = 1,
+      name: Optional[str] = None,
   ):
     """Constructs a ResNet model.
 
@@ -155,11 +155,11 @@ class TinyResNet(ResNetTorso):
   """Tiny resnet for local runs and tests."""
 
   def __init__(self,
-               num_classes = None,
-               bn_config = None,
-               resnet_v2 = False,
-               width_multiplier = 1,
-               name = None):
+               num_classes: Optional[int] = None,
+               bn_config: Optional[Mapping[str, float]] = None,
+               resnet_v2: bool = False,
+               width_multiplier: int = 1,
+               name: Optional[str] = None):
     """Constructs a ResNet model.
 
     Args:
@@ -185,11 +185,11 @@ class ResNet18(ResNetTorso):
   """ResNet18."""
 
   def __init__(self,
-               num_classes = None,
-               bn_config = None,
-               resnet_v2 = False,
-               width_multiplier = 1,
-               name = None):
+               num_classes: Optional[int] = None,
+               bn_config: Optional[Mapping[str, float]] = None,
+               resnet_v2: bool = False,
+               width_multiplier: int = 1,
+               name: Optional[str] = None):
     """Constructs a ResNet model.
 
     Args:
@@ -215,11 +215,11 @@ class ResNet34(ResNetTorso):
   """ResNet34."""
 
   def __init__(self,
-               num_classes,
-               bn_config = None,
-               resnet_v2 = False,
-               width_multiplier = 1,
-               name = None):
+               num_classes: Optional[int],
+               bn_config: Optional[Mapping[str, float]] = None,
+               resnet_v2: bool = False,
+               width_multiplier: int = 1,
+               name: Optional[str] = None):
     """Constructs a ResNet model.
 
     Args:
@@ -245,11 +245,11 @@ class ResNet50(ResNetTorso):
   """ResNet50."""
 
   def __init__(self,
-               num_classes = None,
-               bn_config = None,
-               resnet_v2 = False,
-               width_multiplier = 1,
-               name = None):
+               num_classes: Optional[int] = None,
+               bn_config: Optional[Mapping[str, float]] = None,
+               resnet_v2: bool = False,
+               width_multiplier: int = 1,
+               name: Optional[str] = None):
     """Constructs a ResNet model.
 
     Args:
@@ -274,11 +274,11 @@ class ResNet101(ResNetTorso):
   """ResNet101."""
 
   def __init__(self,
-               num_classes,
-               bn_config = None,
-               resnet_v2 = False,
-               width_multiplier = 1,
-               name = None):
+               num_classes: Optional[int],
+               bn_config: Optional[Mapping[str, float]] = None,
+               resnet_v2: bool = False,
+               width_multiplier: int = 1,
+               name: Optional[str] = None):
     """Constructs a ResNet model.
 
     Args:
@@ -303,11 +303,11 @@ class ResNet152(ResNetTorso):
   """ResNet152."""
 
   def __init__(self,
-               num_classes,
-               bn_config = None,
-               resnet_v2 = False,
-               width_multiplier = 1,
-               name = None):
+               num_classes: Optional[int],
+               bn_config: Optional[Mapping[str, float]] = None,
+               resnet_v2: bool = False,
+               width_multiplier: int = 1,
+               name: Optional[str] = None):
     """Constructs a ResNet model.
 
     Args:
@@ -332,11 +332,11 @@ class ResNet200(ResNetTorso):
   """ResNet200."""
 
   def __init__(self,
-               num_classes,
-               bn_config = None,
-               resnet_v2 = False,
-               width_multiplier = 1,
-               name = None):
+               num_classes: Optional[int],
+               bn_config: Optional[Mapping[str, float]] = None,
+               resnet_v2: bool = False,
+               width_multiplier: int = 1,
+               name: Optional[str] = None):
     """Constructs a ResNet model.
 
     Args:

@@ -17,18 +17,18 @@
 import jax.numpy as jnp
 
 
-def target_ema(global_step,
-               base_ema,
-               max_steps):
+def target_ema(global_step: jnp.ndarray,
+               base_ema: float,
+               max_steps: int) -> jnp.ndarray:
   decay = _cosine_decay(global_step, max_steps, 1.)
   return 1. - (1. - base_ema) * decay
 
 
-def learning_schedule(global_step,
-                      batch_size,
-                      base_learning_rate,
-                      total_steps,
-                      warmup_steps):
+def learning_schedule(global_step: jnp.ndarray,
+                      batch_size: int,
+                      base_learning_rate: float,
+                      total_steps: int,
+                      warmup_steps: int) -> float:
   """Cosine learning rate scheduler."""
   # Compute LR & Scaled LR
   scaled_lr = base_learning_rate * batch_size / 256.
@@ -43,9 +43,9 @@ def learning_schedule(global_step,
                     scaled_lr))
 
 
-def _cosine_decay(global_step,
-                  max_steps,
-                  initial_value):
+def _cosine_decay(global_step: jnp.ndarray,
+                  max_steps: int,
+                  initial_value: float) -> jnp.ndarray:
   """Simple implementation of cosine decay from TF1."""
   global_step = jnp.minimum(global_step, max_steps)
   cosine_decay_value = 0.5 * (1 + jnp.cos(jnp.pi * global_step / max_steps))

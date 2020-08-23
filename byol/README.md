@@ -176,3 +176,37 @@ python -m byol.main_loop \
 With these settings, BYOL should achieve ~92.3% top-1 accuracy (for the
 *online* classifier) in roughly 4 hours. Note that the above parameters were not
 finely tuned and may not be optimal.
+
+
+## Additional checkpoints
+
+Alongside with the pretrained ResNet-50 and ResNet-200 2x, we provide the
+following checkpoints from our ablation study. They all correspond to a
+ResNet-50 1x pre-trained over 300 epochs and were randomly selected within the
+three seeds; file size is roughly 640MB each.
+
+- [Baseline](https://storage.googleapis.com/deepmind-byol/checkpoints/ablations/res50x1_baseline.pkl)
+
+- Smaller batch sizes (figure 3a):
+  - [Batch size 2048](https://storage.googleapis.com/deepmind-byol/checkpoints/ablations/res50x1_batchsize_2048.pkl)
+  - [Batch size 1024](https://storage.googleapis.com/deepmind-byol/checkpoints/ablations/res50x1_batchsize_1024.pkl)
+  - [Batch size 512](https://storage.googleapis.com/deepmind-byol/checkpoints/ablations/res50x1_batchsize_512.pkl)
+  - [Batch size 256](https://storage.googleapis.com/deepmind-byol/checkpoints/ablations/res50x1_batchsize_256.pkl)
+  - [Batch size 128](https://storage.googleapis.com/deepmind-byol/checkpoints/ablations/res50x1_batchsize_128.pkl)
+  - [Batch size 64](https://storage.googleapis.com/deepmind-byol/checkpoints/ablations/res50x1_batchsize_64.pkl)
+
+- Ablation on transformations (figure 3b):
+  - [Remove grayscale](https://storage.googleapis.com/deepmind-byol/checkpoints/ablations/res50x1_no_grayscale.pkl)
+  - [Remove color](https://storage.googleapis.com/deepmind-byol/checkpoints/ablations/res50x1_no_color.pkl)
+  - [Crop and blur only](https://storage.googleapis.com/deepmind-byol/checkpoints/ablations/res50x1_crop_and_blur_only.pkl)
+  - [Crop only](https://storage.googleapis.com/deepmind-byol/checkpoints/ablations/res50x1_crop_only.pkl)
+  - (from Table 18) [Crop and color only](https://storage.googleapis.com/deepmind-byol/checkpoints/ablations/res50x1_crop_and_color_only.pkl)
+
+
+## License
+
+While the code is licensed under the Apache 2.0 License, the checkpoints weights
+are made available for non-commercial use only under the terms of the
+Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
+license. You can find details at:
+https://creativecommons.org/licenses/by-nc/4.0/legalcode.

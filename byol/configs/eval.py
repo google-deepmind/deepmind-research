@@ -19,7 +19,7 @@ from typing import Text
 from byol.utils import dataset
 
 
-def get_config(checkpoint_to_evaluate, batch_size):
+def get_config(checkpoint_to_evaluate: Text, batch_size: int):
   """Return config object for training."""
   train_images_per_epoch = dataset.Split.TRAIN_AND_VALID.num_examples
 

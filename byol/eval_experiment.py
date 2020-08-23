@@ -53,19 +53,19 @@ class EvalExperiment:
 
   def __init__(
       self,
-      random_seed,
-      num_classes,
-      batch_size,
-      max_steps,
-      enable_double_transpose,
-      checkpoint_to_evaluate,
-      allow_train_from_scratch,
-      freeze_backbone,
-      network_config,
-      optimizer_config,
-      lr_schedule_config,
-      evaluation_config,
-      checkpointing_config):
+      random_seed: int,
+      num_classes: int,
+      batch_size: int,
+      max_steps: int,
+      enable_double_transpose: bool,
+      checkpoint_to_evaluate: Optional[Text],
+      allow_train_from_scratch: bool,
+      freeze_backbone: bool,
+      network_config: Mapping[Text, Any],
+      optimizer_config: Mapping[Text, Any],
+      lr_schedule_config: Mapping[Text, Any],
+      evaluation_config: Mapping[Text, Any],
+      checkpointing_config: Mapping[Text, Any]):
     """Constructs the experiment.
 
     Args:
@@ -125,12 +125,12 @@ class EvalExperiment:
 
   def _backbone_fn(
       self,
-      inputs,
-      encoder_class,
-      encoder_config,
-      bn_decay_rate,
-      is_training,
-  ):
+      inputs: dataset.Batch,
+      encoder_class: Text,
+      encoder_config: Mapping[Text, Any],
+      bn_decay_rate: float,
+      is_training: bool,
+  ) -> jnp.ndarray:
     """Forward of the encoder (backbone)."""
     bn_config = {'decay_rate': bn_decay_rate}
     encoder = getattr(networks, encoder_class)
@@ -146,8 +146,8 @@ class EvalExperiment:
 
   def _classif_fn(
       self,
-      embeddings,
-  ):
+      embeddings: jnp.ndarray,
+  ) -> jnp.ndarray:
     classifier = hk.Linear(output_size=self._num_classes)
     return classifier(embeddings)
 
@@ -159,8 +159,8 @@ class EvalExperiment:
   #
 
   def step(self, *,
-           global_step,
-           rng):
+           global_step: jnp.ndarray,
+           rng: jnp.ndarray) -> Mapping[Text, np.ndarray]:
     """Performs a single training step."""
 
     if self._train_input is None:
@@ -173,12 +173,12 @@ class EvalExperiment:
     scalars = helpers.get_first(scalars)
     return scalars
 
-  def save_checkpoint(self, step, rng):
+  def save_checkpoint(self, step: int, rng: jnp.ndarray):
     self._checkpointer.maybe_save_checkpoint(
         self._experiment_state, step=step, rng=rng,
         is_final=step >= self._max_steps)
 
-  def load_checkpoint(self):
+  def load_checkpoint(self) -> Union[Tuple[int, jnp.ndarray], None]:
     checkpoint_data = self._checkpointer.maybe_load_checkpoint()
     if checkpoint_data is None:
       return None
@@ -253,11 +253,11 @@ class EvalExperiment:
 
   def _make_initial_state(
       self,
-      rng,
-      dummy_input,
-      backbone_params,
-      backbone_state,
-  ):
+      rng: jnp.ndarray,
+      dummy_input: dataset.Batch,
+      backbone_params: hk.Params,
+      backbone_state: hk.Params,
+  ) -> _EvalExperimentState:
     """_EvalExperimentState initialization."""
 
     # Initialize the backbone params
@@ -279,7 +279,7 @@ class EvalExperiment:
         classif_opt_state=classif_opt_state,
     )
 
-  def _build_train_input(self):
+  def _build_train_input(self) -> Generator[dataset.Batch, None, None]:
     """See base class."""
     num_devices = jax.device_count()
     global_batch_size = self._batch_size
@@ -296,17 +296,17 @@ class EvalExperiment:
         transpose=self._should_transpose_images(),
         batch_dims=[jax.local_device_count(), per_device_batch_size])
 
-  def _optimizer(self, learning_rate):
+  def _optimizer(self, learning_rate: float):
     """Build optimizer from config."""
     return optax.sgd(learning_rate, **self._optimizer_config)
 
   def _loss_fn(
       self,
-      backbone_params,
-      classif_params,
-      backbone_state,
-      inputs,
-  ):
+      backbone_params: hk.Params,
+      classif_params: hk.Params,
+      backbone_state: hk.State,
+      inputs: dataset.Batch,
+  ) -> Tuple[jnp.ndarray, Tuple[jnp.ndarray, hk.State]]:
     """Compute the classification loss function.
 
     Args:
@@ -333,10 +333,10 @@ class EvalExperiment:
 
   def _update_func(
       self,
-      experiment_state,
-      global_step,
-      inputs,
-  ):
+      experiment_state: _EvalExperimentState,
+      global_step: jnp.ndarray,
+      inputs: dataset.Batch,
+  ) -> Tuple[_EvalExperimentState, LogsDict]:
     """Applies an update to parameters and returns new state."""
     # This function computes the gradient of the first output of loss_fn and
     # passes through the other arguments unchanged.
@@ -421,11 +421,11 @@ class EvalExperiment:
 
   def _eval_batch(
       self,
-      backbone_params,
-      classif_params,
-      backbone_state,
-      inputs,
-  ):
+      backbone_params: hk.Params,
+      classif_params: hk.Params,
+      backbone_state: hk.State,
+      inputs: dataset.Batch,
+  ) -> LogsDict:
     """Evaluates a batch."""
     embeddings, backbone_state = self.forward_backbone.apply(
         backbone_params, backbone_state, inputs, is_training=False)
@@ -441,7 +441,7 @@ class EvalExperiment:
         'top5_accuracy': top5_correct
     }
 
-  def _eval_epoch(self, subset, batch_size):
+  def _eval_epoch(self, subset: Text, batch_size: int):
     """Evaluates an epoch."""
     num_samples = 0.
     summed_scalars = None

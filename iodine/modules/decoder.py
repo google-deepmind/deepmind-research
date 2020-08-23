@@ -37,8 +37,8 @@ class ComponentDecoder(snt.AbstractModule):
     pixel_params = self._pixel_decoder(z_flat).params
 
     self._sg.guard(pixel_params, "B*K, H, W, 1 + Cp")
-    mask_params = pixel_params[Ellipsis, 0:1]
-    pixel_params = pixel_params[Ellipsis, 1:]
+    mask_params = pixel_params[..., 0:1]
+    pixel_params = pixel_params[..., 1:]
 
     output = MixtureParameters(
         pixel=self._sg.reshape(pixel_params, "B, K, H, W, Cp"),

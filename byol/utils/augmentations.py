@@ -66,14 +66,14 @@ augment_config = dict(
     ))
 
 
-def postprocess(inputs, rng):
+def postprocess(inputs: JaxBatch, rng: jnp.ndarray):
   """Apply the image augmentations to crops in inputs (view1 and view2)."""
 
   def _postprocess_image(
-      images,
-      rng,
-      presets,
-  ):
+      images: jnp.ndarray,
+      rng: jnp.ndarray,
+      presets: ConfigDict,
+  ) -> JaxBatch:
     """Applies augmentations in post-processing.
 
     Args:
@@ -144,7 +144,7 @@ def _gaussian_blur_single_image(image, kernel_size, padding, sigma):
   blur_v = jnp.tile(blur_v, [1, 1, 1, num_channels])
   expand_batch_dim = len(image.shape) == 3
   if expand_batch_dim:
-    image = image[jnp.newaxis, Ellipsis]
+    image = image[jnp.newaxis, ...]
   blurred = _depthwise_conv2d(image, blur_h, strides=[1, 1], padding=padding)
   blurred = _depthwise_conv2d(blurred, blur_v, strides=[1, 1], padding=padding)
   blurred = jnp.squeeze(blurred, axis=0)
@@ -284,7 +284,7 @@ def _random_hue(rgb_tuple, rng, max_delta):
 
 def _to_grayscale(image):
   rgb_weights = jnp.array([0.2989, 0.5870, 0.1140])
-  grayscale = jnp.tensordot(image, rgb_weights, axes=(-1, -1))[Ellipsis, jnp.newaxis]
+  grayscale = jnp.tensordot(image, rgb_weights, axes=(-1, -1))[..., jnp.newaxis]
   return jnp.tile(grayscale, (1, 1, 3))  # Back to 3 channels.
 
 

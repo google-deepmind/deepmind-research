@@ -47,7 +47,7 @@ Experiment = Union[
     Type[eval_experiment.EvalExperiment]]
 
 
-def train_loop(experiment_class, config):
+def train_loop(experiment_class: Experiment, config: Mapping[Text, Any]):
   """The main training loop.
 
   This loop periodically saves a checkpoint to be evaluated in the eval_loop.
@@ -95,7 +95,7 @@ def train_loop(experiment_class, config):
   experiment.save_checkpoint(step, rng)
 
 
-def eval_loop(experiment_class, config):
+def eval_loop(experiment_class: Experiment, config: Mapping[Text, Any]):
   """The main evaluation loop.
 
   This loop periodically loads a checkpoint and evaluates its performance on the

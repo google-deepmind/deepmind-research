@@ -325,12 +325,12 @@ class IODINE(snt.AbstractModule):
         [get_components(xd) for xd in iterations["x_dist"]])
 
     # metrics
-    tm = tf.transpose(true_mask[Ellipsis, 0], [0, 1, 3, 4, 2])
+    tm = tf.transpose(true_mask[..., 0], [0, 1, 3, 4, 2])
     tm = tf.reshape(tf.tile(tm, sg["1, T, 1, 1, 1"]), sg["B * T, H * W, L"])
-    pm = tf.transpose(pred_mask[Ellipsis, 0], [0, 1, 3, 4, 2])
+    pm = tf.transpose(pred_mask[..., 0], [0, 1, 3, 4, 2])
     pm = tf.reshape(pm, sg["B * T, H * W, K"])
     ari = tf.reshape(adjusted_rand_index(tm, pm), sg["B, T"])
-    ari_nobg = tf.reshape(adjusted_rand_index(tm[Ellipsis, 1:], pm), sg["B, T"])
+    ari_nobg = tf.reshape(adjusted_rand_index(tm[..., 1:], pm), sg["B, T"])
 
     mse = tf.reduce_mean(tf.square(recons - image[:, None]), axis=[2, 3, 4, 5])
 
@@ -387,7 +387,7 @@ class IODINE(snt.AbstractModule):
         factor_info["assignment"].append(fass)
         for k in fpred:
           factor_info["predictions"][k].append(
-              tf.reduce_sum(fpred[k] * fass[Ellipsis, None], axis=2))
+              tf.reduce_sum(fpred[k] * fass[..., None], axis=2))
           factor_info["metrics"][k].append(fscalars[k])
 
       info["losses"]["factor"] = sg.guard(tf.stack(factor_info["loss"]), "T")
@@ -496,7 +496,7 @@ class IODINE(snt.AbstractModule):
 
   @staticmethod
   def _get_mask_posterior(out_dist, img):
-    p_comp = out_dist.components_distribution.prob(img[Ellipsis, tf.newaxis, :])
+    p_comp = out_dist.components_distribution.prob(img[..., tf.newaxis, :])
     posterior = p_comp / (tf.reduce_sum(p_comp, axis=-1, keepdims=True) + 1e-6)
     return tf.transpose(posterior, [0, 4, 2, 3, 1])
 
@@ -506,7 +506,7 @@ class IODINE(snt.AbstractModule):
     dzp, dxp, dmp = tf.gradients(loss, [zp, out_params.pixel, out_params.mask])
 
     log_prob = sg.guard(
-        out_dist.log_prob(img)[Ellipsis, tf.newaxis], "B, 1, H, W, 1")
+        out_dist.log_prob(img)[..., tf.newaxis], "B, 1, H, W, 1")
 
     counterfactual_log_probs = []
     for k in range(0, self.num_components):
@@ -515,7 +515,7 @@ class IODINE(snt.AbstractModule):
       pixel = tf.concat([out_params.pixel[:, :k], out_params.pixel[:, k + 1:]],
                         axis=1)
       out_dist_k = self.output_dist(pixel, mask)
-      log_prob_k = out_dist_k.log_prob(img)[Ellipsis, tf.newaxis]
+      log_prob_k = out_dist_k.log_prob(img)[..., tf.newaxis]
       counterfactual_log_probs.append(log_prob_k)
     counterfactual = log_prob - tf.concat(counterfactual_log_probs, axis=1)
 
@@ -608,7 +608,7 @@ class IODINE(snt.AbstractModule):
       x_basis = tf.cos(valx * freqs[None, None, None, None, :, None])
       y_basis = tf.cos(valy * freqs[None, None, None, None, None, :])
       xy_basis = tf.reshape(x_basis * y_basis, self._sg["1, 1, H, W, F*F"])
-      coords = tf.tile(xy_basis, self._sg["B, 1, 1, 1, 1"])[Ellipsis, 1:]
+      coords = tf.tile(xy_basis, self._sg["B, 1, 1, 1, 1"])[..., 1:]
       return coords
     else:
       raise KeyError('Unknown coord_type: "{}"'.format(self.coord_type))
@@ -632,7 +632,7 @@ class IODINE(snt.AbstractModule):
       # ########## Mask Monitoring #######
       if "mask" in data:
         true_mask = self._sg.guard(data["mask"], "B, T, L, H, W, 1")
-        true_mask = tf.transpose(true_mask[:, -1, Ellipsis, 0], [0, 2, 3, 1])
+        true_mask = tf.transpose(true_mask[:, -1, ..., 0], [0, 2, 3, 1])
         true_mask = self._sg.reshape(true_mask, "B, H*W, L")
       else:
         true_mask = None
@@ -648,6 +648,6 @@ class IODINE(snt.AbstractModule):
             adjusted_rand_index(true_mask, pred_mask))
 
         scalars["loss/ari_nobg"] = tf.reduce_mean(
-            adjusted_rand_index(true_mask[Ellipsis, 1:], pred_mask))
+            adjusted_rand_index(true_mask[..., 1:], pred_mask))
 
       return scalars

@@ -773,15 +773,15 @@ def _padded_batch(example_ds, batch_size, shapes, drop_remainder=False):
                                  drop_remainder=drop_remainder)
 
 
-def dataset(root_path,
-            data_path,
-            shapes,
-            num_threads,
-            batch_size,
-            uint8_features = None,
-            num_shards = 100,
-            shuffle_buffer_size = 100000,
-            sarsa = True):
+def dataset(root_path: str,
+            data_path: str,
+            shapes: Dict[str, Tuple[int]],
+            num_threads: int,
+            batch_size: int,
+            uint8_features: Set[str] = None,
+            num_shards: int = 100,
+            shuffle_buffer_size: int = 100000,
+            sarsa: bool = True) -> tf.data.Dataset:
   """Create tf dataset for training."""
 
   uint8_features = uint8_features if uint8_features else {}

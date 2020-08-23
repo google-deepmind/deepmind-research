@@ -27,7 +27,7 @@ import tree as nest
 FilterFn = Callable[[Tuple[Any], jnp.ndarray], jnp.ndarray]
 
 
-def exclude_bias_and_norm(path, val):
+def exclude_bias_and_norm(path: Tuple[Any], val: jnp.ndarray) -> jnp.ndarray:
   """Filter to exclude biaises and normalizations weights."""
   del val
   if path[-1] == "b" or "norm" in path[-2]:
@@ -35,10 +35,10 @@ def exclude_bias_and_norm(path, val):
   return True
 
 
-def _partial_update(updates,
-                    new_updates,
-                    params,
-                    filter_fn = None):
+def _partial_update(updates: optax.Updates,
+                    new_updates: optax.Updates,
+                    params: optax.Params,
+                    filter_fn: Optional[FilterFn] = None) -> optax.Updates:
   """Returns new_update for params which filter_fn is True else updates."""
 
   if filter_fn is None:
@@ -47,7 +47,7 @@ def _partial_update(updates,
   wrapped_filter_fn = lambda x, y: jnp.array(filter_fn(x, y))
   params_to_filter = nest.map_structure_with_path(wrapped_filter_fn, params)
 
-  def _update_fn(g, t, m):
+  def _update_fn(g: jnp.ndarray, t: jnp.ndarray, m: jnp.ndarray) -> jnp.ndarray:
     m = m.astype(g.dtype)
     return g * (1. - m) + t * m
 
@@ -59,9 +59,9 @@ class ScaleByLarsState(NamedTuple):
 
 
 def scale_by_lars(
-    momentum = 0.9,
-    eta = 0.001,
-    filter_fn = None):
+    momentum: float = 0.9,
+    eta: float = 0.001,
+    filter_fn: Optional[FilterFn] = None) -> optax.GradientTransformation:
   """Rescales updates according to the LARS algorithm.
 
   Does not include weight decay.
@@ -77,17 +77,17 @@ def scale_by_lars(
     An (init_fn, update_fn) tuple.
   """
 
-  def init_fn(params):
+  def init_fn(params: optax.Params) -> ScaleByLarsState:
     mu = jax.tree_multimap(jnp.zeros_like, params)  # momentum
     return ScaleByLarsState(mu=mu)
 
-  def update_fn(updates, state,
-                params):
+  def update_fn(updates: optax.Updates, state: ScaleByLarsState,
+                params: optax.Params) -> Tuple[optax.Updates, ScaleByLarsState]:
 
     def lars_adaptation(
-        update,
-        param,
-    ):
+        update: jnp.ndarray,
+        param: jnp.ndarray,
+    ) -> jnp.ndarray:
       param_norm = jnp.linalg.norm(param)
       update_norm = jnp.linalg.norm(update)
       return update * jnp.where(
@@ -110,8 +110,8 @@ class AddWeightDecayState(NamedTuple):
 
 
 def add_weight_decay(
-    weight_decay,
-    filter_fn = None):
+    weight_decay: float,
+    filter_fn: Optional[FilterFn] = None) -> optax.GradientTransformation:
   """Adds a weight decay to the update.
 
   Args:
@@ -122,14 +122,14 @@ def add_weight_decay(
     An (init_fn, update_fn) tuple.
   """
 
-  def init_fn(_):
+  def init_fn(_) -> AddWeightDecayState:
     return AddWeightDecayState()
 
   def update_fn(
-      updates,
-      state,
-      params,
-  ):
+      updates: optax.Updates,
+      state: AddWeightDecayState,
+      params: optax.Params,
+  ) -> Tuple[optax.Updates, AddWeightDecayState]:
     new_updates = jax.tree_multimap(lambda g, p: g + weight_decay * p, updates,
                                     params)
     new_updates = _partial_update(updates, new_updates, params, filter_fn)
@@ -142,13 +142,13 @@ LarsState = List  # Type for the lars optimizer
 
 
 def lars(
-    learning_rate,
-    weight_decay = 0.,
-    momentum = 0.9,
-    eta = 0.001,
-    weight_decay_filter = None,
-    lars_adaptation_filter = None,
-):
+    learning_rate: float,
+    weight_decay: float = 0.,
+    momentum: float = 0.9,
+    eta: float = 0.001,
+    weight_decay_filter: Optional[FilterFn] = None,
+    lars_adaptation_filter: Optional[FilterFn] = None,
+) -> optax.GradientTransformation:
   """Creates lars optimizer with weight decay.
 
   References:

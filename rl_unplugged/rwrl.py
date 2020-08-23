@@ -55,7 +55,7 @@ DELIMITER = ':'
 DEFAULT_NUM_TIMESTEPS = 1001
 
 
-def _decombine_key(k, delimiter = DELIMITER):
+def _decombine_key(k: str, delimiter: str = DELIMITER) -> Sequence[str]:
   return k.split(delimiter)
 
 
@@ -79,7 +79,7 @@ def tf_example_to_feature_description(example,
 
 
 def tree_deflatten_with_delimiter(
-    flat_dict, delimiter = DELIMITER):
+    flat_dict: Dict[str, Any], delimiter: str = DELIMITER) -> Dict[str, Any]:
   """De-flattens a dict to its originally nested structure.
 
   Does the opposite of {combine_nested_keys(k) :v
@@ -102,12 +102,12 @@ def tree_deflatten_with_delimiter(
   return dict(root)
 
 
-def get_slice_of_nested(nested, start,
-                        end):
+def get_slice_of_nested(nested: Dict[str, Any], start: int,
+                        end: int) -> Dict[str, Any]:
   return tree.map_structure(lambda item: item[start:end], nested)
 
 
-def repeat_last_and_append_to_nested(nested):
+def repeat_last_and_append_to_nested(nested: Dict[str, Any]) -> Dict[str, Any]:
   return tree.map_structure(
       lambda item: tf.concat((item, item[-1:]), axis=0), nested)
 
@@ -133,13 +133,13 @@ def tf_example_to_reverb_sample(example,
   return ret
 
 
-def dataset(path,
-            combined_challenge,
-            domain,
-            task,
-            difficulty,
-            num_shards = 100,
-            shuffle_buffer_size = 100000):
+def dataset(path: str,
+            combined_challenge: str,
+            domain: str,
+            task: str,
+            difficulty: str,
+            num_shards: int = 100,
+            shuffle_buffer_size: int = 100000) -> tf.data.Dataset:
   """TF dataset of RWRL SARSA tuples."""
   path = os.path.join(
       path,
@@ -178,11 +178,11 @@ def dataset(path,
 
 
 def environment(
-    combined_challenge,
-    domain,
-    task,
-    log_output = None,
-    environment_kwargs = None):
+    combined_challenge: str,
+    domain: str,
+    task: str,
+    log_output: Optional[str] = None,
+    environment_kwargs: Optional[Dict[str, Any]] = None) -> dm_env.Environment:
   """RWRL environment."""
   env = rwrl_envs.load(
       domain_name=domain,

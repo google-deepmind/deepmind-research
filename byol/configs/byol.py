@@ -23,7 +23,7 @@ _WD_PRESETS = {40: 1e-6, 100: 1e-6, 300: 1e-6, 1000: 1.5e-6}
 _EMA_PRESETS = {40: 0.97, 100: 0.99, 300: 0.99, 1000: 0.996}
 
 
-def get_config(num_epochs, batch_size):
+def get_config(num_epochs: int, batch_size: int):
   """Return config object, containing all hyperparameters for training."""
   train_images_per_epoch = dataset.Split.TRAIN_AND_VALID.num_examples
 

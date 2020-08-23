@@ -91,7 +91,7 @@ def make_face_model_dataset(
     # Vertices are quantized. So convert to floats for input to face model
     example['vertices'] = modules.dequantize_verts(vertices, quantization_bits)
     example['vertices_mask'] = tf.ones_like(
-        example['vertices'][Ellipsis, 0], dtype=tf.float32)
+        example['vertices'][..., 0], dtype=tf.float32)
     example['faces_mask'] = tf.ones_like(example['faces'], dtype=tf.float32)
     return example
   return ds.map(_face_model_map_fn)

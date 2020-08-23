@@ -258,7 +258,7 @@ class BroadcastConv(snt.AbstractModule):
       x_basis = tf.cos(valx * freqs[None, None, None, :, None])
       y_basis = tf.cos(valy * freqs[None, None, None, None, :])
       xy_basis = tf.reshape(x_basis * y_basis, sg["1, H, W, F*F"])
-      coords = tf.tile(xy_basis, sg["B,  1, 1, 1"])[Ellipsis, 1:]
+      coords = tf.tile(xy_basis, sg["B,  1, 1, 1"])[..., 1:]
       return tf.concat([output, coords], axis=-1)
     else:
       raise KeyError('Unknown coord_type: "{}"'.format(self._coord_type))

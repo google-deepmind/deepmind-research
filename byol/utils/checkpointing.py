@@ -31,10 +31,10 @@ class Checkpointer:
 
   def __init__(
       self,
-      use_checkpointing,
-      checkpoint_dir,
-      save_checkpoint_interval,
-      filename):
+      use_checkpointing: bool,
+      checkpoint_dir: Text,
+      save_checkpoint_interval: int,
+      filename: Text):
     if (not use_checkpointing or
         checkpoint_dir is None or
         save_checkpoint_interval <= 0):
@@ -51,10 +51,10 @@ class Checkpointer:
 
   def maybe_save_checkpoint(
       self,
-      experiment_state,
-      step,
-      rng,
-      is_final):
+      experiment_state: Mapping[Text, jnp.ndarray],
+      step: int,
+      rng: jnp.ndarray,
+      is_final: bool):
     """Saves a checkpoint if enough time has passed since the previous one."""
     current_time = time.time()
     if (not self._checkpoint_enabled or
@@ -80,7 +80,7 @@ class Checkpointer:
     self._last_checkpoint_time = current_time
 
   def maybe_load_checkpoint(
-      self):
+      self) -> Union[Tuple[Mapping[Text, jnp.ndarray], int, jnp.ndarray], None]:
     """Loads a checkpoint if any is found."""
     checkpoint_data = load_checkpoint(self._checkpoint_path)
     if checkpoint_data is None:

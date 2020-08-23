@@ -46,7 +46,7 @@ def make_so_tangent(q):
     for j in range(i+1, n):
       a[i, j] = 1
       a[j, i] = -1
-      dq[Ellipsis, ii] = a @ q  # tangent vectors are skew-symmetric matrix times Q
+      dq[..., ii] = a @ q  # tangent vectors are skew-symmetric matrix times Q
       a[i, j] = 0
       a[j, i] = 0
       ii += 1
@@ -106,7 +106,7 @@ def make_product_manifold(specification, npts):
       spec_array[1, i] = dim
       latent_dim += dim
       dat = np.random.randn(npts, dim+1)
-      dat /= np.tile(np.sqrt(np.sum(dat**2, axis=1)[Ellipsis, None]),
+      dat /= np.tile(np.sqrt(np.sum(dat**2, axis=1)[..., None]),
                      [1, dim+1])
     elif so_spec is not None:
       dim = int(so_spec.group(1))

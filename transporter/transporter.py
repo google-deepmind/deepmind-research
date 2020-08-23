@@ -106,8 +106,8 @@ class Transporter(snt.AbstractModule):
     num_keypoints = image_a_keypoints["heatmaps"].shape[-1]
     transported_features = image_a_features
     for k in range(num_keypoints):
-      mask_a = image_a_keypoints["heatmaps"][Ellipsis, k, None]
-      mask_b = image_b_keypoints["heatmaps"][Ellipsis, k, None]
+      mask_a = image_a_keypoints["heatmaps"][..., k, None]
+      mask_b = image_b_keypoints["heatmaps"][..., k, None]
 
       # suppress features from image a, around both keypoint locations.
       transported_features = (

@@ -21,11 +21,11 @@ import jax.numpy as jnp
 
 
 def topk_accuracy(
-    logits,
-    labels,
-    topk,
-    ignore_label_above = None,
-):
+    logits: jnp.ndarray,
+    labels: jnp.ndarray,
+    topk: int,
+    ignore_label_above: Optional[int] = None,
+) -> jnp.ndarray:
   """Top-num_codes accuracy."""
   assert len(labels.shape) == 1, 'topk expects 1d int labels.'
   assert len(logits.shape) == 2, 'topk expects 2d logits.'
@@ -42,10 +42,10 @@ def topk_accuracy(
 
 
 def softmax_cross_entropy(
-    logits,
-    labels,
-    reduction = 'mean',
-):
+    logits: jnp.ndarray,
+    labels: jnp.ndarray,
+    reduction: Optional[Text] = 'mean',
+) -> jnp.ndarray:
   """Computes softmax cross entropy given logits and one-hot class labels.
 
   Args:
@@ -72,10 +72,10 @@ def softmax_cross_entropy(
 
 
 def l2_normalize(
-    x,
-    axis = None,
-    epsilon = 1e-12,
-):
+    x: jnp.ndarray,
+    axis: Optional[int] = None,
+    epsilon: float = 1e-12,
+) -> jnp.ndarray:
   """l2 normalize a tensor on an axis with numerical stability."""
   square_sum = jnp.sum(jnp.square(x), axis=axis, keepdims=True)
   x_inv_norm = jax.lax.rsqrt(jnp.maximum(square_sum, epsilon))
@@ -106,7 +106,7 @@ def l2_weight_regularizer(params):
   return 0.5 * l2_norm
 
 
-def regression_loss(x, y):
+def regression_loss(x: jnp.ndarray, y: jnp.ndarray) -> jnp.ndarray:
   """Byol's regression loss. This is a simple cosine similarity."""
   normed_x, normed_y = l2_normalize(x, axis=-1), l2_normalize(y, axis=-1)
   return jnp.sum((normed_x - normed_y)**2, axis=-1)

@@ -145,8 +145,8 @@ class _HierarchicalCore(snt.AbstractModule):
           regularizers=self._regularizers,
           )(decoder_features)
 
-      mu = mu_logsigma[Ellipsis, :latent_dim]
-      logsigma = mu_logsigma[Ellipsis, latent_dim:]
+      mu = mu_logsigma[..., :latent_dim]
+      logsigma = mu_logsigma[..., latent_dim:]
       dist = tfd.MultivariateNormalDiag(loc=mu, scale_diag=tf.exp(logsigma))
       distributions.append(dist)
 

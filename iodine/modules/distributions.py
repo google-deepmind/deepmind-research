@@ -134,8 +134,8 @@ class LocScaleDistribution(DistributionModule):
       n_channels = params.get_shape().as_list()[-1]
       assert n_channels % 2 == 0
       assert n_channels // 2 == self.output_shape[-1]
-      loc = params[Ellipsis, :n_channels // 2]
-      scale = params[Ellipsis, n_channels // 2:]
+      loc = params[..., :n_channels // 2]
+      scale = params[..., n_channels // 2:]
 
     # apply activation functions
     if self._scale != "fixed":

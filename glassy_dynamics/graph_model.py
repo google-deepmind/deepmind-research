@@ -20,7 +20,7 @@ The architecture and performance of this model is described in our publication:
 
 from __future__ import absolute_import
 from __future__ import division
-
+from __future__ import google_type_annotations
 from __future__ import print_function
 
 import functools
@@ -35,10 +35,10 @@ from typing import Any, Dict, Text, Tuple, Optional
 
 
 def make_graph_from_static_structure(
-    positions,
-    types,
-    box,
-    edge_threshold):
+    positions: tf.Tensor,
+    types: tf.Tensor,
+    box: tf.Tensor,
+    edge_threshold: float) -> graphs.GraphsTuple:
   """Returns graph representing the static structure of the glass.
 
   Each particle is represented by a node in the graph. The particle type is
@@ -81,7 +81,7 @@ def make_graph_from_static_structure(
       )
 
 
-def apply_random_rotation(graph):
+def apply_random_rotation(graph: graphs.GraphsTuple) -> graphs.GraphsTuple:
   """Returns randomly rotated graph representation.
 
   The rotation is an element of O(3) with rotation angles multiple of pi/2.
@@ -118,9 +118,9 @@ class GraphBasedModel(snt.AbstractModule):
   """
 
   def __init__(self,
-               n_recurrences,
-               mlp_sizes,
-               mlp_kwargs = None,
+               n_recurrences: int,
+               mlp_sizes: Tuple[int],
+               mlp_kwargs: Optional[Dict[Text, Any]] = None,
                name='Graph'):
     """Creates a new GraphBasedModel object.
 
@@ -168,7 +168,7 @@ class GraphBasedModel(snt.AbstractModule):
           node_model_fn=final_model_fn,
           edge_model_fn=model_fn)
 
-  def _build(self, graphs_tuple):
+  def _build(self, graphs_tuple: graphs.GraphsTuple) -> tf.Tensor:
     """Connects the model into the tensorflow graph.
 
     Args:

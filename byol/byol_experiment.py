@@ -56,17 +56,17 @@ class ByolExperiment:
 
   def __init__(
       self,
-      random_seed,
-      num_classes,
-      batch_size,
-      max_steps,
-      enable_double_transpose,
-      base_target_ema,
-      network_config,
-      optimizer_config,
-      lr_schedule_config,
-      evaluation_config,
-      checkpointing_config):
+      random_seed: int,
+      num_classes: int,
+      batch_size: int,
+      max_steps: int,
+      enable_double_transpose: bool,
+      base_target_ema: float,
+      network_config: Mapping[Text, Any],
+      optimizer_config: Mapping[Text, Any],
+      lr_schedule_config: Mapping[Text, Any],
+      evaluation_config: Mapping[Text, Any],
+      checkpointing_config: Mapping[Text, Any]):
     """Constructs the experiment.
 
     Args:
@@ -115,15 +115,15 @@ class ByolExperiment:
 
   def _forward(
       self,
-      inputs,
-      projector_hidden_size,
-      projector_output_size,
-      predictor_hidden_size,
-      encoder_class,
-      encoder_config,
-      bn_config,
-      is_training,
-  ):
+      inputs: dataset.Batch,
+      projector_hidden_size: int,
+      projector_output_size: int,
+      predictor_hidden_size: int,
+      encoder_class: Text,
+      encoder_config: Mapping[Text, Any],
+      bn_config: Mapping[Text, Any],
+      is_training: bool,
+  ) -> Mapping[Text, jnp.ndarray]:
     """Forward application of byol's architecture.
 
     Args:
@@ -163,7 +163,7 @@ class ByolExperiment:
     classifier = hk.Linear(
         output_size=self._num_classes, name='classifier')
 
-    def apply_once_fn(images, suffix = ''):
+    def apply_once_fn(images: jnp.ndarray, suffix: Text = ''):
       images = dataset.normalize_images(images)
 
       embedding = net(images, is_training=is_training)
@@ -186,7 +186,7 @@ class ByolExperiment:
     else:
       return apply_once_fn(inputs['images'], '')
 
-  def _optimizer(self, learning_rate):
+  def _optimizer(self, learning_rate: float) -> optax.GradientTransformation:
     """Build optimizer from config."""
     return optimizers.lars(
         learning_rate,
@@ -196,13 +196,13 @@ class ByolExperiment:
 
   def loss_fn(
       self,
-      online_params,
-      target_params,
-      online_state,
-      target_state,
-      rng,
-      inputs,
-  ):
+      online_params: hk.Params,
+      target_params: hk.Params,
+      online_state: hk.State,
+      target_state: hk.Params,
+      rng: jnp.ndarray,
+      inputs: dataset.Batch,
+  ) -> Tuple[jnp.ndarray, Tuple[Mapping[Text, hk.State], LogsDict]]:
     """Compute BYOL's loss function.
 
     Args:
@@ -292,11 +292,11 @@ class ByolExperiment:
 
   def _update_fn(
       self,
-      byol_state,
-      global_step,
-      rng,
-      inputs,
-  ):
+      byol_state: _ByolExperimentState,
+      global_step: jnp.ndarray,
+      rng: jnp.ndarray,
+      inputs: dataset.Batch,
+  ) -> Tuple[_ByolExperimentState, LogsDict]:
     """Update online and target parameters.
 
     Args:
@@ -352,9 +352,9 @@ class ByolExperiment:
 
   def _make_initial_state(
       self,
-      rng,
-      dummy_input,
-  ):
+      rng: jnp.ndarray,
+      dummy_input: dataset.Batch,
+  ) -> _ByolExperimentState:
     """BYOL's _ByolExperimentState initialization.
 
     Args:
@@ -393,8 +393,8 @@ class ByolExperiment:
     )
 
   def step(self, *,
-           global_step,
-           rng):
+           global_step: jnp.ndarray,
+           rng: jnp.ndarray) -> Mapping[Text, np.ndarray]:
     """Performs a single training step."""
     if self._train_input is None:
       self._initialize_train()
@@ -410,11 +410,11 @@ class ByolExperiment:
 
     return helpers.get_first(scalars)
 
-  def save_checkpoint(self, step, rng):
+  def save_checkpoint(self, step: int, rng: jnp.ndarray):
     self._checkpointer.maybe_save_checkpoint(
         self._byol_state, step=step, rng=rng, is_final=step >= self._max_steps)
 
-  def load_checkpoint(self):
+  def load_checkpoint(self) -> Union[Tuple[int, jnp.ndarray], None]:
     checkpoint_data = self._checkpointer.maybe_load_checkpoint()
     if checkpoint_data is None:
       return None
@@ -444,7 +444,7 @@ class ByolExperiment:
 
       self._byol_state = init_byol(rng=init_rng, dummy_input=inputs)
 
-  def _build_train_input(self):
+  def _build_train_input(self) -> Generator[dataset.Batch, None, None]:
     """Loads the (infinitely looping) dataset iterator."""
     num_devices = jax.device_count()
     global_batch_size = self._batch_size
@@ -463,10 +463,10 @@ class ByolExperiment:
 
   def _eval_batch(
       self,
-      params,
-      state,
-      batch,
-  ):
+      params: hk.Params,
+      state: hk.State,
+      batch: dataset.Batch,
+  ) -> Mapping[Text, jnp.ndarray]:
     """Evaluates a batch.
 
     Args:
@@ -494,7 +494,7 @@ class ByolExperiment:
         'top5_accuracy': top5_correct,
     }
 
-  def _eval_epoch(self, subset, batch_size):
+  def _eval_epoch(self, subset: Text, batch_size: int):
     """Evaluates an epoch."""
     num_samples = 0.
     summed_scalars = None

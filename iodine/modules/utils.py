@@ -123,7 +123,7 @@ def construct_diagnostic_image(
       components = tf.tile(components[:nr_images], [1, 1, 1, 1, 3])
 
     if mask_components:
-      components *= masks[:nr_images, Ellipsis, tf.newaxis]
+      components *= masks[:nr_images, ..., tf.newaxis]
 
     # Pad everything
     no_pad, pad = (0, 0), (border_width, border_width)
@@ -415,7 +415,7 @@ def images_to_grid(
     if max_grid_width is not None:
       grid_width = min(max_grid_width, grid_width)
 
-  images = images[: grid_height * grid_width, Ellipsis]
+  images = images[: grid_height * grid_width, ...]
 
   # Pad with extra blank frames if grid_height x grid_width is less than the
   # number of frames provided.
@@ -460,7 +460,7 @@ def flatten_all_but_last(tensor, n_dims=1):
 
 def ensure_3d(tensor):
   if tensor.shape.ndims == 2:
-    return tensor[Ellipsis, None]
+    return tensor[..., None]
 
   assert tensor.shape.ndims == 3
   return tensor
