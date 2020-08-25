@@ -14,22 +14,18 @@
 
 """Training pipeline for the prediction of particle mobilities in glasses."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import google_type_annotations
-from __future__ import print_function
 
 import collections
+import enum
 import pickle
+from typing import Any, Dict, List, Optional, Text, Tuple, Sequence
 
 from absl import logging
-import enum
 import numpy as np
 
 import tensorflow.compat.v1 as tf
 import tensorflow_probability as tfp
 
-from typing import Any, Dict, List, Optional, Text, Tuple, Sequence
 
 from glassy_dynamics import graph_model
 

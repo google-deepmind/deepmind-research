@@ -18,12 +18,8 @@ The architecture and performance of this model is described in our publication:
 "Unveiling the predictive power of static structure in glassy systems".
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import google_type_annotations
-from __future__ import print_function
-
 import functools
+from typing import Any, Dict, Text, Tuple, Optional
 
 from graph_nets import graphs
 from graph_nets import modules as gn_modules
@@ -31,7 +27,6 @@ from graph_nets import utils_tf
 
 import sonnet as snt
 import tensorflow.compat.v1 as tf
-from typing import Any, Dict, Text, Tuple, Optional
 
 
 def make_graph_from_static_structure(

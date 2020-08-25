@@ -14,11 +14,6 @@
 
 """Trains a graph-based network to predict particle mobilities in glasses."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import google_type_annotations
-from __future__ import print_function
-
 import os
 
 from absl import app
