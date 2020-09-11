@@ -51,6 +51,7 @@ https://deepmind.com/research/publications/
     Objects](graph_matching_networks), ICML 2019
 *   [REGAL: Transfer Learning for Fast Optimization of Computation Graphs](regal)
 *   [PolyGen: PolyGen: An Autoregressive Generative Model of 3D Meshes](polygen), ICML 2020
+*   [Physically Embedded Planning Problems](physics_planning_games)
 
 
 ## Disclaimer

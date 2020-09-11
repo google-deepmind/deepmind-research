@@ -31,14 +31,18 @@ by:
 ```
 pip3 install -r requirements.txt
 ```
-
 ### Board games
 The game logic is based on [open_spiel]. Please install as instructed [here].
 [gnugo] is required to play the game of Go against a non-random opponent. [gnugo] can be installed in Ubuntu by:
 ```
 apt install gnugo
 ```
-. Board game scripts except gnugo binary to be at: `/usr/games/gnugo`
+
+Board game scripts expect gnugo binary to be at: `/usr/games/gnugo`. Users can
+change this path inside `board_games/go_logic.py`
+
+This library has only been tested on Ubuntu.
+
 ## Example usage
 
 The code snippets below show examples of instantiating each of the environments.
