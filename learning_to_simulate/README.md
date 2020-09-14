@@ -16,13 +16,12 @@ If you use the code here please cite this paper:
 
 Also available in arXiv [arxiv.org/abs/2002.09405](https://arxiv.org/abs/2002.09405)) and as a [site](https://sites.google.com/corp/view/learning-to-simulate).
 
-## Example usage: training model and displaying trajectories.
+
+## Example usage: train a model and display a trajectory
 
 ![WaterRamps rollout](images/water_ramps_rollout.gif)
 
-(After downloading the repo, from the parent directory.)
-
-Install dependencies:
+After downloading the repo, and from the parent directory. Install dependencies:
 
     pip install -r learning_to_simulate/requirements.txt
     mkdir -p /tmp/rollous
@@ -94,7 +93,8 @@ The provided script `./download_dataset.sh` may be used to download all files fr
 
 An additional smaller dataset `WaterDropSample`, including only the first two trajectories of `WaterDrop` for each split is provided for debugging purposes.
 
-## Code structure.
+
+## Code structure
 
 * `train.py`: Script for training, evaluating and generating rollout trajectories.
 * `learned_simulator.py`: Implementation of the learnable one-step model that returns the next position of the particles given inputs. It includes data preprocessing, Euler integration, and a helper method for building normalized training outputs and targets.
