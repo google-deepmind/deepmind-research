@@ -24,6 +24,9 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Learning to Simulate Complex Physics with Graph Networks](learning_to_simulate), ICML 2020
+*   [Physically Embedded Planning Problems](physics_planning_games)
+*   [PolyGen: PolyGen: An Autoregressive Generative Model of 3D Meshes](polygen), ICML 2020
 *   [Bootstrap Your Own Latent](byol)
 *   [Catch & Carry: Reusable Neural Controllers for Vision-Guided Whole-Body Tasks](catch_carry), SIGGRAPH 2020
 *   [MEMO: A Deep Network For Flexible Combination Of Episodic Memories](memo), ICLR 2020
@@ -50,8 +53,7 @@ https://deepmind.com/research/publications/
 *   [Graph Matching Networks for Learning the Similarity of Graph Structured
     Objects](graph_matching_networks), ICML 2019
 *   [REGAL: Transfer Learning for Fast Optimization of Computation Graphs](regal)
-*   [PolyGen: PolyGen: An Autoregressive Generative Model of 3D Meshes](polygen), ICML 2020
-*   [Physically Embedded Planning Problems](physics_planning_games)
+
 
 
 ## Disclaimer
