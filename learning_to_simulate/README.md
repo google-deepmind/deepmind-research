@@ -1,5 +1,11 @@
 # Learning to Simulate Complex Physics with Graph Networks (ICML 2020)
 
+ICML poster: [icml.cc/virtual/2020/poster/6849](https://icml.cc/virtual/2020/poster/6849)
+
+Video site: [sites.google.com/corp/view/learning-to-simulate](https://sites.google.com/corp/view/learning-to-simulate)
+
+ArXiv: [arxiv.org/abs/2002.09405](https://arxiv.org/abs/2002.09405)
+
 If you use the code here please cite this paper:
 
     @inproceedings{sanchezgonzalez2020learning,
@@ -13,8 +19,6 @@ If you use the code here please cite this paper:
       booktitle={International Conference on Machine Learning},
       year={2020}
     }
-
-Also available in arXiv [arxiv.org/abs/2002.09405](https://arxiv.org/abs/2002.09405)) and as a [site](https://sites.google.com/corp/view/learning-to-simulate).
 
 
 ## Example usage: train a model and display a trajectory
@@ -91,7 +95,7 @@ Where:
 
 The provided script `./download_dataset.sh` may be used to download all files from each dataset into a folder given its name.
 
-An additional smaller dataset `WaterDropSample`, including only the first two trajectories of `WaterDrop` for each split is provided for debugging purposes.
+An additional smaller dataset `WaterDropSample`, which includes only the first two trajectories of `WaterDrop` for each split, is provided for debugging purposes.
 
 
 ## Code structure
