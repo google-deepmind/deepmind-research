@@ -21,7 +21,7 @@ set -x
 
 TMP_DIR=`mktemp -d`
 
-virtualenv --python=python3.7 "${TMP_DIR}/learning_to_simulate"
+virtualenv --python=python3.6 "${TMP_DIR}/learning_to_simulate"
 source "${TMP_DIR}/learning_to_simulate/bin/activate"
 
 # Install dependencies.
