@@ -52,6 +52,11 @@ Create and activate a virtual environment if needed:
     virtualenv scratchgan-venv
     source scratchgan-venv/bin/activate
 
+
+Note: the code uses python 2. This might mean that to create the virtual env
+you have to pass a path to the python binary to be used, as follows:
+`virtualenv -p /usr/bin/python2.7 scratchgan-venv`.
+
 Install requirements:
 
     pip install -r scratchgan/requirements.txt
