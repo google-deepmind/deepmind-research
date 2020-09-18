@@ -7,17 +7,13 @@ Learning'
 If you use this package, please cite our accompanying [tech report]:
 
 ```
-@misc{,
-    title={Physically Embedded Planning Problems: New Challenges for
-           Reinforcement Learning},
-    author={Mehdi Mirza, Andrew Jaegle, Jonathan J. Hunt, Arthur Guez,
-            Saran Tunyasuvunakool, Alistair Muldal, Théophane Weber,
-            Peter Karkus, Sébastien Racanière, Lars Buesing,
-            Timothy Lillicrap, Nicolas Heess},
+@misc{mirza2020physically,
+    title={Physically Embedded Planning Problems: New Challenges for Reinforcement Learning},
+    author={Mehdi Mirza and Andrew Jaegle and Jonathan J. Hunt and Arthur Guez and Saran Tunyasuvunakool and Alistair Muldal and Théophane Weber and Peter Karkus and Sébastien Racanière and Lars Buesing and Timothy Lillicrap and Nicolas Heess},
     year={2020},
-    eprint={},
+    eprint={2009.05524},
     archivePrefix={arXiv},
-    primaryClass={cs.RO}
+    primaryClass={cs.AI}
 }
 ```
 
@@ -102,7 +98,7 @@ from [dm_control].
 
 For more details please refer to the [tech report], [dm_control] and [dm_env].
 
-[tech report]: https://arxiv.org/abs/
+[tech report]: https://arxiv.org/abs/2009.05524
 [dm_control]: https://github.com/deepmind/dm_control
 [dm_env]: https://github.com/deepmind/dm_env
 [gnugo]: https://www.gnu.org/software/gnugo/
