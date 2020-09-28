@@ -33,6 +33,7 @@ import os
 from typing import Dict, Optional, Tuple, Set
 
 from acme import wrappers
+from acme.adders import reverb as adders
 from dm_control import composer
 from dm_control import suite
 from dm_control.composer.variation import colors
@@ -726,16 +727,19 @@ def _parse_seq_tf_example(example, uint8_features, shapes):
 
 def _build_sequence_example(sequences):
   """Convert raw sequences into a Reverb sequence sample."""
-  o = sequences['observation']
-  a = sequences['action']
-  r = sequences['reward']
-  p = sequences['discount']
+  data = adders.Step(
+      observation=sequences['observation'],
+      action=sequences['action'],
+      reward=sequences['reward'],
+      discount=sequences['discount'],
+      start_of_episode=(),
+      extras=())
 
   info = reverb.SampleInfo(key=tf.constant(0, tf.uint64),
                            probability=tf.constant(1.0, tf.float64),
                            table_size=tf.constant(0, tf.int64),
                            priority=tf.constant(1.0, tf.float64))
-  return reverb.ReplaySample(info=info, data=(o, a, r, p))
+  return reverb.ReplaySample(info=info, data=data)
 
 
 def _build_sarsa_example(sequences):
