@@ -1,7 +1,7 @@
 # MEMO: A Deep Network For Flexible Combination Of Episodic Memories.
 
 This package contains a [Colaboratory notebook](https://colab.research.google.com/github/deepmind/deepmind_research/blob/master/memo/load_memo_data.ipynb)
-that loads a version a version of the dataset for the Paired associative
+that loads a version of the dataset for the Paired associative
 inference task (length 3 and 4) presented in the ICLR 2020 submission (also on
 [arXiv](https://arxiv.org/abs/2001.10913)).
 
