@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Targeted free energy estimation via learned mappings](learned_free_energy_estimation), Journal of Chemical Physics 2020
 *   [Learning to Simulate Complex Physics with Graph Networks](learning_to_simulate), ICML 2020
 *   [Physically Embedded Planning Problems](physics_planning_games)
 *   [PolyGen: PolyGen: An Autoregressive Generative Model of 3D Meshes](polygen), ICML 2020
