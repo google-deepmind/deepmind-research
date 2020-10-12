@@ -23,16 +23,25 @@ import numpy as np
 from six.moves import range
 
 
-def get_env(env_name, noops):
+def get_env(env_name, noops,
+            movement_reward=-1, goal_reward=1, side_effect_reward=-1):
   """Get a copy of the environment for simulating the baseline."""
-  if env_name == 'box':
-    env = factory.get_environment_obj('side_effects_sokoban', noops=noops)
-  elif env_name in ['vase', 'sushi', 'sushi_goal']:
+  if env_name == 'box' or 'sokocoin' in env_name:
+    levels = {'box': 0, 'sokocoin1': 1, 'sokocoin2': 2, 'sokocoin3': 3}
+    sizes = {'box': 36, 'sokocoin1': 100, 'sokocoin2': 72, 'sokocoin3': 100}
     env = factory.get_environment_obj(
-        'conveyor_belt', variant=env_name, noops=noops)
+        'side_effects_sokoban', noops=noops, movement_reward=movement_reward,
+        goal_reward=goal_reward, wall_reward=side_effect_reward,
+        corner_reward=side_effect_reward, level=levels[env_name])
+    size = sizes[env_name]
+  elif 'sushi' in env_name or env_name == 'vase':
+    env = factory.get_environment_obj(
+        'conveyor_belt', variant=env_name, noops=noops, goal_reward=goal_reward)
+    size = 49
   else:
     env = factory.get_environment_obj(env_name)
-  return env
+    size = None
+  return env, size
 
 
 def run_loop(agent, env, number_episodes, anneal):
@@ -63,8 +72,9 @@ def run_loop(agent, env, number_episodes, anneal):
 
 
 def run_agent(baseline, dev_measure, dev_fun, discount, value_discount, beta,
-              anneal, seed, env_name, noops, num_episodes, num_episodes_noexp,
-              exact_baseline, agent_class):
+              exact_baseline, anneal, num_episodes, num_episodes_noexp, seed,
+              env_name, noops, movement_reward, goal_reward, side_effect_reward,
+              agent_class):
   """Run agent.
 
   Create an agent with the given parameters for the side effects penalty.
@@ -79,14 +89,17 @@ def run_agent(baseline, dev_measure, dev_fun, discount, value_discount, beta,
     discount: discount factor
     value_discount: discount factor for deviation measure value function.
     beta: weight for side effects penalty
+    exact_baseline: whether to use an exact or approximate baseline
     anneal: whether to anneal the exploration rate from 1 to 0 or use a constant
       exploration rate
+    num_episodes: number of episodes
+    num_episodes_noexp: number of episodes with no exploration
     seed: random seed
     env_name: environment name
     noops: whether the environment has noop actions
-    num_episodes: number of episodes
-    num_episodes_noexp: number of episodes with no exploration
-    exact_baseline: whether to use an exact or approximate baseline
+    movement_reward: movement reward
+    goal_reward: reward for reaching a goal state
+    side_effect_reward: hidden reward for causing side effects
     agent_class: Q-learning agent class: QLearning (regular) or QLearningSE
       (with side effects penalty)
 
@@ -95,10 +108,18 @@ def run_agent(baseline, dev_measure, dev_fun, discount, value_discount, beta,
     performances: safety performance for each episode
   """
   np.random.seed(seed)
-  env = get_env(env_name, noops)
+  env, _ = get_env(env_name=env_name,
+                   noops=noops,
+                   movement_reward=movement_reward,
+                   goal_reward=goal_reward,
+                   side_effect_reward=side_effect_reward)
   start_timestep = env.reset()
   if exact_baseline:
-    baseline_env = get_env(env_name, True)
+    baseline_env, _ = get_env(env_name=env_name,
+                              noops=True,
+                              movement_reward=movement_reward,
+                              goal_reward=goal_reward,
+                              side_effect_reward=side_effect_reward)
   else:
     baseline_env = None
   agent = agent_class(

@@ -44,8 +44,8 @@ class SideEffectsTestCase(parameterized.TestCase):
 class BaselineTestCase(SideEffectsTestCase):
 
   def _create_baseline(self, env_name):
-    self._env = training.get_env(env_name, True)
-    self._baseline_env = training.get_env(env_name, True)
+    self._env, _ = training.get_env(env_name, True)
+    self._baseline_env, _ = training.get_env(env_name, True)
     baseline_class = getattr(side_effects_penalty,
                              self.__class__.__name__[:-4])  # remove 'Test'
     self._baseline = baseline_class(
@@ -84,7 +84,8 @@ class StartBaselineTest(BaselineTestCase):
 
 class InactionBaselineTest(BaselineTestCase):
 
-  box_action_spec = training.get_env('box', True).action_spec()
+  box_env, _ = training.get_env('box', True)
+  box_action_spec = box_env.action_spec()
 
   @parameterized.parameters(
       *list(range(box_action_spec.minimum, box_action_spec.maximum + 1)))
@@ -191,7 +192,7 @@ class NoDeviationTest(SideEffectsTestCase):
   def _random_initial_transition(self):
     env_name = np.random.choice(environments)
     noops = np.random.choice([True, False])
-    env = training.get_env(env_name, noops)
+    env, _ = training.get_env(env_name, noops)
     action_range = self._env_to_action_range(env)
     action = np.random.choice(action_range)
     state1 = self._timestep_to_state(env.reset())
@@ -216,7 +217,7 @@ class UnreachabilityTest(SideEffectsTestCase):
   def testUnreachabilityCycle(self, gamma):
     # Reachability with no dev_fun means unreachability
     deviation = side_effects_penalty.Reachability(value_discount=gamma)
-    env = training.get_env('box', False)
+    env, _ = training.get_env('box', False)
 
     state0 = self._timestep_to_state(env.reset())
     state1 = self._timestep_to_state(env.step(Actions.LEFT))

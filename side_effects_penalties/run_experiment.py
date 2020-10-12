@@ -51,6 +51,10 @@ if __name__ == '__main__':  # Avoid defining flags when used as a library.
   flags.DEFINE_integer('seed', 1, 'Random seed.')
   flags.DEFINE_string('env_name', 'box', 'Environment name.')
   flags.DEFINE_bool('noops', True, 'Whether the environment includes noops.')
+  flags.DEFINE_integer('movement_reward', 0, 'Movement reward.')
+  flags.DEFINE_integer('goal_reward', 1, 'Reward for reaching a goal state.')
+  flags.DEFINE_integer('side_effect_reward', -1,
+                       'Hidden reward for causing side effects.')
   flags.DEFINE_bool('exact_baseline', False,
                     'Compute the exact baseline using an environment copy.')
   flags.DEFINE_enum('mode', 'save', ['print', 'save'],
@@ -61,7 +65,8 @@ if __name__ == '__main__':  # Avoid defining flags when used as a library.
 
 def run_experiment(baseline, dev_measure, dev_fun, discount, value_discount,
                    beta, anneal, num_episodes, num_episodes_noexp, seed,
-                   env_name, noops, exact_baseline, mode, path, suffix):
+                   env_name, noops, exact_baseline, mode, path, suffix,
+                   movement_reward, goal_reward, side_effect_reward):
   """Run agent and save or print the results."""
   performances = []
   rewards = []
@@ -75,7 +80,8 @@ def run_experiment(baseline, dev_measure, dev_fun, discount, value_discount,
       anneal=anneal, num_episodes=num_episodes,
       num_episodes_noexp=num_episodes_noexp, seed=seed, env_name=env_name,
       noops=noops, agent_class=agent_with_penalties.QLearningSE,
-      exact_baseline=exact_baseline)
+      exact_baseline=exact_baseline, movement_reward=movement_reward,
+      goal_reward=goal_reward, side_effect_reward=side_effect_reward)
   rewards.extend(reward)
   performances.extend(performance)
   seeds.extend([seed] * (num_episodes + num_episodes_noexp))
@@ -117,6 +123,9 @@ def main(unused_argv):
       seed=FLAGS.seed,
       env_name=FLAGS.env_name,
       noops=FLAGS.noops,
+      movement_reward=FLAGS.movement_reward,
+      goal_reward=FLAGS.goal_reward,
+      side_effect_reward=FLAGS.side_effect_reward,
       exact_baseline=FLAGS.exact_baseline,
       mode=FLAGS.mode,
       path=FLAGS.path,
