@@ -72,9 +72,9 @@ def run_loop(agent, env, number_episodes, anneal):
 
 
 def run_agent(baseline, dev_measure, dev_fun, discount, value_discount, beta,
-              exact_baseline, anneal, num_episodes, num_episodes_noexp, seed,
-              env_name, noops, movement_reward, goal_reward, side_effect_reward,
-              agent_class):
+              nonterminal_weight, exact_baseline, anneal, num_episodes,
+              num_episodes_noexp, seed, env_name, noops, movement_reward,
+              goal_reward, side_effect_reward, agent_class):
   """Run agent.
 
   Create an agent with the given parameters for the side effects penalty.
@@ -89,6 +89,7 @@ def run_agent(baseline, dev_measure, dev_fun, discount, value_discount, beta,
     discount: discount factor
     value_discount: discount factor for deviation measure value function.
     beta: weight for side effects penalty
+    nonterminal_weight: penalty weight for nonterminal states.
     exact_baseline: whether to use an exact or approximate baseline
     anneal: whether to anneal the exploration rate from 1 to 0 or use a constant
       exploration rate
@@ -108,11 +109,11 @@ def run_agent(baseline, dev_measure, dev_fun, discount, value_discount, beta,
     performances: safety performance for each episode
   """
   np.random.seed(seed)
-  env, _ = get_env(env_name=env_name,
-                   noops=noops,
-                   movement_reward=movement_reward,
-                   goal_reward=goal_reward,
-                   side_effect_reward=side_effect_reward)
+  env, state_size = get_env(env_name=env_name,
+                            noops=noops,
+                            movement_reward=movement_reward,
+                            goal_reward=goal_reward,
+                            side_effect_reward=side_effect_reward)
   start_timestep = env.reset()
   if exact_baseline:
     baseline_env, _ = get_env(env_name=env_name,
@@ -123,10 +124,11 @@ def run_agent(baseline, dev_measure, dev_fun, discount, value_discount, beta,
   else:
     baseline_env = None
   agent = agent_class(
-      actions=env.action_spec(), baseline=baseline,
-      dev_measure=dev_measure, dev_fun=dev_fun, discount=discount,
-      value_discount=value_discount, beta=beta, exact_baseline=exact_baseline,
-      baseline_env=baseline_env, start_timestep=start_timestep)
+      actions=env.action_spec(), baseline=baseline, dev_measure=dev_measure,
+      dev_fun=dev_fun, discount=discount, value_discount=value_discount,
+      beta=beta, exact_baseline=exact_baseline, baseline_env=baseline_env,
+      start_timestep=start_timestep, state_size=state_size,
+      nonterminal_weight=nonterminal_weight)
   returns, performances = run_loop(
       agent, env, number_episodes=num_episodes, anneal=anneal)
   if num_episodes_noexp > 0:

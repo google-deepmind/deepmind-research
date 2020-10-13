@@ -87,6 +87,10 @@ class Baseline(object):
   def rollout_func(self):
     """Function to compute a rollout chain, or None if n/a."""
 
+  @property
+  def baseline_state(self):
+    return self._baseline_state
+
 
 class StartBaseline(Baseline):
   """Starting state baseline."""
@@ -609,31 +613,32 @@ class NoDeviation(DeviationMeasure):
 class SideEffectPenalty(object):
   """Impact penalty."""
 
-  def __init__(self, baseline, dev_measure, beta=1.0,
-               use_inseparable_rollout=False):
+  def __init__(
+      self, baseline, dev_measure, beta=1.0, nonterminal_weight=0.01,
+      use_inseparable_rollout=False):
     """Make an object to calculate the impact penalty.
 
     Args:
       baseline: object for calculating the baseline state
       dev_measure: object for calculating the deviation between states
       beta: weight (scaling factor) for the impact penalty
-      use_inseparable_rollout: whether to compute the penalty as the average of
-        deviations over parallel inaction rollouts from the current and
-        baselines states (True) otherwise just between the current state and
-        baseline state (or by whatever rollout value is provided in the
-        baseline) (False)
+      nonterminal_weight: penalty weight on nonterminal states.
+      use_inseparable_rollout:
+        whether to compute the penalty as the average of deviations over
+        parallel inaction rollouts from the current and baseline states (True)
+        otherwise just between the current state and baseline state (or by
+        whatever rollout value is provided in the baseline) (False)
     """
     self._baseline = baseline
     self._dev_measure = dev_measure
     self._beta = beta
+    self._nonterminal_weight = nonterminal_weight
     self._use_inseparable_rollout = use_inseparable_rollout
 
   def calculate(self, prev_state, action, current_state):
     """Calculate the penalty associated with a transition, and update models."""
-    if current_state:
-      self._dev_measure.update(prev_state, current_state, action)
-      baseline_state = self._baseline.calculate(prev_state, action,
-                                                current_state)
+    def compute_penalty(current_state, baseline_state):
+      """Compute penalty."""
       if self._use_inseparable_rollout:
         penalty = self._rollout_value(current_state, baseline_state,
                                       self._dev_measure.discount,
@@ -642,8 +647,15 @@ class SideEffectPenalty(object):
         penalty = self._dev_measure.calculate(current_state, baseline_state,
                                               self._baseline.rollout_func)
       return self._beta * penalty
-    else:
-      return 0
+    if current_state:  # not a terminal state
+      self._dev_measure.update(prev_state, current_state, action)
+      baseline_state =\
+          self._baseline.calculate(prev_state, action, current_state)
+      penalty = compute_penalty(current_state, baseline_state)
+      return self._nonterminal_weight * penalty
+    else:  # terminal state
+      penalty = compute_penalty(prev_state, self._baseline.baseline_state)
+      return penalty
 
   def reset(self):
     """Signal start of new episode."""

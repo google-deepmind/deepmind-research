@@ -31,11 +31,13 @@ from side_effects_penalties.file_loading import filename
 FLAGS = flags.FLAGS
 
 if __name__ == '__main__':  # Avoid defining flags when used as a library.
-  flags.DEFINE_enum('baseline', 'stepwise',
+  # Side effects penalty settings
+  flags.DEFINE_enum('baseline', 'inaction',
                     ['start', 'inaction', 'stepwise', 'step_noroll'],
                     'Baseline.')
   flags.DEFINE_enum('dev_measure', 'rel_reach',
-                    ['none', 'reach', 'rel_reach', 'att_util'],
+                    ['none', 'reach', 'rel_reach',
+                     'uvfa_rel_reach', 'att_util'],
                     'Deviation measure.')
   flags.DEFINE_enum('dev_fun', 'truncation', ['truncation', 'absolute'],
                     'Summary function for the deviation measure.')
@@ -43,45 +45,65 @@ if __name__ == '__main__':  # Avoid defining flags when used as a library.
   flags.DEFINE_float('value_discount', 0.99,
                      'Discount factor for deviation measure value function.')
   flags.DEFINE_float('beta', 30.0, 'Weight for side effects penalty.')
+  flags.DEFINE_string('nonterminal', 'disc',
+                      'Penalty for nonterminal states relative to terminal'
+                      'states: none (0), full (1), or disc (1-discount).')
+  flags.DEFINE_bool('exact_baseline', False,
+                    'Compute the exact baseline using an environment copy.')
+  # Agent settings
   flags.DEFINE_bool('anneal', True,
                     'Whether to anneal the exploration rate from 1 to 0.')
   flags.DEFINE_integer('num_episodes', 10000, 'Number of episodes.')
   flags.DEFINE_integer('num_episodes_noexp', 0,
                        'Number of episodes with no exploration.')
   flags.DEFINE_integer('seed', 1, 'Random seed.')
+  # Environment settings
   flags.DEFINE_string('env_name', 'box', 'Environment name.')
   flags.DEFINE_bool('noops', True, 'Whether the environment includes noops.')
   flags.DEFINE_integer('movement_reward', 0, 'Movement reward.')
   flags.DEFINE_integer('goal_reward', 1, 'Reward for reaching a goal state.')
   flags.DEFINE_integer('side_effect_reward', -1,
                        'Hidden reward for causing side effects.')
-  flags.DEFINE_bool('exact_baseline', False,
-                    'Compute the exact baseline using an environment copy.')
+  # Settings for outputting results
   flags.DEFINE_enum('mode', 'save', ['print', 'save'],
                     'Print results or save to file.')
   flags.DEFINE_string('path', '', 'File path.')
   flags.DEFINE_string('suffix', '', 'Filename suffix.')
 
 
-def run_experiment(baseline, dev_measure, dev_fun, discount, value_discount,
-                   beta, anneal, num_episodes, num_episodes_noexp, seed,
-                   env_name, noops, exact_baseline, mode, path, suffix,
-                   movement_reward, goal_reward, side_effect_reward):
+def run_experiment(
+    baseline, dev_measure, dev_fun, discount, value_discount, beta, nonterminal,
+    exact_baseline, anneal, num_episodes, num_episodes_noexp, seed,
+    env_name, noops, movement_reward, goal_reward, side_effect_reward,
+    mode, path, suffix):
   """Run agent and save or print the results."""
   performances = []
   rewards = []
   seeds = []
   episodes = []
-  if dev_measure not in ['rel_reach', 'att_util']:
+  if 'rel_reach' not in dev_measure and 'att_util' not in dev_measure:
     dev_fun = 'none'
+  nonterminal_weights = {'none': 0.0, 'disc': 1.0-discount, 'full': 1.0}
+  nonterminal_weight = nonterminal_weights[nonterminal]
   reward, performance = training.run_agent(
-      baseline=baseline, dev_measure=dev_measure, dev_fun=dev_fun,
-      discount=discount, value_discount=value_discount, beta=beta,
-      anneal=anneal, num_episodes=num_episodes,
-      num_episodes_noexp=num_episodes_noexp, seed=seed, env_name=env_name,
-      noops=noops, agent_class=agent_with_penalties.QLearningSE,
-      exact_baseline=exact_baseline, movement_reward=movement_reward,
-      goal_reward=goal_reward, side_effect_reward=side_effect_reward)
+      baseline=baseline,
+      dev_measure=dev_measure,
+      dev_fun=dev_fun,
+      discount=discount,
+      value_discount=value_discount,
+      beta=beta,
+      nonterminal_weight=nonterminal_weight,
+      exact_baseline=exact_baseline,
+      anneal=anneal,
+      num_episodes=num_episodes,
+      num_episodes_noexp=num_episodes_noexp,
+      seed=seed,
+      env_name=env_name,
+      noops=noops,
+      movement_reward=movement_reward,
+      goal_reward=goal_reward,
+      side_effect_reward=side_effect_reward,
+      agent_class=agent_with_penalties.QLearningSE)
   rewards.extend(reward)
   performances.extend(performance)
   seeds.extend([seed] * (num_episodes + num_episodes_noexp))
@@ -117,6 +139,8 @@ def main(unused_argv):
       discount=FLAGS.discount,
       value_discount=FLAGS.value_discount,
       beta=FLAGS.beta,
+      nonterminal=FLAGS.nonterminal,
+      exact_baseline=FLAGS.exact_baseline,
       anneal=FLAGS.anneal,
       num_episodes=FLAGS.num_episodes,
       num_episodes_noexp=FLAGS.num_episodes_noexp,
@@ -126,7 +150,6 @@ def main(unused_argv):
       movement_reward=FLAGS.movement_reward,
       goal_reward=FLAGS.goal_reward,
       side_effect_reward=FLAGS.side_effect_reward,
-      exact_baseline=FLAGS.exact_baseline,
       mode=FLAGS.mode,
       path=FLAGS.path,
       suffix=FLAGS.suffix)
