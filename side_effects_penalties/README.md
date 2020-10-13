@@ -2,6 +2,8 @@
 
 Side effects are unnecessary disruptions to the agent's environment while completing a task. Instead of trying to explicitly penalize all possible side effects, we give the agent a general penalty for impacting the environment, defined as a deviation from some baseline state. For example, a reversibility penalty measures unreachability (deviation) of the starting state (baseline). This code implements a tabular Q-learning agent with different impact penalties. Each penalty consists of a deviation measure (none, unreachability, relative reachability, or attainable utility), a baseline (starting state, inaction, or stepwise inaction), and some other design choices. This is the code for the paper [Penalizing side effects using stepwise relative reachability](https://arxiv.org/abs/1806.01186) by Krakovna et al (2019).
 
+In our latest paper "Avoiding Side Effects By Considering Future Tasks" by Krakovna et al (NeurIPS 2020), the agent receives an auxiliary reward for preserving the ability to perform future tasks. This approach is equivalent to relative reachability with an inaction baseline in deterministic environments. The UVFA approximation for the auxiliary reward is included as an option for the deviation measure.
+
 ## Instructions
 
 Clone the repository:
@@ -14,20 +16,28 @@ Run the agent with a given penalty on an AI Safety Gridworlds environment:
 
 `python -m side_effects_penalties.run_experiment -baseline <X> -dev_measure <Y> -env_name <Z> -suffix <S>`
 
-The following parameters can be specified for the side effects penalty:
+The following settings can be specified for the side effects penalty:
 * Baseline state (`-baseline`): starting state (`start`), inaction (`inaction`),
   stepwise inaction with rollouts (`stepwise`), stepwise inaction without
   rollouts (`step_noroll`)
 * Deviation measure (`-dev_measure`): none (`none`), unreachability (`reach`),
-  relative reachability (`rel_reach`), attainable utility (`att_util`)
-* Discount factor for the deviation measure value function (`-value_discount`)
+  relative reachability (`rel_reach`), attainable utility (`att_util`),
+  UVFA approximation of relative reachability (`uvfa_rel_reach`)
 * Summary function to apply to the relative reachability or attainable utility
   deviation measure (`-dev_fun`): max (0, x) (`truncation`) or |x| (`absolute`)
+* Discount factor for rewards (`discount`). We use `discount=0.95` for the UVFA
+  approximation of relative reachability.
+* Discount factor for the deviation measure value function (`-value_discount`).
+  Should be the same as `discount` unless using an undiscounted reachability
+  measure.
 * Weight for the side effects penalty relative to the reward (`-beta`)
+* Penalty for nonterminal states relative to terminal states (`-nonterminal'):
+  1 (`full`) is used in the stepwise relative reachability paper, while
+  (1-discount) (`disc`) is used in the future tasks paper.
 
-Other arguments:
-* AI Safety Gridworlds environment name (`-env_name`)
+Other settings include:
 * Number of episodes (`-num_episodes`)
+* AI Safety Gridworlds environment name (`-env_name`)
 * Filename suffix for saving result files (`-suffix`)
 
 ### Plotting the results
@@ -53,17 +63,20 @@ learning curve plot.
 
 * Python 2.7 or 3 (tested with Python 2.7.15 and 3.6.7)
 * [AI Safety Gridworlds](https://github.com/deepmind/ai-safety-gridworlds) suite
-of safety environments
+  of safety environments
 * [Abseil](https://github.com/abseil/abseil-py) Python common libraries
 * Numpy
+* Tensorflow 1
+* Sonnet
 * Pandas
 * Six
 * Matplotlib
 * Seaborn
 
+
 ## Citing this work
 
-If you use this code in your work, please cite the accompanying paper:
+If you use this code in your work, please cite one of the accompanying papers:
 
 `@article{srr2019,
   title = {Penalizing Side Effects using Stepwise Relative Reachability},
@@ -71,4 +84,11 @@ If you use this code in your work, please cite the accompanying paper:
   journal = {CoRR},
   volume = {abs/1806.01186},
   year = {2019}
+}`
+
+`@inproceedings{ft2020,
+  title = {Avoiding Side Effects By Considering Future Tasks},
+  author = {Victoria Krakovna and Laurent Orseau and Richard Ngo and Miljan Martic and Shane Legg},
+  booktitle = {Neural Information Processing Systems},
+  year = {2020}
 }`
