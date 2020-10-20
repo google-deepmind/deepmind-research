@@ -98,7 +98,7 @@ If you use this code in your work, we ask you to cite this paper:
   title={Disentangling by Subspace Diffusion},
   author={Pfau, David and Higgins, Irina and Botev, Aleksandar and Racani\`ere,
   S{\'e}bastian},
-  journal={arXiv preprint arXiv:2006.12982},
+  journal={Advances in Neural Information Processing Systems (NeurIPS)},
   year={2020}
 }
 ```

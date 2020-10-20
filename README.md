@@ -33,7 +33,7 @@ https://deepmind.com/research/publications/
 *   [Catch & Carry: Reusable Neural Controllers for Vision-Guided Whole-Body Tasks](catch_carry), SIGGRAPH 2020
 *   [MEMO: A Deep Network For Flexible Combination Of Episodic Memories](memo), ICLR 2020
 *   [RL Unplugged: Benchmarks for Offline Reinforcement Learning](rl_unplugged)
-*   [Disentangling by Subspace Diffusion (GEOMANCER)](geomancer)
+*   [Disentangling by Subspace Diffusion (GEOMANCER)](geomancer), NeurIPS 2020
 *   [What can I do here? A theory of affordances in reinforcement learning](affordances_theory), ICML 2020
 *   [Scaling data-driven robotics with reward sketching and batch reinforcement learning](sketchy), RSS 2020
 *   [The Option Keyboard: Combining Skills in Reinforcement Learning](option_keyboard), NeurIPS 2019
