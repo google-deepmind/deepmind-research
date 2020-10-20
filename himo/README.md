@@ -1,6 +1,6 @@
 # Accompanying code for Value-driven Hindsight Modelling
 
-`himo_example.ipynb` contains code for the illustrative task of Section 3.2 in the [paper](https://arxiv.org/abs/2009.05524).
+`himo_example.ipynb` contains code for the illustrative task of Section 3.2 in the [paper](https://arxiv.org/abs/2002.08329).
 
 ## Requirements and Installation
 
@@ -15,4 +15,4 @@ If your runtime doesn't include [Haiku](https://github.com/deepmind/dm-haiku) an
 
 ## Reference
 **Value-driven Hindsight Modelling** Arthur Guez, Fabio Viola, Théophane Weber, Lars Buesing, Steven Kapturowski, Doina Precup, David Silver, and Nicolas Heess
-Neural Information Processing Systems 2020, URL: https://arxiv.org/abs/2009.05524
+Neural Information Processing Systems 2020, URL: https://arxiv.org/abs/2002.08329
