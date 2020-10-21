@@ -1,7 +1,8 @@
 # Targeted free energy estimation via learned mappings
 
 This repository contains supporting data for our publication
-([arXiv](https://arxiv.org/abs/2002.04913)). Here, we provide
+([journal](https://doi.org/10.1063/5.0018903), [arXiv](https://arxiv.org/abs/2002.04913)).
+Here, we provide
 - molecular dynamics (MD) datasets underlying the results reported in our paper,
 - a LAMMPS input script to generate these datasets, and
 - the data plotted in Fig. 5 of our paper to facilitate comparison.
@@ -96,9 +97,11 @@ If you find this repository helpful for your research, please cite our publicati
   title={Targeted free energy estimation via learned mappings},
   author={Wirnsberger, Peter and Ballard, Andrew J and Papamakarios, George and
           Abercrombie, Stuart and Racanière, Sébastien and Pritzel, Alexander and
-          Jimenez Rezende, Danilo and Blundell, Charles}
-  journal={Journal of Chemical Physics},
-  vol={153},
+          Jimenez Rezende, Danilo and Blundell, Charles},
+  journal={J. Chem. Phys.},
+  volume={153},
+  number={14},
+  pages={144112},
   year={2020},
   doi={10.1063/5.0018903}
 }
