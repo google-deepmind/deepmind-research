@@ -21,7 +21,7 @@ protobuf==3.10.0
 semantic-version==2.8.2
 six==1.12.0
 tensorboard==1.15.0
-tensorflow==1.15.0
+tensorflow==1.15.4
 tensorflow-estimator==1.15.1
 tensorflow-probability==0.7.0
 termcolor==1.1.0
