@@ -2,6 +2,6 @@ absl-py==0.7.1
 dm-sonnet==1.34
 numpy==1.16.4
 Pillow
-tensorflow==1.15rc2
+tensorflow==1.15.4
 tensorflow-probability==0.7.0
 tensorflow-gan==2.0.0
