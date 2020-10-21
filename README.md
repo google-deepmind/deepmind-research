@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Gated Linear Networks](gated_linear_networks), NeurIPS 2020
 *   [Value-driven Hindsight Modelling](himo), NeurIPS 2020
 *   [Targeted free energy estimation via learned mappings](learned_free_energy_estimation), Journal of Chemical Physics 2020
 *   [Learning to Simulate Complex Physics with Graph Networks](learning_to_simulate), ICML 2020
