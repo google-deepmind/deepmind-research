@@ -3,7 +3,7 @@ dm-env==1.2
 dm-sonnet==1.34
 dm-tree
 numpy==1.16.4
-tensorflow==1.13.2
+tensorflow==1.15.4
 tensorflow_hub==0.7.0
 tensorflow_probability==0.6.0
 wrapt
