@@ -11,7 +11,7 @@ and counterfactuals), and operate on arbitrary propositional and causal events. 
 work expands the domain of causal reasoning to a very general class of discrete
 stochastic processes.
 
-For details, see our paper [Algorithms for Causal Reasoning in Probability Trees]().
+For details, see our paper [Algorithms for Causal Reasoning in Probability Trees](https://arxiv.org/abs/2010.12237).
 
 The accompanying colab is available here:
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/deepmind/deepmind_research/blob/master/causal_reasoning/Causal_Reasoning_in_Probability_Trees.ipynb)
