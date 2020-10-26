@@ -13,9 +13,10 @@ stochastic processes.
 
 For details, see our paper [Algorithms for Causal Reasoning in Probability Trees]().
 
-To launch the accompanying notebook in Google colab, [click here](https://colab.research.google.com/github/deepmind/deepmind_research/blob/master/causal_reasoning/Causal_Reasoning_in_Probability_Trees.ipynb).
+The accompanying colab is available here:
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/deepmind/deepmind_research/blob/master/causal_reasoning/Causal_Reasoning_in_Probability_Trees.ipynb)
 
 If you use the code here please cite this paper.
 
-> Tim Genewein*, Tom McGrath*, Grégoire Delétang*, Vladimir Mikulik*, Miljan Martic, Shane Legg, Pedro A. Ortega. NeurIPS 2020. [\[arXiv\]]()
+> Tim Genewein*, Tom McGrath*, Grégoire Delétang*, Vladimir Mikulik*, Miljan Martic, Shane Legg, Pedro A. Ortega. [\[arXiv\]](https://arxiv.org/abs/2010.12237)
 
