@@ -12,6 +12,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+
+# Get EMNLP data.
+mkdir -p /tmp/emnlp2017
+curl https://storage.googleapis.com/deepmind-scratchgan-data/train.json --output /tmp/emnlp2017/train.json
+curl https://storage.googleapis.com/deepmind-scratchgan-data/valid.json --output /tmp/emnlp2017/valid.json
+curl https://storage.googleapis.com/deepmind-scratchgan-data/test.json --output /tmp/emnlp2017/test.json
+curl https://storage.googleapis.com/deepmind-scratchgan-data/glove_emnlp2017.txt --output /tmp/emnlp2017/glove_emnlp2017.txt
+
+
 # Install python3.5
 which python3.5
 if  [ $? -eq 1 ]; then
@@ -26,18 +36,17 @@ if  [ $? -eq 1 ]; then
 fi
 # Fail on any error.
 set -e
-python3.5 -m venv cs_gan_venv
+python3.5 -m venv scratchgan-venv
 echo 'Created venv'
-source cs_gan_venv/bin/activate
+source scratchgan-venv/bin/activate
 echo 'Installing pip'
 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 python3.5 get-pip.py pip==20.2.3
 
-echo 'Getting requirements.'
-pip install -r cs_gan/requirements.txt
 
+echo 'Getting requirements.'
+pip install -r scratchgan/requirements.txt
 
 echo 'Starting training...'
-python3.5 -m cs_gan.main_cs
-# Gan code.
-python3.5 -m cs_gan.main
+python3.5 -m scratchgan.experiment --mode="train" &
+python3.5 -m scratchgan.experiment --mode="evaluate_pair" &
