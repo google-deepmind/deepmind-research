@@ -12,7 +12,7 @@ chrome-gnome-shell==0.0.0
 cloudpickle==1.6.0
 CredentialKit==0.7
 credentialkit-client==1
-cryptography==2.8
+cryptography==3.2
 cupshelpers==1.0
 dbus-python==1.2.16
 decorator==4.4.2
