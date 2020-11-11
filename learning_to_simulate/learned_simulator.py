@@ -98,8 +98,8 @@ class LearnedSimulator(snt.AbstractModule):
         If None, we assume all particles are the same type.
 
     Returns:
-      updated_position_sequence with shape [num_particles_in_batch,
-        num_dimensions] for one step into the future from the input sequence.
+      Next position with shape [num_particles_in_batch, num_dimensions] for one
+      step into the future from the input sequence.
     """
     input_graphs_tuple = self._encoder_preprocessor(
         position_sequence, n_particles_per_example, global_context,
