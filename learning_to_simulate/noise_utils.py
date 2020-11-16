@@ -45,8 +45,8 @@ def get_random_walk_noise_for_position_sequence(
 
   # Integrate the noise in the velocity to the positions, assuming
   # an Euler intergrator and a dt = 1, and adding no noise to the very first
-  # position (since that will only be used to calculate the first position#
-  # change.
+  # position (since that will only be used to calculate the first position
+  # change).
   position_sequence_noise = tf.concat([
       tf.zeros_like(velocity_sequence_noise[:, 0:1]),
       tf.cumsum(velocity_sequence_noise, axis=1)], axis=1)

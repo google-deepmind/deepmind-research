@@ -207,7 +207,7 @@ class LearnedSimulator(snt.AbstractModule):
   def get_predicted_and_target_normalized_accelerations(
       self, next_position, position_sequence_noise, position_sequence,
       n_particles_per_example, global_context=None, particle_types=None):  # pylint: disable=g-doc-args
-    """Produces a model step, outputting the next position for each particle.
+    """Produces normalized and predicted acceleration targets.
 
     Args:
       next_position: Tensor of shape [num_particles_in_batch, num_dimensions]
