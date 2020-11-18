@@ -93,7 +93,7 @@ should span the same subspace as the results in the second plot.
 
 ## Stanford 3D Objects for Disentangling (S3O4D)
 
-<img src="s304d.png" alt="Stanford 3D Objects for Disentangling"
+<img src="s3o4d.png" alt="Stanford 3D Objects for Disentangling"
      width="1076" height="182" />
 
 The data used in the "Stanford 3D Objects" section of the experimental results
