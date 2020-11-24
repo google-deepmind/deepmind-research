@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [ODE-GAN: Training GANs by Solving Ordinary Differential Equations](ode_gan), NeurIPS 2020
 *   [Algorithms for Causal Reasoning in Probability Trees](causal_reasoning)
 *   [Gated Linear Networks](gated_linear_networks), NeurIPS 2020
 *   [Value-driven Hindsight Modelling](himo), NeurIPS 2020
