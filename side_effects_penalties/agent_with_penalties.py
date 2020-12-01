@@ -30,7 +30,8 @@ class QLearningSE(agent.QLearning):
       self, actions, alpha=0.1, epsilon=0.1, q_initialisation=0.0,
       baseline='start', dev_measure='none', dev_fun='truncation',
       discount=0.99, value_discount=1.0, beta=1.0, num_util_funs=10,
-      exact_baseline=False, baseline_env=None, start_timestep=None):
+      exact_baseline=False, baseline_env=None, start_timestep=None,
+      state_size=None, nonterminal_weight=0.01):
     """Create a Q-learning agent with a side effects penalty.
 
     Args:
@@ -53,6 +54,8 @@ class QLearningSE(agent.QLearning):
       exact_baseline: whether to use an exact or approximate baseline.
       baseline_env: copy of environment (with noops) for the exact baseline.
       start_timestep: copy of starting timestep for the baseline.
+      state_size: the size of each state (flattened) for NN reachability.
+      nonterminal_weight: penalty weight on nonterminal states.
 
     Raises:
       ValueError: for incorrect baseline, dev_measure, or dev_fun
@@ -62,9 +65,9 @@ class QLearningSE(agent.QLearning):
                                       discount)
 
     # Impact penalty: set dev_fun (f)
-    if dev_measure in {'rel_reach', 'att_util'}:
+    if 'rel_reach' in dev_measure or 'att_util' in dev_measure:
       if dev_fun == 'truncation':
-        dev_fun = lambda diff: max(0, diff)
+        dev_fun = lambda diff: np.maximum(0, diff)
       elif dev_fun == 'absolute':
         dev_fun = np.abs
       else:
@@ -76,6 +79,9 @@ class QLearningSE(agent.QLearning):
     # Impact penalty: create deviation measure
     if dev_measure in {'reach', 'rel_reach'}:
       deviation = sep.Reachability(value_discount, dev_fun, discount)
+    elif dev_measure == 'uvfa_rel_reach':
+      deviation = sep.UVFAReachability(value_discount, dev_fun, discount,
+                                       state_size)
     elif dev_measure == 'att_util':
       deviation = sep.AttainableUtility(value_discount, dev_fun, num_util_funs,
                                         discount)
@@ -99,8 +105,8 @@ class QLearningSE(agent.QLearning):
     else:
       raise ValueError('Baseline not recognized')
 
-    self._impact_penalty = sep.SideEffectPenalty(baseline, deviation, beta,
-                                                 use_inseparable_rollout)
+    self._impact_penalty = sep.SideEffectPenalty(
+        baseline, deviation, beta, nonterminal_weight, use_inseparable_rollout)
 
   def begin_episode(self):
     """Perform episode initialisation."""

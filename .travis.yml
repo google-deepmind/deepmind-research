@@ -10,7 +10,10 @@ env:
   matrix:
     - PROJECT="tvt"
     - PROJECT="cs_gan"
+    - PROJECT="iodine"
     - PROJECT="transporter"
+    - PROJECT="polygen"
+    - PROJECT="learning_to_simulate"
 before_script:
   - sudo apt-get update -qq
   - pip install --upgrade pip

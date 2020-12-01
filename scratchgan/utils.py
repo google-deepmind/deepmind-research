@@ -1,3 +1,4 @@
+# Lint as: python3
 # Copyright 2019 DeepMind Technologies Limited and Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +35,7 @@ def _get_embedding_initializer(vocab_file, embedding_source, vocab_size):
     embedding_lines = f.readlines()
 
   # First line contains embedding dim.
-  _, embedding_dim = map(int, embedding_lines[0].split())
+  _, embedding_dim = list(map(int, embedding_lines[0].split()))
   # Get the tokens as strings.
   tokens = [line.split()[0] for line in embedding_lines[1:]]
   # Get the actual embedding matrix.
@@ -274,6 +275,12 @@ def make_partially_trainable_embeddings(vocab_file, embedding_source,
   [1] Pennington, J., Socher, R., & Manning, C. (2014, October). Glove: Global
   vectors for word representation. In Proceedings of the 2014 conference on
   empirical methods in natural language processing (EMNLP) (pp. 1532-1543).
+
+  Args:
+    vocab_file: vocabulary file.
+    embedding_source: path to the actual embeddings.
+    vocab_size: number of words in vocabulary.
+    trainable_embedding_size: size of the trainable part of the embeddings.
 
   Returns:
     A matrix of partially pretrained embeddings.

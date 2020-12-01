@@ -1,0 +1,129 @@
+# Simulate a WCA solute particle immersed into a Lennard-Jones solvent.
+#
+# We first generate an initial configuration of particles located at random
+# positions. We then minimise the system and equilibrate it to the target
+# temperature. During the production run, we sample configurations at regular
+# intervals.
+
+################################################################################
+# Specify input parameters.
+################################################################################
+
+# We use the same box dimensions and temperature as in Jarzynski (2002),
+# Phys. Rev. E 65, 046122, but convert these quantities to reduced units.
+# T=300 K, eps=0.1854 kcal/mol, k_boltzmann=0.001987204 kcal/mol/K.
+variable      solute_radius           equal   9.2/3.542
+variable      box_length              equal   22.28/3.542
+variable      temperature_reference   equal   300*0.001987204/0.1854
+variable      temperature_damp        equal   0.5
+variable      seed                    equal   1234
+variable      num_solvent_particles   equal   125
+variable      dump_frequency          equal   5000
+variable      timestep                equal   0.002
+variable      runtime_equi            equal   50000
+variable      runtime_prod            equal   500000
+variable      steps_equilibration     equal   floor(${runtime_equi}/${timestep})
+variable      steps_production        equal   floor(${runtime_prod}/${timestep})
+
+################################################################################
+# Create solvent particles at random positions and place solute at the origin.
+################################################################################
+
+units          lj
+atom_style     atomic
+dimension      3
+boundary       p p p
+variable       box_length_half equal ${box_length}/2.0
+region         domain block -${box_length_half} ${box_length_half} &
+                             -${box_length_half} ${box_length_half} &
+                             -${box_length_half} ${box_length_half} &
+                             units box
+create_box     2 domain
+create_atoms   2 random 1                        ${seed} domain
+create_atoms   1 random ${num_solvent_particles} ${seed} domain
+set            type 2 x 0.0 y 0.0 z 0.0
+group          solute type 2
+group          solvent type 1
+
+# Initialise particle masses.
+mass           1 1
+mass           2 10000000
+
+################################################################################
+# Define pair-style.
+################################################################################
+
+variable       sigma_solute            equal ${solute_radius}
+variable       radius_cutoff_solute    equal 1.12246*${sigma_solute}
+variable       radius_cutoff           equal ${box_length}/2.0
+pair_style     lj/cut                  ${radius_cutoff}
+
+# Lennard-Jones interaction between solvent particles.
+pair_coeff     1 1 1.0 1.0
+
+# WCA interaction between solute and solvent particles.
+pair_coeff     1 2 1.0 ${sigma_solute} ${radius_cutoff_solute}
+
+# No interaction between solute particles.
+pair_coeff     2 2 0.0 0.0
+
+# Shift energies to be zero at the cutoff and update neighbor list settings.
+pair_modify    shift yes
+neighbor       0.3 bin
+neigh_modify   delay 5
+
+################################################################################
+# Perform minimisation.
+################################################################################
+
+fix freeze solute setforce 0.0 0.0 0.0
+minimize       1.0e-4 1.0e-6 100 1000
+
+################################################################################
+# Perform equilibration run.
+################################################################################
+
+reset_timestep 0
+
+compute        temperature_solvent  solvent  temp
+compute        kinetic_energy       all      ke
+compute        potential_energy     all      pe
+variable       total_energy         equal    c_kinetic_energy+c_potential_energy
+
+# Compute centre-of-mass velocity and solute position for monitoring.
+variable       vcmx       equal     "vcm(all,x)"
+variable       vcmy       equal     "vcm(all,y)"
+variable       vcmz       equal     "vcm(all,z)"
+variable       vcm2       equal     v_vcmx*v_vcmx+v_vcmy*v_vcmy+v_vcmz*v_vcmz
+compute        position_solute      solute com
+
+# Specify terminal output.
+thermo_style   custom step temp c_temperature_solvent c_potential_energy &
+               c_kinetic_energy v_total_energy press v_vcm2 &
+               c_position_solute[1] c_position_solute[2] c_position_solute[3]
+thermo_modify  norm no
+thermo         1000
+
+# Specify integration timestep.
+timestep       ${timestep}
+
+# Apply Langevin thermostat to solvent particles.
+fix            flangevin solvent langevin ${temperature_reference} &
+               ${temperature_reference} ${temperature_damp} ${seed} zero yes
+
+fix            fnve all nve
+run            ${steps_equilibration}
+
+################################################################################
+# Production run.
+################################################################################
+
+reset_timestep 0
+
+dump           fDumpTrajectory all custom ${dump_frequency} &
+               trajectory.dat id type x y z
+dump_modify    fDumpTrajectory sort id format float %.8g
+
+fix            fDumpEnergy all ave/time ${dump_frequency} 1 ${dump_frequency} &
+               c_potential_energy file energy.dat format %.8g
+run            ${steps_production}

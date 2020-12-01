@@ -1,3 +1,4 @@
+# Lint as: python3
 # Copyright 2019 DeepMind Technologies Limited and Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -104,7 +105,7 @@ class LSTMGen(snt.AbstractModule):
     sample = tf.tile(
         tf.constant(self._pad_token, dtype=tf.int32)[None], [batch_size])
     logging.info('Unrolling over %d steps.', max_sequence_length)
-    for _ in xrange(max_sequence_length):
+    for _ in range(max_sequence_length):
       # Input is sampled word at t-1.
       embedding = tf.nn.embedding_lookup(input_embeddings, sample)
       embedding.shape.assert_is_compatible_with(

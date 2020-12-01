@@ -39,29 +39,4 @@ The data contains:
 
 ## Running
 
-Download the data and place it in the directory specified by `data_dir` flag:
-
-    mkdir -p /tmp/emnlp2017
-    curl https://storage.googleapis.com/deepmind-scratchgan-data/train.json --output /tmp/emnlp2017/train.json
-    curl https://storage.googleapis.com/deepmind-scratchgan-data/valid.json --output /tmp/emnlp2017/valid.json
-    curl https://storage.googleapis.com/deepmind-scratchgan-data/test.json --output /tmp/emnlp2017/test.json
-    curl https://storage.googleapis.com/deepmind-scratchgan-data/glove_emnlp2017.txt --output /tmp/emnlp2017/glove_emnlp2017.txt
-
-Create and activate a virtual environment if needed:
-
-    virtualenv scratchgan-venv
-    source scratchgan-venv/bin/activate
-
-Install requirements:
-
-    pip install -r scratchgan/requirements.txt
-
-Run training and evaluation jobs:
-
-    python2 -m scratchgan.experiment --mode="train" &
-    python2 -m scratchgan.experiment --mode="evaluate_pair" &
-
-The evaluation code is designed to run in parallel with the training.
-
-The training code saves checkpoints periodically, the evaluation code
-looks for new checkpoints and evaluate them.
+    ./scratchgan/run.sh

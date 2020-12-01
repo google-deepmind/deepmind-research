@@ -1,0 +1,6 @@
+absl-py == 0.9.0
+dm-control
+dm-env
+labmaze
+numpy == 1.19.1
+requests == 2.24.0

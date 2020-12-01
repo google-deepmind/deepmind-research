@@ -12,12 +12,32 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-python3 -m venv cs_gan_venv
+# Install python3.5
+which python3.5
+if  [ $? -eq 1 ]; then
+  echo 'Installing python3.5'
+  (cd /usr/src/
+   sudo wget https://www.python.org/ftp/python/3.5.6/Python-3.5.6.tgz
+   tar -xvzf Python-3.5.6.tgz
+   sudo tar -xvzf Python-3.5.6.tgz
+   cd Python-3.5.6
+   ./configure --enable-loadable-sqlite-extensions --enable-optimizations
+   sudo make altinstall)
+fi
+# Fail on any error.
+set -e
+python3.5 -m venv cs_gan_venv
+echo 'Created venv'
 source cs_gan_venv/bin/activate
-pip install --upgrade pip
+echo 'Installing pip'
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python3.5 get-pip.py pip==20.2.3
+
+echo 'Getting requirements.'
 pip install -r cs_gan/requirements.txt
 
-python -m cs_gan.main_cs
 
-python -m cs_gan.main
+echo 'Starting training...'
+python3.5 -m cs_gan.main_cs
+# Gan code.
+python3.5 -m cs_gan.main
