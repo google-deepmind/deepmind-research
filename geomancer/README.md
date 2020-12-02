@@ -97,7 +97,7 @@ should span the same subspace as the results in the second plot.
      width="1076" height="182" />
 
 The data used in the "Stanford 3D Objects" section of the experimental results
-can be found [here](https://console.cloud.google.com/storage/browser/dm_s3o4d).
+is available in [TensorFlow Datasets](https://www.tensorflow.org/datasets/catalog/s3o4d).
 The data consists of 100,000 renderings each of the Bunny and Dragon objects
 from the [Stanford 3D Scanning Repository](http://graphics.stanford.edu/data/3Dscanrep/).
 More objects may be added in the future, but only the Bunny and Dragon are used
@@ -125,6 +125,24 @@ methods where the curvature of the manifold is important.
 
 ### Usage
 
+To load from TensorFlow Datasets, simply run:
+
+```
+import tensorflow_datasets as tfds
+
+ds = tfds.load('s3o4d', split='bunny_train', shuffle_files=True)
+for example in ds.take(1):
+  image, label, illumination, pose_mat, pose_quat = (
+      example['image'], example['label'], example['illumination'],
+      example['pose_mat'], example['pose_quat'])
+```
+
+where the split can be any of `bunny_train`, `dragon_train`, `bunny_test` or
+`dragon_test`.
+
+If you prefer to not have TensorFlow as a dependency for your project, and want
+to download the data manually, you can find the raw data (as zipped JPEGs and
+NumPy arrays) on [Google Cloud](https://console.cloud.google.com/storage/browser/dm_s3o4d).
 To load the data for a given object, unzip `images.zip` into a folder called
 `images` in the same directory as `latents.npz`, and from inside that
 directory run:
@@ -150,6 +168,9 @@ def get_data(i):
 
 img, latent = get_data(0)
 ```
+
+To do the same train/test split as in TensorFlow Datasets, simply use the first
+80,000 images for each object as training data and the last 20,000 as test.
 
 ## Giving Credit
 
