@@ -24,6 +24,8 @@ to the features used for those accustomed to computing them below. See also
 [issue #18](https://github.com/deepmind/deepmind-research/issues/28) for more
 details.
 
+This code works on Linux, we don't support other operating systems.
+
 ### Dependencies
 
 *   Python 3.6+.
