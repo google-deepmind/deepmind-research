@@ -3,5 +3,5 @@ absl-py==0.8.1
 numpy==1.16
 six==1.12
 dm-sonnet==1.35
-tensorflow==1.14
+tensorflow==2.3.1
 tensorflow-probability==0.7.0
