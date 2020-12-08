@@ -1,0 +1,9 @@
+dm-haiku
+dm-tree
+jax
+jaxlib
+numpy>=1.16
+optax
+sklearn
+tensorflow
+tensorflow_datasets
