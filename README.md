@@ -59,6 +59,8 @@ https://deepmind.com/research/publications/
 *   [Graph Matching Networks for Learning the Similarity of Graph Structured
     Objects](graph_matching_networks), ICML 2019
 *   [REGAL: Transfer Learning for Fast Optimization of Computation Graphs](regal)
+*   [Deep Ensembles: A Loss Landscape Perspective](ensemble_loss_landscape)
+
 
 
 
