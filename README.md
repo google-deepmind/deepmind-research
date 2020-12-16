@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Functional Regularisation for Continual Learning](functional_regularisation_for_continual_learning), ICLR 2020
 *   [Self-Supervised MultiModal Versatile Networks](mmv), NeurIPS 2020
 *   [ODE-GAN: Training GANs by Solving Ordinary Differential Equations](ode_gan), NeurIPS 2020
 *   [Algorithms for Causal Reasoning in Probability Trees](causal_reasoning)
