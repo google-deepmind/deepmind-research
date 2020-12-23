@@ -19,7 +19,8 @@ import os
 from absl import app
 from absl import flags
 
-from glassy_dynamics import train
+from glassy_dynamics import train as train_using_tf
+from glassy_dynamics import train_using_jax
 
 FLAGS = flags.FLAGS
 
@@ -39,6 +40,10 @@ flags.DEFINE_string(
     'checkpoint_path',
     None,
     'Path used to store a checkpoint of the best model.')
+flags.DEFINE_boolean(
+    'use_jax',
+    False,
+    'Uses jax to train model.')
 
 
 def main(argv):
@@ -47,6 +52,7 @@ def main(argv):
 
   train_file_pattern = os.path.join(FLAGS.data_directory, 'train/aggregated*')
   test_file_pattern = os.path.join(FLAGS.data_directory, 'test/aggregated*')
+  train = train_using_jax if FLAGS.use_jax else train_using_tf
   train.train_model(
       train_file_pattern=train_file_pattern,
       test_file_pattern=test_file_pattern,
