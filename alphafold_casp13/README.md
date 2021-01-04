@@ -81,7 +81,9 @@ file. Each target directory contains the following files:
     [TFRecord](https://www.tensorflow.org/tutorials/load_data/tfrecord) file
     with serialized tf.train.Example protocol buffers that contain the features
     needed to run the model.
-1.  `contacts/TARGET.pickle` file(s) with the predicted distogram.
+1.  `contacts/TARGET.pickle` file(s) with the predicted distogram. These pickles
+    were pickled using Python 2, so to unpickle them in Python 3 you will need
+    to set the `encoding='latin1'` optional argument for `pickle.load()`.
 1.  `contacts/TARGET.rr` file(s) with the contact map derived from the predicted
     distogram. The RR format is described on the
     [CASP website](http://predictioncenter.org/casp13/index.cgi?page=format#RR).
