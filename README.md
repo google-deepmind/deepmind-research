@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Uncovering the Limits of Adversarial Training against Norm-Bounded Adversarial Examples](adversarial_robustness)
 *   [Functional Regularisation for Continual Learning](functional_regularisation_for_continual_learning), ICLR 2020
 *   [Self-Supervised MultiModal Versatile Networks](mmv), NeurIPS 2020
 *   [ODE-GAN: Training GANs by Solving Ordinary Differential Equations](ode_gan), NeurIPS 2020
