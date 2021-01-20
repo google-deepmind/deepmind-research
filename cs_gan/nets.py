@@ -30,11 +30,11 @@ def _sn_custom_getter():
       name_filter=name_filter)
 
 
-class SNGenNet(snt.AbstractModule):
+class ConvGenNet(snt.AbstractModule):
   """As in the SN paper."""
 
   def __init__(self, name='conv_gen'):
-    super(SNGenNet, self).__init__(name=name)
+    super(ConvGenNet, self).__init__(name=name)
 
   def _build(self, inputs, is_training):
     batch_size = inputs.get_shape().as_list()[0]
@@ -57,15 +57,17 @@ class SNGenNet(snt.AbstractModule):
     return tf.nn.tanh(output)
 
 
-class SNMetricNet(snt.AbstractModule):
-  """Spectral normalization discriminator (metric) architecture."""
+class ConvMetricNet(snt.AbstractModule):
+  """Convolutional discriminator (metric) architecture."""
 
-  def __init__(self, num_outputs=2, name='sn_metric'):
-    super(SNMetricNet, self).__init__(name=name)
+  def __init__(self, num_outputs=2, use_sn=True, name='sn_metric'):
+    super(ConvMetricNet, self).__init__(name=name)
     self._num_outputs = num_outputs
+    self._use_sn = use_sn
 
   def _build(self, inputs):
-    with tf.variable_scope('', custom_getter=_sn_custom_getter()):
+
+    def build_net():
       net = snt.nets.ConvNet2D(
           output_channels=[64, 64, 128, 128, 256, 256, 512],
           kernel_shapes=[
@@ -74,7 +76,14 @@ class SNMetricNet(snt.AbstractModule):
           paddings=[snt.SAME], activate_final=True,
           activation=functools.partial(tf.nn.leaky_relu, alpha=0.1))
       linear = snt.Linear(self._num_outputs)
-    output = linear(snt.BatchFlatten()(net(inputs)))
+      output = linear(snt.BatchFlatten()(net(inputs)))
+      return output
+    if self._use_sn:
+      with tf.variable_scope('', custom_getter=_sn_custom_getter()):
+        output = build_net()
+    else:
+      output = build_net()
+
     return output
 
 

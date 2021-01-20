@@ -89,7 +89,7 @@ def cross_entropy_loss(logits, expected):
 def optimise_and_sample(init_z, module, data, is_training):
   """Optimising generator latent variables and sample."""
 
-  if module.num_z_iters == 0:
+  if module.num_z_iters is None or module.num_z_iters == 0:
     z_final = init_z
   else:
     init_loop_vars = (0, _project_z(init_z, module.z_project_method))
@@ -215,14 +215,14 @@ def get_generator(dataset):
   if dataset == 'mnist':
     return nets.MLPGeneratorNet()
   if dataset == 'cifar':
-    return nets.SNGenNet()
+    return nets.ConvGenNet()
 
 
-def get_metric_net(dataset, num_outputs=2):
+def get_metric_net(dataset, num_outputs=2, use_sn=True):
   if dataset == 'mnist':
     return nets.MLPMetricNet(num_outputs)
   if dataset == 'cifar':
-    return nets.SNMetricNet(num_outputs)
+    return nets.ConvMetricNet(num_outputs, use_sn)
 
 
 def make_prior(num_latents):
