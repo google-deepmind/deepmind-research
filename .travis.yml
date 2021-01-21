@@ -14,6 +14,7 @@ env:
     - PROJECT="transporter"
     - PROJECT="polygen"
     - PROJECT="learning_to_simulate"
+    - PROJECT="avae"
 before_script:
   - sudo apt-get update -qq
   - pip install --upgrade pip
