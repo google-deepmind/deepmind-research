@@ -32,7 +32,7 @@ gbulb==0.6.1
 gpg===1.13.1-unknown
 hg-evolve==10.1.0.dev0
 html5lib==1.0.1
-httplib2==0.18.1
+httplib2==0.19.0
 idna==2.9
 iniparse==0.4
 IPy==1.0
