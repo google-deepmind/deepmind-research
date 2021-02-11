@@ -1,0 +1,14 @@
+absl-py==0.10.0
+chex>=0.0.2
+dm-haiku>=0.0.3
+jax>=0.2.8
+jaxlib>=0.1.58
+jaxline>=0.0.1
+ml_collections>=0.1
+numpy>=1.18.0
+tensorflow>=2.3.1
+tensorflow-addons>=0.12.0
+tensorflow-datasets>=4.1.0
+tensorflow-probability>=0.12.1
+typing_extensions>=3.7
+wrapt>=1.11.2

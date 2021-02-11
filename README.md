@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Characterizing signal propagation to close the performance gap in unnormalized ResNets](nfnets), ICLR 2021
 *   [Uncovering the Limits of Adversarial Training against Norm-Bounded Adversarial Examples](adversarial_robustness)
 *   [Functional Regularisation for Continual Learning](functional_regularisation_for_continual_learning), ICLR 2020
 *   [Self-Supervised MultiModal Versatile Networks](mmv), NeurIPS 2020
