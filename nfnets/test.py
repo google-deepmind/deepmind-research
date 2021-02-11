@@ -16,20 +16,47 @@
 import jax
 import jax.numpy as jnp
 from nfnets import experiment
+from nfnets import experiment_nfnets
 
-config = experiment.get_config()
-exp_config = config.experiment_kwargs.config
-exp_config.train_batch_size = 2
-exp_config.eval_batch_size = 2
-exp_config.lr = 0.1
-exp_config.fake_data = True
-exp_config.model_kwargs.width = 2
-print(exp_config.model_kwargs)
 
-xp = experiment.Experiment('train', exp_config, jax.random.PRNGKey(0))
-bcast = jax.pmap(lambda x: x)
-global_step = bcast(jnp.zeros(jax.local_device_count()))
-rng = bcast(jnp.stack([jax.random.PRNGKey(0)] * jax.local_device_count()))
-print('Taking a single experiment step for test purposes!')
-result = xp.step(global_step, rng)
-print(f'Step successfully taken, resulting metrics are {result}')
+def test_experiment():
+  """Tests the main experiment."""
+  config = experiment.get_config()
+  exp_config = config.experiment_kwargs.config
+  exp_config.train_batch_size = 2
+  exp_config.eval_batch_size = 2
+  exp_config.lr = 0.1
+  exp_config.fake_data = True
+  exp_config.model_kwargs.width = 2
+  print(exp_config.model_kwargs)
+
+  xp = experiment.Experiment('train', exp_config, jax.random.PRNGKey(0))
+  bcast = jax.pmap(lambda x: x)
+  global_step = bcast(jnp.zeros(jax.local_device_count()))
+  rng = bcast(jnp.stack([jax.random.PRNGKey(0)] * jax.local_device_count()))
+  print('Taking a single experiment step for test purposes!')
+  result = xp.step(global_step, rng)
+  print(f'Step successfully taken, resulting metrics are {result}')
+
+
+def test_nfnet_experiment():
+  """Tests the NFNet experiment."""
+  config = experiment_nfnets.get_config()
+  exp_config = config.experiment_kwargs.config
+  exp_config.train_batch_size = 2
+  exp_config.eval_batch_size = 2
+  exp_config.lr = 0.1
+  exp_config.fake_data = True
+  exp_config.model_kwargs.width = 2
+  print(exp_config.model_kwargs)
+
+  xp = experiment_nfnets.Experiment('train', exp_config, jax.random.PRNGKey(0))
+  bcast = jax.pmap(lambda x: x)
+  global_step = bcast(jnp.zeros(jax.local_device_count()))
+  rng = bcast(jnp.stack([jax.random.PRNGKey(0)] * jax.local_device_count()))
+  print('Taking a single NFNet experiment step for test purposes!')
+  result = xp.step(global_step, rng)
+  print(f'NFNet Step successfully taken, resulting metrics are {result}')
+
+test_experiment()
+test_nfnet_experiment()
