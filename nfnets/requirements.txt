@@ -1,5 +1,6 @@
 absl-py==0.10.0
 chex>=0.0.2
+dill>=0.3.3
 dm-haiku>=0.0.3
 jax>=0.2.8
 jaxlib>=0.1.58

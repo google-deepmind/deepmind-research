@@ -1,4 +1,4 @@
-# Copyright 2020 DeepMind Technologies Limited. All Rights Reserved.
+# Copyright 2021 DeepMind Technologies Limited. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 """Utils."""
+import dill
 import jax
 import jax.numpy as jnp
 import tree
@@ -105,3 +106,23 @@ def split_tree(tuple_tree, base_tree, n):
   """Splits tuple_tree with n-tuple leaves into n trees."""
   return [tree.map_structure_up_to(base_tree, lambda x: x[i], tuple_tree)  # pylint: disable=cell-var-from-loop
           for i in range(n)]
+
+
+def load_haiku_file(filename):
+  """Loads a haiku parameter tree, using dill."""
+  with open(filename, 'rb') as in_file:
+    output = dill.load(in_file)
+  return output
+
+
+def flatten_haiku_tree(haiku_dict):
+  """Flattens a haiku parameter tree into a flat dictionary."""
+  out = {}
+  for module in haiku_dict.keys():
+    out_module = module.replace('/~/', '.').replace('/', '.')
+    for key in haiku_dict[module]:
+      out_key = f'{out_module}.{key}'
+      out[out_key] = haiku_dict[module][key]
+  return out
+
+
