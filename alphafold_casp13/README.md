@@ -1,7 +1,9 @@
-# AlphaFold
+# AlphaFold 1
 
-This package provides an implementation of the contact prediction network,
-associated model weights and CASP13 dataset as published in Nature.
+This package provides an implementation of the contact prediction network used
+in AlphaFold 1, associated model weights and CASP13 dataset as used for CASP13
+(2018) and published in Nature. This is completely different code from that used
+in AlphaFold 2 which was used in CASP14 (2020).
 
 Any publication that discloses findings arising from using this source code must
 cite *Improved protein structure prediction using potentials from deep learning*
