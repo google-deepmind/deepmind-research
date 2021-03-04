@@ -2,11 +2,10 @@
 
 (require racket/list
          rackunit
-         "../Clause.rkt"
-         (submod "../Clause.rkt" test)
-         "../clause.rkt"
-         "../unification-tree.rkt")
-
+         (submod satore/Clause test)
+         satore/Clause
+         satore/clause
+         satore/unification-tree)
 
 (let ()
   (define utree (make-unification-tree))
@@ -36,7 +35,7 @@
 
 (define (utree-remove-subsumed! utree cl)
   (define C (make-Clause cl))
-  (utree-inverse-find/remove! utree C Clause<=>-subsumes))
+  (utree-inverse-find/remove! utree C Clause-subsumes))
 
 (define (make-utree1)
   (define utree (make-unification-tree))

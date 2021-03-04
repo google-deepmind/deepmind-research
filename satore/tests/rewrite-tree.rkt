@@ -2,17 +2,17 @@
 
 (require bazaar/debug
          (except-in bazaar/order atom<=>)
-         racket/list
          racket/file
+         racket/list
          racket/pretty
          racket/random
          rackunit
-         "../Clause.rkt"
-         "../clause.rkt"
-         "../misc.rkt"
-         "../rewrite-tree.rkt"
-         "../unification.rkt"  ; for atom1<=>
-         (submod "../Clause.rkt" test))
+         (submod satore/Clause test)
+         satore/Clause
+         satore/clause
+         satore/misc
+         satore/rewrite-tree
+         satore/unification)
 
 (*debug-level* 0)
 

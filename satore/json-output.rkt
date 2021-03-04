@@ -10,6 +10,7 @@
 
 (provide (all-defined-out))
 
+;; Correspondance with Eprover output values
 (define status-dict
   '((running   . UNSPECIFIED_PROOF_STATUS)
     (refuted   . REFUTATION_FOUND)
@@ -18,6 +19,9 @@
     (steps     . STEP_LIMIT_REACHED)
     (saturated . COUNTER_SATISFIABLE)))
 
+;; Take a result dictionary from `saturation` and returns a JSON string representation of it.
+;;
+;; dict? -> string?
 (define (saturation-result->json res)
   (define d
     (let* ([res (dict-remove res 'name)]
@@ -32,6 +36,7 @@
    ",\n  "
    #:after-last "\n}"))
 
+;; Simple visual test.
 (module+ drracket
   (define res
   '((name . "GEO170+1.p")

@@ -4,8 +4,12 @@
 ;****                Operations On Literals: Unification And Friends                ****;
 ;***************************************************************************************;
 
+;;; * A literal A unifies with a literal B iff there exists a substitution σ s.t. Aσ = Bσ.
+;;; * A literal A left-unifies (= matches) with a literal B iff there exists a substitution
+;;;   σ s.t. Aσ = B.
+;;;   Note that left-unifies => unifies.
+
 (require bazaar/cond-else
-         bazaar/debug
          bazaar/list
          bazaar/mutation
          (except-in bazaar/order atom<=>)
@@ -37,9 +41,11 @@
 ;=== Variables ===;
 ;=================;
 
+;; The name of a variable is a number.
 (struct Var (name)
   #:prefab)
 
+;; Comparisons between variables
 (begin-encourage-inline
   (define Var-name<?  <)
   (define Var-name=?  eqv?)
@@ -48,18 +54,24 @@
   (define (Var=? v1 v2) (Var-name=? (Var-name v1) (Var-name v2)))
   (define (Var<? v1 v2) (Var-name<? (Var-name v1) (Var-name v2))))
 (define (Var<=> v1 v2) (Var-name<=> (Var-name v1) (Var-name v2)))
-; (order=? (Var<=> v1 v2)) = (Vars=? v1 v2)
+; Ensures: (order=? (Var<=> v1 v2)) = (Vars=? v1 v2)
 
 ;:::::::::::::::::::::::::::::::::::;
 ;:: Basic operations on Variables ::;
 ;:::::::::::::::::::::::::::::::::::;
 
 ;; All symbols starting with a capitale letter are considered as variables.
+;;
+;; any/c -> boolean?
 (define (symbol-variable? t)
   (and (symbol? t)
        (char<=? #\A (string-ref (symbol->string t) 0) #\Z)))
 
+;; Returns a variable 'name' corresponding to the given symbol.
+;; Currently accepts only symbols like X1, X2, … and A, B, C, …
 ;; The same symbol is always mapped to the same Var-name, globally.
+;;
+;; symbol? -> exact-nonnegative-integer?
 (define (symbol->Var-name s)
   (define str (symbol->string s))
   (cond [(regexp-match #px"^X(\\d+)$" str)
@@ -70,7 +82,10 @@
         [else
          (error 'Varify "Unknown variable format: ~a" s)]))
 
+;; Inverse operation of symbol->Var-name.
 ;; The same Var-name is always mapped to the same symbol, globally.
+;;
+;; exact-nonnegative-integer? -> symbol?
 (define (Var-name->symbol n)
   (cond [(symbol-variable? n) n]
         [(number? n)
@@ -80,6 +95,9 @@
         [else (error 'Var-name->symbol "Don't know what to do with ~a" n)]))
 
 ;; Returns a new atom like t where all symbol-variables have been turned into `Var?`s.
+;; Notice: Does *not* ensure unicity of the variables across clauses.
+;;
+;; tree? -> atom?
 (define (Varify t)
   (cond [(pair? t)
          ; Works also in assocs
@@ -89,32 +107,15 @@
          (Var (symbol->Var-name t))]
         [else t]))
 
-;; Returns a new atom like t where all `Var`s are replaced with a symbol.
-(define (unVarify t)
-  (cond [(pair? t)
-         ; Works also in assocs
-         (cons (unVarify (car t))
-               (unVarify (cdr t)))]
-        [(Var? t)
-         (Var-name->symbol (Var-name t))]
-        [else t]))
-
-(define (rule->string rule)
-  (format "~a -> ~a" (first rule) (second rule)))
-
-
 ;====================================;
 ;=== Substitutions data structure ===;
 ;====================================;
 
-(define (make-make-hash =?)
-  (cond [(eq? =? eq?) make-hasheq]
-        [(or (eq? =? =) (eq? =? eqv?)) make-hasheqv]
-        [(eq? =? equal?) make-hash]
-        [else (error 'make-make-hash "Unknown hash type: ~a" =?)]))
-
+;; Basic substitution operations.
+;; Simply put, a substitution is a `hasheqv`, where the keys are variables names,
+;; and the values are terms.
 (begin-encourage-inline
-  (define make-subst       (make-make-hash Var-name=?))
+  (define make-subst       make-hasheqv)
   (define subst?           hash?)
   (define in-subst         in-hash)
   (define subst-count      hash-count)
@@ -122,48 +123,80 @@
   (define subst-set!/name  hash-set!)
   (define subst-copy       hash-copy)
 
-  (define (subst-set! subst var t)
-    (hash-set! subst (Var-name var) t)
-    subst) ; return the substitution to mimick the immutable update behaviour
-
-  (define (subst-ref subst var [default #false])
-    (hash-ref subst (Var-name var) default))
-
-  (define (subst-ref! subst var default)
-    (hash-ref! subst (Var-name var) default))
-
-  (define (subst-update! subst var update default)
-    (hash-update! subst (Var-name var) update default)
+  ;; Modifies the substitution to bind `t` to `var`.
+  ;; Returns the substitution to mimick the immutable update behaviour.
+  ;;
+  ;; subst? Var? term? -> subst?
+  (define (subst-set! subst V t)
+    (hash-set! subst (Var-name V) t)
     subst)
 
+  ;; Returns the binding for the variable `V` in `subst`, or `default` if it doesn't exist.
+  ;;
+  ;; susbt? Var? term? -> term?
+  (define (subst-ref subst V [default #false])
+    (hash-ref subst (Var-name V) default))
+
+  ;; Returns the binding for the variable `V` in `susbt` if it exists,
+  ;; otherwise sets it to `default` and returns `default`.
+  ;;
+  ;; subst? Var? term? -> term?
+  (define (subst-ref! subst V default)
+    (hash-ref! subst (Var-name V) default))
+
+  ;; Updates the binding for the variable `V` with `update`
+  ;; Returns the modified substitution
+  ;;
+  ;; subst : subst?
+  ;; V : Var?
+  ;; update : term? -> term?
+  ;; default : term
+  (define (subst-update! subst V update default)
+    (hash-update! subst (Var-name V) update default)
+    subst)
+
+  ;; Returns the substitution as an association list sorted by `Var-name<?`.
+  ;;
+  ;; subst -> list?
   (define (subst->list s)
-    (sort (hash->list s) Var-name<? #:key car))
-  )
+    (sort (hash->list s) Var-name<? #:key car)))
 
 ;::::::::::::::::::::::::::::;
 ;:: Immutable substitution ::;
 ;::::::::::::::::::::::::::::;
 
+;;; Like mutable substitions above, but uses an immutable association list.
+;;; This can be faster in some contexts
+
 (begin-encourage-inline
+  ;; Returns a new immutable substitution.
+  ;;
+  ;; list? -> list?
   (define (make-imsubst [pairs '()]) pairs)
 
-  (define (imsubst-ref subst var default)
-    (define p (assoc (Var-name var) subst Var-name=?))
-    (if p (cdr p) default))
-  )
+  ;; Like subst-ref for immutable substitutions.
+  ;;
+  ;; imsubst? Var? term? -> term?
+  (define (imsubst-ref subst V default)
+    (define p (assoc (Var-name V) subst Var-name=?))
+    (if p (cdr p) default)))
 
-;; like dict-set, but possibly faster and with fewer checks
-(define (imsubst-set subst var val)
-  (define name (Var-name var))
+;; like subst-set!, but does not modify the substitution and returns a new substitution.
+;;
+;; subst : imsubst?
+;; V : var?
+;; t : term?
+(define (imsubst-set subst V t)
+  (define name (Var-name V))
   (let loop ([s subst] [left '()])
     (cond/else
      [(empty? s)
-      (cons (cons name val) subst)]
+      (cons (cons name t) subst)]
      #:else
      (define p (car s))
      #:cond
      [(Var-name=? (car p) name)
-      (rev-append left (cons (cons name val) (cdr s)))]
+      (rev-append left (cons (cons name t) (cdr s)))]
      #:else
      (loop (cdr s) (cons p left)))))
 
@@ -171,18 +204,22 @@
 ;=== Operations on Variables ===;
 ;===============================;
 
+;; Global index to ensure unicity of variable names.
 (define fresh-idx 0)
+
+;; Returns a fresh variable with a unique name.
+;;
+;; -> Var?
 (define (new-Var)
   (++ fresh-idx)
   (Var fresh-idx))
 
-(define-syntax-rule (define-Vars v ...)
-  (begin (define v (new-Var)) ...))
-
 ;; Renames all variables with fresh names to avoid collisions.
-(define (fresh C)
+;;
+;; term? -> term?
+(define (fresh t)
   (define h (make-subst))
-  (let loop ([t C])
+  (let loop ([t t])
     (cond [(pair? t)
            (cons (loop (car t)) (loop (cdr t)))]
           [(Var? t)
@@ -193,6 +230,8 @@
 ;; and this mapping is guaranteed to be consistent only locally to the term t.
 ;; Used mostly to turn human-readable expressions into terms, without needing to worry about
 ;; the actual names of the variables.
+;;
+;; tree? -> term?
 (define (symbol-variables->Vars t)
   (define h (make-hasheq))
   (let loop ([t t])
@@ -203,6 +242,8 @@
           [else t])))
 
 ;; Variables are replaced with symbols by order of appearence. Mostly for ease of reading by humans.
+;;
+;; term? -> tree?
 (define (Vars->symbols t)
   (define h (make-subst))
   (define idx -1)
@@ -213,8 +254,9 @@
            (subst-ref! h t (λ () (++ idx) (Var-name->symbol idx)))]
           [else t])))
 
-;; Returns a subst of the number of occurrences of the variables *names* in the term t.
-;; (-> term? subst?)
+;; Returns a subst of the number of occurrences of the variables *names* in the term `t`.
+;;
+;; term? -> subst?
 (define (var-occs t)
   (define h (make-subst))
   (let loop ([t t])
@@ -225,29 +267,31 @@
            (subst-update! h t add1 0)]))
   h)
 
-;; Returns the variable names of the term t.
+;; Returns the variable names of the term `t`.
+;;
+;; term? -> list?
 (define (vars t)
   (map car (subst->list (var-occs t))))
 
-;; Returns the variables of the term t.
+;; Returns the variables of the term `t`.
+;;
+;; term? -> (listof Var?)
 (define (Vars t)
   (map Var (vars t)))
 
-;; Useful for debugging that two literals have different fresh variables.
-(define (common-variables t1 t2)
-  (let ([h (var-occs t1)])
-    (for/list ([(v n) (in-hash (var-occs t2))]
-               #:when (hash-has-key? h v))
-      v)))
-
-;; Returns the set of variables *names* that appear in t1 but not in t2.
+;; Returns the set of variables *names* that appear in `t1` but not in `t2`.
+;;
+;; term? term? -> list?
 (define (variables-minus t1 t2)
   (define h2 (var-occs t2))
   (for/list ([(v n) (in-hash (var-occs t1))]
              #:unless (hash-has-key? h2 v))
     v))
 
-;; Returns the lexicographical index of each occurrence of the variables, with a depth-first search.
+;; Returns the lexicographical index of each occurrence of the variable names of `t`,
+;; in depth-first order.
+;;
+;; term? -> list?
 (define (find-var-names t)
   (define h (make-subst))
   (let loop ([t t] [idx 0])
@@ -268,6 +312,8 @@
 ;; This is used for KBO in particular.
 ;; Note: (var-occs<=> t1 t2) == (var-occs<=> t2 t1)
 ;; Note: t1 and t2 may have variables in common if they are two subterms of the same clause.
+;;
+;; term? term? -> (or/c '< '> '= #false)
 (define (var-occs<=> t1 t2)
   (define h1 (var-occs t1)) ; assumes does not contain 0s
   (define h2 (var-occs t2)) ; assumes does not contain 0s
@@ -304,8 +350,12 @@
 (begin-encourage-inline
   ;; Logical false
   (define lfalse '$false)
+  ;; any/c -> boolean
   (define (lfalse? x) (eq? lfalse x))
+
   ;; lfalse must be the bottom element for the various atom orders.
+  ;;
+  ;; any/c any/c -> (or/c '< '> '= #false)
   (define (lfalse<=> a b)
     (define afalse? (lfalse? a))
     (define bfalse? (lfalse? b))
@@ -315,31 +365,32 @@
           [else #false]))
 
   (define ltrue '$true)
+  ;; any/c -> boolean?
   (define (ltrue? x) (eq? x ltrue))
 
+  ;; Returns whether the literal `lit` has negative polarity.
+  ;;
+  ;; literal? -> boolean?
   (define (lnot? lit)
     (and (pair? lit)
          (eq? 'not (car lit))))
 
-  ;; Inverses the polarity of the atom.
+  ;; Inverses the polarity of the literal.
   ;; NOTICE: Always use `lnot`, do not construct negated atoms yourself.
+  ;;
+  ;; literal? -> literal?
   (define (lnot x)
     (cond [(lnot? x) (cadr x)]
           [(lfalse? x) ltrue]
           [(ltrue? x) lfalse]
           [else (list 'not x)]))
 
+  ;; Compares the polarities of the two literals.
+  ;; (polarity<=> 'a '(not a)) returns '<
+  ;;
+  ;; literal? literal? -> (or/c '< '> '= #false)
   (define (polarity<=> lit1 lit2)
-    (boolean<=> (lnot? lit1) (lnot? lit2)))
-
-  )
-
-;; Converse implication clause. Invert polarities if binary.
-(define (converse cl)
-  (case (length cl)
-    [(1) ltrue] ; If A is a fact, then true => A, and thus converse is A => true == true
-    [(2) (map lnot cl)]
-    [else (error "Undefined converse for ~v" cl)]))
+    (boolean<=> (lnot? lit1) (lnot? lit2))))
 
 ;=================================;
 ;=== Literals, atoms, terms, … ===;
@@ -355,10 +406,12 @@ constant  = symbol?
 variable  = (Var number?)
 
 For simplicity, we sometimes use 'term' to mean 'atom or term', or even
-'literal, atom or tem'.
+'literal, atom or term'.
 |#
 
-;; Returns the number of nodes in the tree representing the term t (or literal, atom).
+;; Returns the number of nodes in the tree representing the term `t` (or literal, atom).
+;;
+;; term? -> exact-nonnegative-integer?
 (define (tree-size t)
   (let loop ([t t] [s 0])
     (cond [(Var? t) (+ s 1)]
@@ -367,15 +420,20 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
           [else (+ s 1)])))
 
 ;; The literals are depolarized first, because negation should not count.
+;;
+;; literal? -> exact-nonnegative-integer?
 (define (literal-size lit)
   (tree-size (depolarize lit)))
 
 ;; In particular, it should be as easy to prove A | B as ~A | ~B, otherwise finding equivalences
 ;; can be more difficult.
+;;
+;; clause? -> exact-nonnegative-integer?
 (define (clause-size cl)
   (for/sum ([lit (in-list cl)])
     (literal-size lit)))
 
+;; Comparison of atoms (or literals) for atom rewriting.
 ;; Returns < if for every substitution α, (atom1<=> t1α t2α) returns <.
 ;; (Can this be calculated given a base atom1<=> ?)
 ;; - Rk: variables of t2 that don't appear in t1 are not a problem since they are not instanciated
@@ -383,9 +441,11 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
 ;; - Equality is loose and is based only on *some* properties of the atoms.
 ;; - This is a good first comparator, but not good enough (e.g., does not associativity)
 ;; Notice: (order=? (atom<=> t1 t2)) does NOT necessarily mean that t1 and t2 are syntactically equal.
-(define (atom1<=> t1 t2)
-  (let ([t1 (depolarize t1)]
-        [t2 (depolarize t2)])
+;;
+;; literal? literal? -> (or/c '< '> '= #false)
+(define (atom1<=> lit1 lit2)
+  (let ([t1 (depolarize lit1)]
+        [t2 (depolarize lit2)])
     (cond/else
      [(lfalse<=> t1 t2)] ; continue if neither is lfalse
      #:else
@@ -397,9 +457,14 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
      [(and (order≥? vs) (order≥? size)) '>]
      #:else #false)))
 
-;; For KBO
+;; For KBO.
 ;; fun-weight is also for constants, hence it's more like symbol-weight
 ;; (but the name 'function' is commonly used for constants too).
+;;
+;; t : term?
+;; var-weight : number?
+;; fun-weight : symbol? -> number?
+;; -> number?
 (define (term-weight t #:? [var-weight 1] #:? [fun-weight (λ (f) 1)])
   (let loop ([t t])
     (cond [(Var? t) var-weight]
@@ -408,10 +473,16 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
           [else (error "Unknown term ~a" t)])))
 
 ;; Knuth-Bendix Ordering, naive version.
+;; Can be used for atom rewriting.
+;; To do: Implement a faster version.
 ;; See "Things to know when implementing KB", Löchner, 2006.
 ;; var-weight MUST be ≤ to all fun-weights of constants.
 ;; Simple version for clarity and proximity to the specifications.
-;; TODO: Implement a faster version
+;;
+;; var-weight : number?
+;; fun-weight : symbol? -> number?
+;; fun<=> : symbol? symbol? -> (or/c '< '> '= #false)
+;; -> (term? term? -> (or/c '< '> '= #false))
 (define (make-KBO<=> #:? var-weight #:? fun-weight #:? [fun<=> symbol<=>])
   (define (weight t)
     (term-weight t #:var-weight var-weight #:fun-weight fun-weight))
@@ -445,15 +516,22 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
       (or (lfalse<=> t1 t2)
           (KBO<=> t1 t2)))))
 
+;; Default KBO comparator.
+;;
+;; term? term? -> (or/c '< '> '= #false)
 (define KBO1lex<=> (make-KBO<=>))
 
-;; Returns a literal like lit, but without negation if lit was negative.
+;; Returns the atom of the literal.
+;;
+;; literal? -> atom?
 (define (depolarize lit)
   (match lit
     [`(not ,x) x]
     [else lit]))
 
 ;; Returns the number of arguments of the predicate of the literal lit, after depolarizing it.
+;;
+;; literal? -> exact-nonnegative-integer?
 (define (literal-arity lit)
   (let ([lit (depolarize lit)])
     (if (list? lit)
@@ -461,6 +539,8 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
         0)))
 
 ;; Returns the name of the predicate (or constant) of the literal.
+;;
+;; literal? -> symbol?
 (define (literal-symbol lit)
   (match lit
     [`(not (,p . ,r)) p]
@@ -469,8 +549,10 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
     [else lit]))
 
 ;; Lexicographical comparison.
+;; Used in literal<=> to sort literals within a clause. NOT used for rewriting.
 ;; Guarantees: (order=? (term-lex<=> t1 t2)) = (term==? t1 t2) (but maybe a slightly slower?)
-;; Warning: Doesn't handle variables that are not Var? properly
+;;
+;; term? term? -> (or/c '< '> '= #false)
 (define (term-lex<=> t1 t2)
   (cond [(eq? t1 t2) '=] ; takes care of '()
         [(and (pair? t1) (pair? t2))
@@ -487,8 +569,11 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
         [else
          (error 'term-lex<=> "Unknown term kind for: ~a, ~a" t1 t2)]))
 
+;; Comparator for terms used in atom1<=> for atom rewriting.
 ;; Can't compare vars with symbols, or vars with vars. Can only compare ground symbols:
 ;; A binary rule can't be oriented with variables
+;;
+;; term? term? -> (or/c '< '> '= #false)
 (define (term-lex2<=> t1 t2)
   (cond [(eq? t1 t2) '=] ; takes care of '()
         [(and (Var? t1) (Var? t2) (Var=? t1 t2)) '=]
@@ -504,7 +589,10 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
          (error 'term-lex2<=> "Unknown term kind for: ~a, ~a" t1 t2)]))
 
 ;; Depth-first lexicographical order (df-lex)
+;; Used for literal ordering in clauses. Not used for atom rewriting.
 ;; Guarantees: (order=? (literal<=> lit1 lit2)) = (literal==? lit1 lit2). (or it's a bug)
+;;
+;; literal? literal? -> (or/c '< '> '= #false)
 (define (literal<=> lit1 lit2)
   (chain-comparisons
    (polarity<=> lit1 lit2)
@@ -516,12 +604,19 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
          [(list? lit1) '>]
          [else '=])))
 
+;; Used to sort literals in a clause.
+;;
+;; literal? literal? -> boolean?
 (define (literal<? lit1 lit2)
   (order<? (literal<=> lit1 lit2)))
 
-;; This works because variables are transparent (prefab), hence equal? traverses the struct too.
+;; Syntactic comparison of terms and literals.
+;; This works because variables are transparent (prefab), hence equal? traverses the Var struct too.
 ;; We use `==` to denote syntactic equivalence.
+;;
+;; term? term? -> boolean?
 (define term==? equal?)
+;; literal? literal? -> boolean?
 (define literal==? equal?)
 
 ;==================================;
@@ -534,9 +629,18 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
 ;; Also, it's not necessary.
 (define reduce-mgu? #false)
 
+;; A simple box to signify that there is no need to attempt to substitute
+;; inside `term` as this has already been done.
 (struct already-substed (term) #:prefab)
 
 ;; Returns a term where the substitution s is applied to the term t.
+;; The substitution `s` may not be 'reduced' in the sense that variables
+;; of the domain may appear in the range.
+;; Such substitutions are performed 'on-demand', if needed.
+;; Once a substitution has been applied recursively to a rhs, the resulting
+;; term is marked with `already-substed` to avoid attempting it again.
+;;
+;; term? subst? -> term?
 (define (substitute t s)
   (define t-orig t)
   (let loop ([t t])
@@ -560,8 +664,9 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
                 new-rhs]))]
       [else t])))
 
-;; v : variable name (symbol)
-;; t : term
+;; Checks whether the variable `V` occurs un `t`.
+;;
+;; Var? term? -> boolean?
 (define (occurs? V t)
   (cond [(Var? t) (Var=? V t)]
         [(pair? t)
@@ -569,19 +674,20 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
              (occurs? V (cdr t)))]
         [else #false]))
 
-(define (occurs?/extend var t2 subst)
+;; Returns #false if `V` occurs in `t2`, otherwise binds `t2` to `V` in `subst` and returns `subst`.
+;;
+;; Var? term? subst? -> (or/c #false subst?)
+(define (occurs?/extend V t2 subst)
   (define t2c (substitute t2 subst))
-  (if (occurs? var t2c)
+  (if (occurs? V t2c)
     #false
     (begin
-      (subst-set! subst var t2c)
+      (subst-set! subst V t2c)
       subst)))
 
 ;; Returns one most general unifier α such that t1α = t2α.
-;; Assumes that the variables of t1 and t2 are disjoint,
-;; so that occur-check is not needed. (really?)
-;; TODO: In case left-unification is possible, does this return a left-unifier?
-;;   Can we also return a boolean saying whether this is the case?
+;;
+;; term? term? subst? -> subst?
 (define (unify t1 t2 [subst (make-subst)])
   (define success?
     (let loop ([t1 t1] [t2 t2])
@@ -622,16 +728,6 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
              s2)
            subst)))
 
-(define (subst/#false->imsubst s)
-  (cond [(subst? s)
-         (subst->list s)]
-        [(list? s)
-         (sort (map (λ (p) (cons (Var-name (Varify (car p)))
-                                 (Varify (cdr p))))
-                    s)
-               Var-name<? #:key car)]
-        [else s]))
-
 ;; Creates a procedure that returns the substitution α such that t1α = t2, of #false if none exists.
 ;; t2 is assumed to not contain any variable of t1.
 ;; Also known as matching
@@ -641,12 +737,12 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
 ;; The found substitution must be specializing, that is C2σ = C2 (and C1σ = C2),
 ;; otherwise safe factoring can fail, in particular.
 ;; Hence we must ensure that vars(C2) ∩ dom(σ) = ø.
-;; TODO: Find a literature reference for these definitions!
 (define-syntax-rule
   (define-left-subst+unify left-substitute left-unify make-subst subst-ref subst-set)
   (begin
-    ;; t: term?
-    ;; s: subst?
+    ;; Returns a term like `t` where the substitution `s` has been applied.
+    ;;
+    ;; term? subst? -> term?
     (define (left-substitute t s)
       (let loop ([t t])
         (cond
@@ -657,9 +753,10 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
           [(and (Var? t)
                 (subst-ref s t #false))]
           [else t])))
-    ;; t1: term?
-    ;; t2: term?
-    ;; subst: subst?
+
+    ;; Returns a substitution α such that t1α = t2, if it exists, #false otherwise.
+    ;;
+    ;; term? term? subst? -> (or/c #false subst?)
     (define (left-unify t1 t2 [subst (make-subst)])
       (cond/else
        [(eq? t1 t2) ; takes care of both null?
@@ -668,7 +765,7 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
         (define new-subst (left-unify (car t1) (car t2) subst))
         (and new-subst
              (left-unify (cdr t1) (cdr t2) new-subst))]
-       [(term==? t1 t2) subst] ; *** WARNING: This is costly
+       [(term==? t1 t2) subst] ; To do: This is costly
        [(not (Var? t1)) #false]
        #:else
        (define t1b (subst-ref subst t1 #false))
@@ -685,21 +782,25 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
        #:else
        (subst-set subst t1 t2)))))
 
-
+;; Mutable substitutions
 (define-left-subst+unify left-substitute left-unify make-subst subst-ref subst-set!)
 ;; Immutable substitutions
 (define-left-subst+unify left-substitute/assoc left-unify/assoc make-imsubst imsubst-ref imsubst-set)
 
-;; Like traditional pattern matching, but using left-unify
+;; Returns #true if `pat` left-unifies with any subterm of `t`.
+;;
+;; term? term? -> (or/c #false term?)
 (define (left-unify-anywhere pat t)
   (let loop ([t t])
     (cond [(left-unify pat t)]
           [(list? t) (ormap loop t)]
           [else #false])))
 
-; Could also use match:
-(define (match-anywhere filt term)
-  (let loop ([t term])
+;; Returns #true if `(filt tt)` is true for any subterm `tt` of `t`.
+;;
+;; (term? -> boolean?) term? -> boolean?
+(define (match-anywhere filt t)
+  (let loop ([t t])
     (cond [(filt t)]
           [(list? t) (ormap loop (rest t))]
           [else #false])))

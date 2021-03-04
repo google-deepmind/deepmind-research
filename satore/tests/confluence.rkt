@@ -1,7 +1,6 @@
 #lang racket/base
 
-(require (for-syntax racket/base
-                     syntax/parse)
+(require (for-syntax racket/base syntax/parse)
          bazaar/debug
          define2
          define2/define-wrapper
@@ -9,12 +8,12 @@
          racket/list
          racket/pretty
          rackunit
-         "../Clause.rkt"
-         "../clause.rkt"
-         "../clause-format.rkt"
-         "../rewrite-tree.rkt"
-         "../unification.rkt"
-         (submod "../Clause.rkt" test))
+         (submod satore/Clause test)
+         satore/Clause
+         satore/clause
+         satore/clause-format
+         satore/rewrite-tree
+         satore/unification)
 
 (define-global:boolean *dynamic-ok?* #true
   "Use dynamic rules?")

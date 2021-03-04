@@ -1,19 +1,18 @@
 #lang racket/base
 
-(require (for-syntax syntax/parse
-                     racket/base)
+(require (for-syntax racket/base syntax/parse)
          define2
          define2/define-wrapper
          global
-         rackunit
          racket/dict
          racket/pretty
-         syntax/parse/define
-         "../clause.rkt"
-         "../misc.rkt" ; for easy access to *debug-level*
-         "../rewrite-tree.rkt"
-         (prefix-in sat: "../saturation.rkt")
-         "../unification.rkt")
+         rackunit
+         (prefix-in sat: satore/saturation)
+         satore/clause
+         satore/misc
+         satore/rewrite-tree
+         satore/unification
+         syntax/parse/define)
 
 (define-global *cpu-limit* 10
   "Time limit in seconds for tests"
@@ -113,8 +112,8 @@
              'status)
    'saturated)
 
-  ;; WARNING (TODO): If L-resolvents-pruning applied to input clauses too,
-  ;; it would discard the 2nd clause immediately and would saturate!
+  ;; To do: If L-resolvents-pruning applied to input clauses too,
+  ;; it would discard the 2nd clause immediately and would saturate.
   (replay-on-failure
    (check-equal?
     (dict-ref (saturation (Vars+clausify-list '( [(p z)]
@@ -254,26 +253,7 @@
     (when rwtree-in=out?
       (check-equal? (dict-ref res 'binary-rules) 4)
       (check-true (> (dict-ref res 'binary-rewrites) 0))))
-  ;; Same but with rules loaded from a file
-  ;; TODO
-  #;
-  (replay-on-failure
-    (define res
-      (saturation
-       (map clausify
-            '([(not (p A A)) (q A)] ; Not a rule in itself (too general), but enables the next ones
-              [(p a a) (not (q a))] ; rule (p a a) <-> (q a)
-              [(p b b) (not (q b))] ; rule (p b b) <-> (q b)
-              [(p a a) (p b b) (p c c)]
-              [(not (q a)) (remove-me x Y)]
-              [(not (q b)) (remove-me x Y)]
-              [(not (p c c)) (remove-me x Y)]
-              [(not (remove-me X y))] ; defeats urw
-              ))))
-    (check-equal? (dict-ref res 'status) 'refuted)
-    (when rwtree-in=out?
-      (check-equal? (dict-ref res 'binary-rules) 4)
-      (check-true (> (dict-ref res 'binary-rewrites) 0))))
+  ;; TODO: Same test but with rules loaded from a file
 
   ;; Greedy selection of binary rewrites can lead to failure
   (replay-on-failure

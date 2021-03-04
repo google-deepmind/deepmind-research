@@ -23,15 +23,27 @@
 (define-global:boolean *git?* #false
   "Commit to git if needed and include the last git commit hash in the globals.")
 
+;; Calls thunk. Outputs to a log file if `log?` is not #false.
+;; When `git?` is not #false, also commits to git to ensure consistency of the code base
+;; with the experiment, and adds the git commit number to the global variables.
+;;
+;; thunk : thunk?
+;; dir : path-string?
+;; filename : string?
+;; filepath : path-string?
+;; log? : boolean?
+;; git? : boolean?
+;; quiet? : boolean?
 (define (call-with-log thunk
                        #:? [dir "logs"]
                        #:? [filename (string-append "log-" (date-iso-file) ".txt")]
                        ; if given, dir and filename have no effect:
                        #:? [filepath (build-path dir filename)]
                        #:? [log? (*log*)]
+                       #:? [git? (*git?*)]
                        #:? [quiet? #false])
 
-  (when (*git?*)
+  (when git?
     (define cmd "git commit -am \".\" ")
     (displayln cmd)
     (system cmd))
@@ -41,7 +53,7 @@
     ; Also write the last commit hash for easy retrieval.
     (pretty-write
      (list* `(cmd-line . ,(current-command-line-arguments))
-            `(git-commit . ,(and (*git?*)
+            `(git-commit . ,(and git?
                                  (string-normalize-spaces
                                   (with-output-to-string (λ () (system "git rev-parse HEAD"))))))
             (globals->assoc)))

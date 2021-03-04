@@ -1,9 +1,9 @@
 #lang racket/base
 
-(require "../trie.rkt"
+(require racket/pretty
          rackunit
-         (only-in "../unification.rkt" symbol-variable?)
-         racket/pretty)
+         satore/trie
+         (only-in satore/unification symbol-variable?))
 
 (let ([atrie (make-trie #:variable? symbol-variable?)])
   (trie-set! atrie
@@ -28,8 +28,7 @@
                 '(C))
   (check-equal? (trie-ref atrie '(a (f (g Y)) (f Y) c))
                 '(A))
-  #;(pretty-print (trie-root atrie))
-  #;(displayln (trie-values atrie))
+
   (check-equal? (sort (trie-values atrie) symbol<?)
                 '(A B C))
   (check-equal? (trie-ref atrie '(X X X X)) '())
@@ -60,7 +59,7 @@
    (sort (trie-ref atrie '(eq Y (mul Y one))) symbol<?)
    '(A B C)))
 
-;; Trie-traversal
+;; Trie traversal
 (let ([atrie (make-trie #:variable? symbol-variable?)])
   (trie-set! atrie
              '(a X (f Y) c)

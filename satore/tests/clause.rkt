@@ -2,11 +2,11 @@
 
 (require global
          racket/dict
-         rackunit
          racket/list
-         "../clause.rkt"
-         "../misc.rkt"
-         "../unification.rkt")
+         rackunit
+         satore/clause
+         satore/misc
+         satore/unification)
 
 (*subsumes-iter-limit* 0)
 
@@ -28,18 +28,6 @@
   )
 
 (begin
-  (define-simple-check (check-remove-duplicate-literals cl res)
-    (check-equal? (remove-duplicate-literals (sort-clause (Varify cl)))
-                  (sort-clause (Varify res))))
-
-  (check-remove-duplicate-literals '(a (p X) (q X) (p X) (p Y) a (p a) a b)
-                                   '(a b (p a) (p X) (p Y) (q X))))
-
-
-
-(begin
-  ;; NOTICE: symbol-tree->clause first performs some simplications (which themselves call
-  ;; clause-implies/1pass)
   ;; Equivalences
   (for ([(A B) (in-dict '(([] . [] ) ; if empty clause #true, everything is #true
                           ([p] . [p] )
@@ -98,23 +86,22 @@
                  (list A B)))
 
   (let* ()
-    (define-Vars X Y Z)
     (define cl
-      `((not (incident ,X ,Y))
-        (not (incident ab ,Y))
-        (not (incident ab ,Z))
-        (not (incident ab ,Z))
-        (not (incident ac ,Y))
-        (not (incident ac ,Z))
-        (not (incident ac ,Z))
-        (not (incident bc a1b1))
-        (not (line_equal ,Z ,Z))
-        (not (point_equal bc ,X))))
+      (Varify
+       `((not (incident X Y))
+         (not (incident ab Y))
+         (not (incident ab Z))
+         (not (incident ab Z))
+         (not (incident ac Y))
+         (not (incident ac Z))
+         (not (incident ac Z))
+         (not (incident bc a1b1))
+         (not (line_equal Z Z))
+         (not (point_equal bc X)))))
     (define cl2
-      (sort-clause (fresh (left-substitute cl (hasheq (Var-name X) 'bc
-                                                      (Var-name Y) 'a1b1)))))
-    (check-not-false (clause-subsumes cl cl2)))
-  )
+      (sort-clause (fresh (left-substitute cl (hasheq (symbol->Var-name 'X) 'bc
+                                                      (symbol->Var-name 'Y) 'a1b1)))))
+    (check-not-false (clause-subsumes cl cl2))))
 
 #;
 (begin
@@ -122,12 +109,11 @@
   ; multisets, but our current definition of subsumption is more general (not necessarily in a
   ; good way.)
   ; Our definition is based on sets, with a constraint on the number of literals (in
-  ; Clause<=-subsumes).
+  ; Clause-subsumes).
   ; This makes it more general, but also not well-founded (though I'm not sure yet whether this is
   ; really bad).
   (check-false (clause-subsumes (clausify '[(p A A) (q X Y) (q Y Z)])
-                                (clausify '[(p a a) (p b b) (q C C)])))
-  )
+                                (clausify '[(p a a) (p b b) (q C C)]))))
 
 
 (begin

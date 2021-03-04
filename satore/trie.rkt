@@ -4,12 +4,23 @@
 ;****                      Trie: Imperfect Discrimination Tree                      ****;
 ;***************************************************************************************;
 
-;;; A key is a tree (a list of lists of ...), which is flattened to a list
+;;; A discrimination tree is like a hashtable where the key is a list of elements.
+;;; The keys are organized in a tree structure so that to retrieving an object
+;;; takes at most O(A×l) steps, where l is the length of the key and A is the size of
+;;; the alphabet. In practice it will be closer to O(l) since a hash table is used
+;;; at each node to store the branches.
+;;;
+;;; A key is a actually tree (a list of lists of ...), which is flattened to a list
 ;;; where parenthesis are replaced with symbols.
 ;;; Variables are considered to be unnamed and there is no unification/matching.
 ;;; The only dependency on first-order logic specifics is `variable?`.
+;;;
+;;; An imperfect discrimination tree does not differentiate variable names.
+;;; Hence p(X Y) is stored in the same node as p(A A). An additional tests
+;;; is required to tell them apart.
 
 (require bazaar/cond-else
+         define2
          racket/list
          racket/match
          satore/misc)
@@ -24,7 +35,8 @@
 (define sublist-begin  (string->uninterned-symbol "<<"))
 (define sublist-end    (string->uninterned-symbol ">>"))
 
-;; edges: hasheq(key . node?)
+;; edges : hasheq(key . node?)
+;; value : any/c
 (struct trie-node (edges value)
   #:transparent
   #:mutable)
@@ -32,17 +44,32 @@
   (trie-node (make-hasheq) no-value))
 
 ;; Trie structure with variables.
+;;
+;; root : trie-node?
+;; variable? : any/c -> boolean?
 (struct trie (root variable?))
 
-(define (make-trie #:constructor [constructor trie]
-                   #:variable? [variable? (λ (x) #false)]
+;; Trie constructor.
+;;
+;; constructor : procedure?
+;; variable? : any/c -> boolean?
+;; other-args  : (listof any/c)
+;; -> trie?
+(define (make-trie #:? [constructor trie]
+                   #:? [variable? (λ (x) #false)]
                    . other-args)
   (apply constructor (make-node) variable? other-args))
 
-;; Updates the value of the node for the given key (or add one if none exists).
-;; atrie: trie?
-;; key: list?
-;; val: any/c
+;; Updates the value of the node for the given key (or sets one if none exists).
+;; If default-val/proc is a procedure of arity 0, then it is applied to produce the
+;; default value when requested, otherwise default-val/proc is used itself as the
+;; default value.
+;;
+;; atrie : trie?
+;; key : any/c
+;; update : any/c -> any/c
+;; default-val/proc : (or/c thunk? any/c)
+;; -> void?
 (define (trie-update! atrie key update default-val/proc)
   (match-define (trie root variable?) atrie)
   ; The key is `list`ed because we need a list, and this allows the given key to not be a list.
@@ -69,17 +96,32 @@
        (define nd2 (hash-ref! edges k make-node))
        (node-insert! nd2 (cdr key))))))
 
-;; Keep a list of values at the leaves.
+;; Keeps a list of values at the leaves.
 ;; If `trie-insert!` is used, any use of `trie-update!` should be consistent with values being lists.
+;;
+;; atrie : trie?
+;; key : any/c
+;; val : any/c
+;; -> void?
 (define (trie-insert! atrie key val)
   (trie-update! atrie key (λ (old) (cons val old)) '()))
 
 ;; Replacing the current value (if any) for key with val.
+;;
+;; atrie : trie?
+;; key : any/c
+;; val : any/C
 (define (trie-set! atrie key val)
   (trie-update! atrie key (λ _ val) #false))
 
 ;; Applies on-leaf at each node that match with key.
 ;; The matching keys of the trie are necessarily no less general than the given key.
+;; `on-leaf` may be effectful.
+;;
+;; atrie : trie?
+;; key : any/c
+;; on-leaf : trie-node? -> any
+;; -> void?
 (define (trie-find atrie key on-leaf)
   (define variable? (trie-variable? atrie))
   (let node-ref ([nd (trie-root atrie)] [key (list key)])
@@ -112,8 +154,12 @@
 
 ;; Applies the procedure `on-leaf` to any node for which the key is matched by the given key.
 ;; The matching keys of the trie are necessarily no more general than the given key.
-;; TODO: We could easily maintain a substitution over the branches since there's only one match.
-;; on-leaf: (-> node? any/c)
+;; `on-leaf` may be effectful.
+;;
+;; atrie : trie?
+;; key : any/c
+;; on-leaf : trie-node -> any/c
+;; -> void?
 (define (trie-inverse-find atrie key on-leaf)
   (define variable? (trie-variable? atrie))
   (let node-find ([nd (trie-root atrie)] [key (list key)] [depth 0])
@@ -152,7 +198,12 @@
 
 ;; Both find and inverse-find at the same time.
 ;; Useful when (full) unification must be performed afterwards.
-;; WARNING: A LOT OF CODE DUPLICATION WITH THE ABOVE 2 FUNCTIONS.
+;; `on-leaf` may be effectful.
+;;
+;; atrie : trie?
+;; key : any/c
+;; on-leaf : trie-node? -> any
+;; -> void?
 (define (trie-both-find atrie key on-leaf)
   (define variable? (trie-variable? atrie))
   (let node-find ([nd (trie-root atrie)] [key (list key)] [depth 0])
@@ -196,7 +247,7 @@
      (when nd2
        (node-find nd2 (cdr key) 0)))))
 
-
+;; Helper function
 (define ((make-proc-tree-ref proc) atrie key)
   (define res '())
   (proc atrie
@@ -206,11 +257,20 @@
 
 ;; Returns a list of values which keys are matched by the given key.
 ;; The matching keys of the trie are necessarily no more general than the given key.
-;; TODO: We could easily maintain a substitution over the branches since there's only one mach
+;; These functions do not have side effects.
+;;
+;; Each function takes as input:
+;; atrie : trie?
+;; key : any/c
+;; -> list?
 (define trie-inverse-ref (make-proc-tree-ref trie-inverse-find))
 (define trie-ref         (make-proc-tree-ref trie-find))
 (define trie-both-ref    (make-proc-tree-ref trie-both-find))
 
+;; Returns the list of all values in all nodes.
+;;
+;; atrie : trie?
+;; -> list?
 (define (trie-values atrie)
   (let loop ([nd (trie-root atrie)] [res '()])
     (define edges (trie-node-edges nd))

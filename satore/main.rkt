@@ -5,6 +5,10 @@
 ;****                                    Satore                                    ****;
 ;**************************************************************************************;
 
+;;; Try:
+;;;   racket -l- satore --help
+;;; to see all the available flags.
+
 (module+ main
   (require global
            racket/file

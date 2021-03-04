@@ -30,7 +30,10 @@ File formats:
 
 |#
 
-
+;; Reads a .p file and returns a list of clauses.
+;;
+;; program-file : file?
+;; -> (listof clause?)
 (define (tptp-program-file->clauses program-file)
   ; Not efficient: Loads the whole program as a string then parses it.
   ; It would be more efficient to read it as a stream with an actual parser.
@@ -38,6 +41,7 @@ File formats:
   ; but that will file if the cnf(…) is multiline.
   (tptp-prog->clauses (file->string program-file)))
 
+;; Helper function
 (define (tptp-pre-clauses->clauses pre-clauses)
   (define clauses
     (for/list ([cl (in-list pre-clauses)])
@@ -61,7 +65,10 @@ File formats:
           [else (error "Unrecognized token: " t)]))))
   (map (compose clausify symbol-variables->Vars) clauses))
 
-;; Prolog .p program to rkt format
+;; Reads the .p program given as a string and returns a list of clauses.
+;;
+;; str : string?
+;; -> (listof clause?)
 (define (tptp-prog->clauses str)
 
   ; hardly tested and not strict enough
@@ -84,7 +91,7 @@ File formats:
        str
        (list*
         '[#px"(?:^|\n)\\s*[%#][^\n]*" "\n"] ; prolog and shell/python/eprover full-line comments
-        '[#px"\\bnot\\b" "_not_"] ;; WARNING!!! replace lnot with $not instead (as in TPTP)
+        '[#px"\\bnot\\b" "_not_"] ;; To do: Use $not for `lnot` instead? (as in TPTP)
         (map (λ (p) (list (regexp-quote (first p))
                           (string-append " " (regexp-replace-quote (second p)) " ")))
              '(["|" "" ]
@@ -101,8 +108,11 @@ File formats:
 
 ;; Simple parser for the proposer output into s-exp clauses.
 ;; The format is expected to be in cnf.
+;;
+;; str : string?
+;; -> (listof clause?)
 (define (tptp-string->clauses str)
-  ; TODO: Optimize. This can be veeeery slow for large conjectures.
+  ; To do: Optimize. This can be very slow for large conjectures.
   (define pre-clauses
     (append*
      ; split first to avoid regenerating the whole string after each substitution?
@@ -114,7 +124,7 @@ File formats:
           (regexp-replaces
            str
            (list*
-            '[#px"\\bnot\\b" "_not_"] ;; WARNING!!! Instead: replace lnot with $not (as TPTP)
+            '[#px"\\bnot\\b" "_not_"] ;; To do: use $not for `lnot` instead? (as TPTP)
             (map (λ (p) (list (regexp-quote (first p))
                               (string-append " " (regexp-replace-quote (second p)) " ")))
                  '(["|" ""]
@@ -123,7 +133,10 @@ File formats:
                    ["'" "\""])))))))))
   (tptp-pre-clauses->clauses pre-clauses))
 
-
+;; Returns a string representing the literal lit.
+;;
+;; lit : literal?
+;; -> string?
 (define (literal->tptp-string lit)
     (cond
       [(lnot? lit)
@@ -138,15 +151,26 @@ File formats:
       [(Var? lit) (symbol->string (Var-name->symbol lit))]
       [else (format "~a" lit)]))
 
+;; Returns a string representing the clause cl.
+;;
+;; cl : clause?
+;; ->string?
 (define (clause->tptp-string cl)
   (string-join
    (map literal->tptp-string (Vars->symbols cl))
    " | "))
 
+;; Returns a string representing the clauses cls.
+;;
+;; cls : (listof clause?)
+;; -> string?
 (define (clauses->tptp-string cls)
   (string-join (map clause->tptp-string cls) "\n"))
 
 ;; String replacement of tptp names with shorter ones to improve readability
+;;
+;; str : string?
+;; -> string?
 (define (tptp-shortener str)
   (define substs
     (sort
@@ -195,6 +219,8 @@ File formats:
        (string-replace line from to #:all? #true)))
    "\n"))
 
+;; Helper: Surround any printing operation with this macro
+;; to automatically replace the output with shortened names.
 (define-syntax-rule (with-tptp-shortener body ...)
   (let ([str (with-output-to-string (λ () body ...))])
     (displayln (tptp-shortener str))))

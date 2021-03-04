@@ -18,7 +18,7 @@
 ;; Even though the namespace is at the module level, the variables
 ;; are set in the namespace with their value so they can be used with eval.
 ;; TODO: When a ns-anchor is given, commands are eval'ed by default, and to directly modify
-;;   variables one must use ! (where the second argument is evaled)
+;; TODO: variables one must use ! (where the second argument is evaled)
 (define-syntax (interact stx)
   (syntax-parse stx
     #:literals (list)
@@ -83,6 +83,7 @@
                    [else (printf "Unknown command: ~a\n" cmd)
                          (loop)]))))))]))
 
+;; For manual testing in DrRacket
 (module+ drracket
   (define-namespace-anchor ns-anchor) ; optional, to use the eval command
 

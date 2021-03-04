@@ -3,7 +3,7 @@
 (require racket/list
          racket/port
          rackunit
-         "../interact.rkt")
+         satore/interact)
 
 (define-syntax-rule (check-interact in out args ...)
   (check-equal?

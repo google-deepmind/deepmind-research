@@ -17,6 +17,7 @@
 
 (provide (all-defined-out))
 
+;; Prints #true and #false
 (print-boolean-long-form #true)
 
 (define-syntax-rule (begin-for-both e)
@@ -25,6 +26,7 @@
     (begin-for-syntax e)))
 
 (begin-for-both
+  ;; (or/c string? symbol? number?) -> number?
   (define (debug-level->number lev)
     (cond
       [(number? lev) lev]
@@ -43,10 +45,11 @@
   debug-level->number
   '("--debug"))
 
+;; ;; (or/c string? symbol? number?) -> boolean?
 (define (debug>= lev)
   (>= (*debug-level*) (debug-level->number lev)))
 
-;; TODO: Make faster
+;; Do a sequence of actions only when debug-level is greater than a given level.
 (define-syntax (when-debug>= stx)
   (syntax-case stx ()
     [(_ lev body ...)
@@ -54,11 +57,12 @@
        #'(when (>= (*debug-level*) levv)
            body ...))]))
 
+;; any/c -> boolean?
 (define (thunk? p)
   (and (procedure? p)
        (procedure-arity-includes? p 0)))
 
-;; Defines a counter with a reset function and an increment function
+;; Defines a counter with a reset function and an increment function.
 ;; Ex:
 ;; (define-counter num 0)
 ;; (++num)
@@ -76,15 +80,19 @@
            (define (++ [n 1])
              (set! name (+ name n)))))]))
 
+;; -> number?
+(define (current-inexact-seconds)
+  (* 0.001 (current-inexact-milliseconds)))
 
+;; -> exact-nonnegative-integere?
 (define (current-memory-use-MB)
   (arithmetic-shift (current-memory-use) -20))
 
-(define (car+cdr p)
-  (values (car p) (cdr p)))
-
+;; Prints `x` with a given precision if it is a rational, otherwise formants it with `~a`.
+;;
+;; x : any/c
+;; precision : (or/c exact-nonnegative-integer? (list/c '= exact-nonnegative-integer?))
 (define (~r2 x #:precision [precision 2])
   (if (rational? x)
       (~r x #:precision precision)
       (~a x)))
-

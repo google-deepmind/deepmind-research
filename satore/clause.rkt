@@ -33,25 +33,37 @@
 
 (define-counter n-tautologies 0)
 
+;; Returns a new clause where the literals have been sorted according to `literal<?`.
+;;
+;; (listof literal?) -> (listof literal?)
 (define (sort-clause cl)
   (sort cl literal<?))
 
+;; 'Normalizes' a clause by sorting the literals, safely factoring it (removes duplicate literals),
+;; and 'freshing' the variables.
 ;; cl is assumed to be already Varified, but possibly not freshed.
-;; Notice: Does not do rewriting.
+;;
+;; (listof literal?) -> (listof literal?)
 (define (clause-normalize cl)
    ; fresh the variables just to make sure
   (fresh (safe-factoring (sort-clause cl))))
 
+;; Takes a tree of symbols and returns a clause, after turning symbol variables into `Var`s.
 ;; Used to turn human-readable clauses into computer-friendly clauses.
-(define (clausify cl)
-  (clause-normalize (Varify cl)))
+;;
+;; tree? -> clause?
+(define (clausify l)
+  (clause-normalize (Varify l)))
 
+;; clause? -> boolean?
 (define (empty-clause? cl)
   (empty? cl))
 
-;; Definition of tautology:
-;; cl is a tautology if all ground instances of cl contain an atom and its negation.
+;; Returns whether the clause `cl` is a tautologie.
+;; cl is a tautology if it contains the literals `l` and `(not l)`.
 ;; Assumes that the clause cl is sorted according to `sort-clause`.
+;;
+;; clause? -> boolean?
 (define (clause-tautology? cl)
   (define-values (neg pos) (partition lnot? cl))
   (define pneg (map lnot neg))
@@ -73,26 +85,22 @@
        #:else (error "uh?"))))
    (begin (++n-tautologies) #true)))
 
-;; NOTICE: This does *not* rename the variables.
+;; Returns the converse clause of `cl`.
+;; Notice: This does *not* rename the variables.
+;;
+;; clause? -> clause?
 (define (clause-converse cl)
   (sort-clause (map lnot cl)))
 
-;; Assumes that cl is sorted according to `sort-clause`.
-(define (remove-duplicate-literals cl)
-  (zip-loop ([(x r) cl] [res '()] #:result (reverse res))
-    (cond/else
-     [(empty? r) (cons x res)]
-     #:else
-     (define y (first r))
-     #:cond
-     [(literal==? x y) res]
-     #:else (cons x res))))
-
+;; Returns the pair of (predicate-symbol . arity) of the literal.
+;;
+;; literal? -> (cons/c symbol? exact-nonnegative-integer?)
 (define (predicate.arity lit)
-  (cond [(list? lit) (cons (first lit) (length lit))]
-        [else (cons lit 0)]))
+  (let ([lit (depolarize lit)])
+    (cond [(list? lit) (cons (first lit) (length lit))]
+          [else (cons lit 0)])))
 
-
+;; Several counters to keep track of statistics.
 (define-counter n-subsumes-checks 0)
 (define-counter n-subsumes-steps 0)
 (define-counter n-subsumes-breaks 0)
@@ -102,20 +110,17 @@
   (reset-n-subsumes-breaks!))
 
 
-;; θ-subsumption.
-;; ca θ-subsumes cb if there exists a substitution α such that ca[α] ⊆ cb
-;; (requires removing duplicate literals as in FOL clauses are assumed to be sets of literals).
+;; θ-subsumption. Returns a (unreduced) most-general unifier θ such that caθ ⊆ cb, in the sense
+;; of set inclusion.
 ;; Assumes vars(ca) ∩ vars(cb) = ∅.
-
+;; Note that this function does not check for multiset inclusion. A length check is performed in
+;; Clause-subsumes?.
+;;
+;; clause? clause? -> subst?
 (define (clause-subsumes ca cb)
   (++n-subsumes-checks)
   ; For every each la of ca  with current substitution β, we need to find a literal lb of cb
-  ; such that we can extend β to β' so that la[β'] = lb.
-  ; TODO: order the groups by smallest size for cb.
-  ; TODO: need to split by polarity first, or sort by (polarity predicate arity)
-  ; For each literal of ca, obtain the list of literals of cb that unify with it.
-  ; place cb in a trie
-  ; then retrieve
+  ; such that we can extend β to β' so that la β' = lb.
 
   (define cbtrie (make-trie #:variable? Var?))
   (for ([litb (in-list cb)])
@@ -133,13 +138,13 @@
      < #:key length #:cache-keys? #true))
 
   ;; Depth-first search while trying to find a substitution that works for all literals of ca.
-  ;; TODO: if number of iterations is larger than threshold, abort (use let/ec)
   (define n-iter-max (*subsumes-iter-limit*))
   (define n-iter 0)
 
   (let/ec return
     (let loop ([groups groups] [subst '()])
       (++ n-iter)
+      ; Abort when we have reached the step limit
       (when (= n-iter n-iter-max) ; if n-iter-max = 0 then no limit
         (++n-subsumes-breaks)
         (return #false))
@@ -147,17 +152,23 @@
       (cond
         [(empty? groups) subst]
         [else
-         (define-values (lita litbs) (car+cdr (first groups)))
+         (define gp (first groups))
+         (define lita (car gp))
+         (define litbs (cdr gp))
          (for/or ([litb (in-list litbs)])
            ; We use a immutable substitution to let racket handle copies when needed.
            (define new-subst (left-unify/assoc lita litb subst))
            (and new-subst (loop (rest groups) new-subst)))]))))
 
+;; Returns the shortest clause `cl2` such that `cl2` subsumes `cl`.
+;; Since `cl` subsumes each of its factors (safe or unsafe, and in the sense of
+;; non-multiset subsumption above), this means that `cl2` is equivalent to `cl`
+;; (hence no information is lost in `cl2`, it's a 'safe' factor).
 ;; Assumes that the clause cl is sorted according to `sort-clause`.
-;; A safe factor f of cl is such that f[α] ⊆ cl for some subst α, that is,
-;; f θ-subsumes cl. But since cl necessarily θ-subsumes all of its factors XXX
 ;; - The return value is eq? to the argument cl if no safe-factoring is possible.
 ;; - Applies safe-factoring as much as possible.
+;;
+;; clause? -> clause?
 (define (safe-factoring cl)
   (let/ec return
     (zip-loop ([(l x r) cl])
@@ -181,17 +192,29 @@
         (attempt y x)))
     cl))
 
-(define (clause-equivalence? A B)
-  (and (clause-subsumes A B)
-       (clause-subsumes B A)))
+;; Returns whether the two clauses subsume each other,
+;; in the sense of (non-multiset) subsumption above.
+;;
+;; clause? clause? -> boolean?
+(define (clause-equivalence? cl1 cl2)
+  (and (clause-subsumes cl1 cl2)
+       (clause-subsumes cl2 cl1)))
 
-;==============;
-;=== Saving ===;
-;==============;
+;=================;
+;=== Save/load ===;
+;=================;
 
+;; Save the clauses `cls` to the file `f`.
+;;
+;; cls : (listof clause?)
+;; f : file?
+;; exists : symbol? ; See `with-output-to-file`.
 (define (save-clauses! cls f #:? [exists 'replace])
   (with-output-to-file f #:exists exists
     (λ () (for-each writeln cls))))
 
+;; Returns the list of clauses loaded from the file `f`.
+;;
+;; file? -> (listof clause?)
 (define (load-clauses f)
   (map clausify (file->list f)))

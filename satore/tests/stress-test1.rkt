@@ -1,7 +1,7 @@
 #lang racket/base
 
-(require "../clause.rkt"
-         "../unification.rkt")
+(require satore/clause
+         satore/unification)
 
 (define cms current-milliseconds)
 

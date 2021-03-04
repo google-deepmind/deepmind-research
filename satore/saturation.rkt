@@ -114,26 +114,16 @@
         (build-path "rules" (string-append "rules-" (date-iso-file) ".txt"))
         str)))
 
-;===============;
-;=== Helpers ===;
-;===============;
-
-(define (current-inexact-seconds)
-  (* 0.001 (current-inexact-milliseconds)))
-
-;==============;
-;=== Clause ===;
-;==============;
-
-(define (Candidate<= C1 C2)
-  (<= (Clause-cost C1) (Clause-cost C2)))
-
 ;======================;
 ;=== Rule discovery ===;
 ;======================;
 
-;; Finds new binary equivalences between C and the clauses of utree,
-;; and adds and returns the set of resulting new rules that can be added to rwtree.
+;; Finds new binary equivalences between `C` and the clauses of `utree`,
+;; and adds and returns the set of resulting new rules that can be added to `rwtree`.
+;;
+;; rwtree-out : rewrite-tree?
+;; C : Clause?
+;; utree : unification-tree?
 (define (discover-new-rules! rwtree-out C utree)
   (cond/else
    [(not rwtree-out) '()]
@@ -158,7 +148,7 @@
    ;; C2 has a converse clause, but not C1. Hence C2 can be added as a binary rewrite rule
    ;; but not C1.
    (define Conv (make-converse-Clause C))
-   (define self-conv? (Clause<=>-subsumes C Conv))
+   (define self-conv? (Clause-subsumes C Conv))
    #:cond
    [self-conv?
     ; Self-converse Clause, so only one Clause to add (but will lead to 2 rules).
@@ -166,7 +156,7 @@
     (rewrite-tree-add-binary-Clause! rwtree-out C C #:rewrite? #false)]
    #:else
    (define Subs (utree-find/any utree Conv (λ (a Conv) (and (binary-Clause? a)
-                                                            (Clause<=>-subsumes a Conv)))))
+                                                            (Clause-subsumes a Conv)))))
    #:cond
    [Subs
     ; We found a converse Clause in the active set, or a Clause that subsumes the
@@ -188,7 +178,7 @@
    ; other more specific Clauses of the active set to be added as rules too.
    ; Eg, selected-Clause = p(X) | q(X) and some other active clause is ~p(a) | ~q(a).
    (define Subsd (utree-find/all utree Conv (λ (a Conv) (and (binary-Clause? a)
-                                                             (Clause<=>-subsumes Conv a)))))
+                                                             (Clause-subsumes Conv a)))))
    #:cond
    [(not (empty? Subsd))
     (when-debug>= steps
@@ -197,14 +187,27 @@
     ; rewrite=#true is ok here because Clause->rules already considers both directions
     ; of the implication. Hence if a potential rule is rewritten to a tautology,
     ; we know it's already redundant anyway.
-    ;; TODO: Rename this to add-asymmetric-rules ?
+    ; TODO: Rename this to add-asymmetric-rules ?
     (rewrite-tree-add-binary-Clauses! rwtree-out Subsd C #:rewrite? #true)]
    #:else '()))
 
-;=================;
-;=== Cost/loss ===;
-;=================;
+;====================;
+;=== Clause costs ===;
+;====================;
 
+;; Clause comparison for the cost queue.
+;;
+;; Clause? Clause? -> boolean?
+(define (Candidate<= C1 C2)
+  (<= (Clause-cost C1) (Clause-cost C2)))
+
+;; Sets the cost of a list of Clauses that all have the same parent `parent`.
+;; Some noise can be added to the cost via *cost-noise*.
+;;
+;; Cs : (listof Clause?)
+;; cost-type: symbol?
+;; parent : Clause?
+;; -> void?
 (define (Clauses-calculate-cost! Cs cost-type parent)
   (case cost-type
     ;; Very simple cost function that uses the weight of the Clause. May not be fair.
@@ -237,8 +240,13 @@
 ;=== Saturation ===;
 ;==================;
 
+;; List of possible status values. Used to prevent mistakes.
 (define statuses '(refuted saturated time memory steps running))
 
+;; Returns whether the result dictionary `res` has the status `status`.
+;;
+;; res : dict?
+;; status : symbol?
 (define (check-status res status)
   (define res-status (dict-ref res 'status #false))
 
@@ -248,6 +256,25 @@
 
   (eq? status res-status))
 
+;; The main algorithm. Saturates the formula given by the input clauses
+;; by adding new clauses (either resolutions or factors) until either
+;; the empty clause is produced, or a resource limit is reached (steps, time, memory).
+;;
+;; input-clauses : (listof clause?)
+;; step-limit : number?
+;; memory-limit : number?
+;; cpu-limit : number?
+;; rwtree : (or/c #false rewrite-tree?)
+;; rwtree-out : (or/c #false rewrite-tree?)
+;; backward-rewrite? : boolean?
+;; parent-discard? : boolean?
+;; age:cost : (list/c exact-nonnegative-integer? exact-nonnegative-integer?)
+;; cost-type : symbol?
+;; disp-proof? : boolean?
+;; L-resolvent-pruning : boolean?
+;; find-unit-rules-in-candidates? : boolean?
+;; negative-literal-selection? : boolean?
+;; -> dict?
 (define (saturation input-clauses
                     #:? [step-limit +inf.0]
                     #:? [memory-limit (*memory-limit*)] ; in MB
@@ -287,7 +314,7 @@
   ;; Both heaps contain the candidate clauses (there may be duplicates between the two,
   ;; but this is checked when extracting Clauses from either heap).
   (define candidates (make-heap Candidate<=))
-  (define age-queue (make-heap Clause-age<=))
+  (define age-queue (make-heap Clause-age>=))
   ;; Frequency of extracting Clauses from either heap.
   (define age-freq (first age:cost))
   (define cost-freq (second age:cost))
@@ -345,7 +372,7 @@
   (reset-n-L-resolvent-pruning!)
   (define start-time (current-milliseconds))
 
-  ;; TODO: Some calls are slow...
+  ;; TODO: Some calls are very slow...
   (define (make-return-dict status [other '()])
     (assert (memq status statuses) status)
     (define stop-time (current-milliseconds))
@@ -436,7 +463,7 @@
                [(or (= 0 (heap-count candidates))
                     (and (> (heap-count age-queue) 0)
                          (< (modulo step age+cost-freq) age-freq)))
-                ; Warning: This is somewhat defeated by the `priority` queue.
+                ; TODO: This is somewhat defeated by the `priority` queue.
                 age-queue]
                [else candidates]))
        (when-debug>= steps
@@ -503,8 +530,8 @@
         (discard-Clause! selected-Clause)
         (loop)] ; skip clause
        ;; FORWARD SUBSUMPTION
-       [(utree-find/any utree selected-Clause Clause<=-subsumes)
-        ;; TODO: TESTS
+       [(utree-find/any utree selected-Clause Clause-subsumes)
+        ;; TODO: Tests
         =>
         (λ (C2)
           (++ n-forward-subsumed)
@@ -515,7 +542,7 @@
        ;; Clause is being processed.
 
        ;; BACKWARD SUBSUMPTION
-       (define removed (utree-inverse-find/remove! utree selected-Clause Clause<=-subsumes))
+       (define removed (utree-inverse-find/remove! utree selected-Clause Clause-subsumes))
        (for-each discard-Clause! removed)
        (+= n-backward-subsumed (length removed))
 
@@ -554,7 +581,7 @@
          ; is popped from priority.
          (define removed-active-Clauses
            ;; TODO: This is inefficient. We should modify utree-inverse-find/remove!
-           ;; to handle multiple rule-C so as to take advantage of its hash/cache.
+           ;; TODO: to handle multiple rule-C so as to take advantage of its hash/cache.
            (remove-duplicates
             (flatten
              (for/list ([rule-C (in-list new-rule-Clauses)])
@@ -612,7 +639,7 @@
          (when rwtree-out
            (for ([C (in-list new-Candidates)])
              (when (unit-Clause? C)
-               ;; WARNING: Should be calling/merged with discover-rules! to avoid inconsistencies
+               ;; TODO: Should be calling/merged with discover-rules! to avoid inconsistencies
                (rewrite-tree-add-unit-Clause! rwtree-out C #:rewrite? #false)))))
 
        (add-Clause! utree selected-Clause)
@@ -633,6 +660,8 @@
 ;========================;
 ;=== User interaction ===;
 ;========================;
+
+;; Some commands to use with '--debug interact'. Type 'help' for information.
 
 (define interact-commands '())
 
@@ -681,6 +710,12 @@
       "Save the binary rules from the default rules-file"
       (save-rules! rwtree)])))
 
+;; Prints the set of active Clauses (held in utree).
+;;
+;; utree : unification-tree?
+;; long? : boolean?
+;; what : (or/c 'all (listof symbol?))
+;; -> void?
 (define (print-active-Clauses utree long? [what 'all])
   (define actives (unification-tree-Clauses utree))
   (printf "#active clauses: ~a\n" (length actives))
@@ -688,6 +723,9 @@
     (displayln "Active clauses:")
     (print-Clauses (sort actives < #:key Clause-idx) what)))
 
+;; Prints the set of binary rules.
+;;
+;; rewrite-tree? boolean? -> void?
 (define (print-binary-rules rwtree long?)
   (define rules (rewrite-tree-rules rwtree))
   (printf "#binary rules: ~a #original clauses: ~a\n"
@@ -700,8 +738,10 @@
 ;=== Iterative saturation ===;
 ;============================;
 
+;; A struct holding information about a given input formula.
 (struct problem (file name clauses [time-used #:mutable] [last-time #:mutable]))
 
+;; file? (or/ #false string?) (listof clause?) -> problem?
 (define (make-problem file name clauses)
   (problem file name clauses 0 0))
 
@@ -716,11 +756,19 @@
 ;; Tries again each unsolved problem after multiplying the step-limit by step-limit-factor
 ;; and so on untill all problems are solved.
 ;; Loading time from files is *not* taken into account.
+;;
+;; problems : (listof problem?)
+;; saturate : procedure?
+;; memory-limit : number?
+;; cpu-limit : number?
+;; cpu-first-limit : number?
+;; cpu-limit-factor? : number?
+;; -> void?
 (define (iterative-saturation/problem-set problems
                                           saturate
                                           #:! memory-limit
-                                          #:! cpu-first-limit   ; in seconds
                                           #:! cpu-limit         ; in second
+                                          #:! cpu-first-limit   ; in seconds
                                           #:! cpu-limit-factor) ; in seconds
   (define n-problems (length problems))
   (define n-attempted 0)
@@ -808,8 +856,17 @@
 ;;
 ;; NOTICE: In this mode the unit rewrites are gathered only for the next round, but this is
 ;; likely not necessary!
+;;
+;; saturate : procedure?
+;; tptp-program : string?
+;; rwtree-in : rewrite-tree?
+;; discover-online? : boolean?
+;; cpu-limit : number?
+;; cpu-first-limit : number?
+;; cpu-limit-factor? : number?
+;; -> void?
 (define (iterative-saturation saturate
-                              #:! tptp-program ; string?
+                              #:! tptp-program
                               #:! rwtree-in
                               #:? [discover-online? (*discover-online?*)]
                               #:? [cpu-limit (*cpu-limit*)]

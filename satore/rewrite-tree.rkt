@@ -44,10 +44,18 @@
 ;====================;
 
 ;; atom<=> : comparator?
-;; dynamic-ok? : whether we keep dynamic rules
-;; rules-file : if not #false, loads rules from the given file
+;; dynamic-ok? : boolean? ; whether we keep dynamic rules
+;; rules-file : file? ; if not #false, loads rules from the given file
 (struct rewrite-tree trie (atom<=> dynamic?))
 
+;; rewrite-tree constructor.
+;;
+;; constructor: procedure?
+;; atom<=> : comparator?
+;; dynamic-ok? : boolean?
+;; rules-file : file?
+;; other-args : list?
+;; -> rewrite-tree?
 (define (make-rewrite-tree #:? [constructor rewrite-tree]
                            #:! atom<=>
                            #:? [dynamic-ok? #true]
@@ -67,6 +75,9 @@
 ;; Returns a new rewrite-tree.
 ;; Duplicates the structure of rwtree, but the Clauses and rules are shared.
 ;; This means that the Clause ancestors of the rules are preserved.
+;;
+;; rwtree : rewrite-tree?
+;; -> rewrite-tree?
 (define (rewrite-tree-shallow-copy rwtree)
   (define new-rwtree (make-rewrite-tree #:atom<=> (rewrite-tree-atom<=> rwtree)
                                         #:dynamic-ok? (rewrite-tree-dynamic? rwtree)))
@@ -74,6 +85,11 @@
     (add-rule! new-rwtree rl))
   new-rwtree)
 
+;; Returns the list of values that match the literal t.
+;;
+;; rwtree : rewrite-tree?
+;; t : any/c
+;; -> list?
 (define (rewrite-tree-ref rwtree t)
   ; Node values are lists of rules, and trie-ref returns a list of node-values,
   ; hence the append*.
@@ -85,6 +101,13 @@
 ;; to-literal : light side
 ;; to-fresh : variables of to-literal not in from-literal that need to be freshed
 ;;   after applying the rule
+;;
+;; Clause : Clause?
+;; rule-group : rule-group?
+;; from-literal? : literal?
+;; to-literal? : literal?
+;; to-fresh : unused
+;; static? : boolean?
 (struct rule (Clause rule-group from-literal to-literal to-fresh static?)
   #:prefab)
 
@@ -94,24 +117,55 @@
 ;; the other rules of the same group from a given group.
 ;; A single group can have 2 or 4 rules: 2 for static rules or dynamic self-converse rules,
 ;; and 4 for dynamic non-self-converse rules.
+;;
+;; Clause : (or/c false/c Clause?)
+;; Converse : Clause?
+;; rules: (listof rule?)
 (struct rule-group (Clause Converse [rules #:mutable]) #:prefab)
 
-
+;; Rule constructor.
+;;
+;; C : Clause?
+;; rule-gp : rule-group?
+;; from : literal?
+;; to : literal?
+;; static? : boolean?
+;; -> rule?
 (define (make-rule C rule-gp from to static?)
   (define-values (lit1 lit2) (apply values (fresh (list from to))))
   (rule C rule-gp lit1 lit2 (variables-minus lit2 lit1) static?))
 
+;; Returns whether rule is a unit rule, that is, if the `to` literal
+;; is either ltrue or lfalse.
+;;
+;; rl : rule?
+;; -> any/c
 (define (unit-rule? rl)
   (memq (rule-to-literal rl) (list lfalse ltrue)))
 
+;; Returns whether rl is a 'tautology', that is, if its `to` and `from`
+;; literals are syntactically equal.
+;;
+;; rl : rule?
+;; -> boolean?
 (define (rule-tautology? rl)
   (equal? (rule-from-literal rl) (rule-to-literal rl)))
 
+;; Returns whether the rule is left linear, that is, if each variable
+;; occurs at most once in the `from` literal.
+;;
+;; rl : rule?
+;; -> boolean?
 (define (left-linear? rl)
   (define occs (var-occs (rule-from-literal rl)))
   (for/and ([(v n) (in-hash occs)])
     (<= n 1)))
 
+;; Returns whether rl1 subsumes rl2.
+;;
+;; rl1 : rule?
+;; rl2 : rule?
+;; -> any/c
 (define (rule-subsumes rl1 rl2)
   (define subst (left-unify (rule-from-literal rl1) (rule-from-literal rl2)))
   (and subst (left-unify (rule-to-literal rl1) (rule-to-literal rl2) subst)))
@@ -131,6 +185,12 @@
 ;; as a parent reference (for proofs), even if converse(C) is more specific than Conv.
 ;; Conv is *not* used to generate the rules themselves (only C), so if Conv is more general than C
 ;; (as for asymmetric rules) the generated rules will *not* be more general than those of C.
+;;
+;; C : Clause?
+;; Conv : Clause?
+;; atom<=> : comparator?
+;; dynamic-ok? : boolean?
+;; -> (listof rule?)
 (define (Clause->rules C Conv #:! atom<=> #:? [dynamic-ok? #true])
   (define cl (Clause-clause C))
   (define unit? (unit-Clause? C))
@@ -155,7 +215,8 @@
                #:when parent
                [c (in-value (atom<=> from to))]
                #:when (and (not (order<? c)) ; wrong direction
-                           ; either we keep dynamic rules or the rule is static  TODO TESTS
+                           ; either we keep dynamic rules or the rule is static
+                           ; TODO: Tests
                            (or dynamic-ok? (order>? c))))
       ; rule cannot be oriented to → from,
       ; so the rule from → to is valid.
@@ -165,6 +226,9 @@
   rules)
 
 ;; a is left-unify< to b if a left-unifies with b.
+;;
+;; comparator?
+;; literal? literal? -> (one-of '< '> '= #false)
 (define left-unify<=> (make<=> left-unify) ; left-unify is <=?
   ; equivalent to:
   #;(if (left-unify c1 c2)
@@ -184,24 +248,32 @@
 ;;   and its light side is no heavier than that of rl2.
 ;; NOTICE: A return value of '= does not mean that rl1 and rl2 are equal or equivalent;
 ;; it only means that either can be used. It does mean that their heavy sides are equivalent though.
+;;
+;; rl1 : rule?
+;; rl2 : rule?
+;; atom<=> : comparator?
+;; -> (one-of '< '> '= #false)
 (define (rule<=> rl1 rl2 atom<=>)
   (chain-comparisons
    (left-unify<=> (rule-from-literal rl1) (rule-from-literal rl2))
    (atom<=> (rule-to-literal rl1) (rule-to-literal rl2))))
 
-(define (find-rule<=> order? rwtree rl)
-  (define atom<=> (rewrite-tree-atom<=> rwtree))
-  (for/or ([rl2 (in-list (rewrite-tree-ref rwtree (rule-from-literal rl)))])
-    (and (order? (rule<=> rl2 rl atom<=>))
-         rl2)))
-
+;; Returns a rule of rwtree that subsumes rl if any.
+;;
+;; rwtree : rewrite-tree?
+;; rl : rule?
+;; -> (or/c #false rule?)
 (define (find-subsuming-rule rwtree rl)
   (for/or ([rl2 (in-list (rewrite-tree-ref rwtree (rule-from-literal rl)))])
     (and (rule-subsumes rl2 rl) rl2)))
 
-;; If there is a substitution α such that rule-from[α] = lit, then rule-to[α] is returned,
+;; If there is a substitution α such that rule-from α = lit, then rule-to α is returned,
 ;; otherwise #false is returned.
 ;; If the rule introduces variables, these are freshed.
+;;
+;; rl : rule?
+;; lit : literal?
+;; -> literal?
 (define (rule-rewrite-literal rl lit)
   (define subst (left-unify (rule-from-literal rl) lit))
   (cond [subst
@@ -221,6 +293,10 @@
 ;; (may contain duplicate rules).
 ;; lit: literal?
 ;; C: The Clause containing the literal lit. Used to avoid backward rewriting C to a tautology.
+;;
+;; rwtree : rewrite-tree?
+;; lit : literal?
+;; C : Clause?
 (define (binary-rewrite-literal rwtree lit C)
   (define atom<=> (rewrite-tree-atom<=> rwtree))
   (let loop ([lit lit] [rules '()])
@@ -249,6 +325,10 @@
 ;; Rewriting a clause is a simple as rewriting each literal, because
 ;; only left-unification is used, so the substitution cannot apply to the rest of the clause.
 ;; NOTICE: The variables of the resulting clause are not freshed.
+;;
+;; rwtree : rewrite-tree?
+;; cl : clause?
+;; C : Clause?
 (define (binary-rewrite-clause rwtree cl C)
   (let/ec return
     (for/fold ([lits '()]
@@ -264,12 +344,17 @@
 
 (define Clause-type-rw 'rw)
 
+;; Clause? -> boolean?
 (define (Clause-type-rw? C)
   (eq? (Clause-type C) Clause-type-rw))
 
 ;; Returns a new Clause if C can be rewritten, C otherwise.
 ;; The parents of the new Clause are C followed by the set of clauses from which the rules
 ;; used for rewriting C originate.
+;;
+;; rwtree : rewrite-tree?
+;; C : Clause?
+;; -> Clause?
 (define (binary-rewrite-Clause rwtree C)
   (define-values (new-cl rules) (binary-rewrite-clause rwtree (Clause-clause C) C))
   (cond [(empty? rules)
@@ -281,6 +366,11 @@
                       #:type Clause-type-rw)]))
 
 ;; Returns whether the clause cl would be rewritten. Does not perform the rewriting.
+;;
+;; rwtree : rewrite-tree?
+;; cl : clause?
+;; C : Clause?
+;; -> boolean?
 (define (binary-rewrite-clause? rwtree cl C)
   (for/or ([lit (in-list cl)])
     ; We need to perform the literal rewriting anyway, because
@@ -289,11 +379,19 @@
     (not (empty? new-rules))))
 
 ;; Returns whether the Clause C would be rewritten. Does not perform the rewriting.
+;;
+;; rwtree : rewrite-tree?
+;; C : Clause?
+;; -> boolean?
 (define (binary-rewrite-Clause? rwtree C)
   (binary-rewrite-clause? rwtree (Clause-clause C) C))
 
 ;; Unconditionally adds the rule rl to the rewrite-tree rwtree,
 ;; and removes from rwtree the rules that are subsumed by rl
+;;
+;; rwtree : rewrite-tree?
+;; rl : rule?
+;; -> void?
 (define (add-rule! rwtree rl)
   (define atom<=> (rewrite-tree-atom<=> rwtree))
   (unless (or (rule-tautology? rl)
@@ -309,8 +407,7 @@
                                         #:unless (rule-subsumes rl rl2))
                                rl2))
                            ;; TODO: If new-value is '(), the node should be removed from the trie,
-                           ;; along with any similar parent.
-                           ;; (this could be made automatic?)
+                           ;; TODO: along with any similar parent. (this could be made automatic?)
                            (set-trie-node-value! nd new-value))))
 
     ;; NOTICE: No need to backward-rewrite the rules.
@@ -327,18 +424,25 @@
 
 ;; Unconditionally removes a single (oriented) rule from the tree.
 ;; Use with caution and see instead remove-rule-group!.
+;;
+;; rwtree : rewrite-tree?
+;; rl : rule?
+;; -> void?
 (define (remove-rule! rwtree rl)
   (trie-find rwtree (rule-from-literal rl)
              (λ (nd)
                (define old-value (trie-node-value nd))
                (when (list? old-value) ; o.w. no-value
                  ;; TODO: If new-value is '(), the node should be removed from the trie,
-                 ;; along with any similar parent.
-                 ;; (this could be made automatic?)
+                 ;; TODO: along with any similar parent. (this could be made automatic?)
                  (set-trie-node-value! nd (remove rl old-value eq?))))))
 
 ;; Removes a group of rules that were added at the same time via Clause->rules
 ;; (via add-binary-Clause!).
+;;
+;; rwtree : rewrite-tree?
+;; gp : rule-group?
+;; -> void?
 (define (remove-rule-group! rwtree gp)
   (for ([rl (in-list (rule-group-rules gp))])
     (remove-rule! rwtree rl)))
@@ -349,6 +453,11 @@
 ;; A self-converse rule is necessarily dynamic (unless commutativity can be handled statically?),.
 ;; A unit rule is necessarily static (since $false is the bottom element).
 ;; Hence a 'self-converse' static rule is necessarily a unit rule (for now).
+;;
+;; rwtree : rewrite-tree?
+;; C : Clause?
+;; rewrite? : boolean?
+;; -> void?
 (define (rewrite-tree-add-unit-Clause! rwtree C #:? rewrite?)
   (unless (unit-Clause? C) (error "Non-unit Clause v" C))
   (rewrite-tree-add-binary-Clause! rwtree C C #:rewrite? rewrite?))
@@ -356,6 +465,12 @@
 ;; Rewriting of the clause C must be done prior to calling this function.
 ;; Conv: Converse of C. See Clause->rules.
 ;; Returns the new rules (use these to obtain the rewritten Clauses).
+;;
+;; rwtree : rewrite-tree?
+;; C : Clause?
+;; Conv : Clause?
+;; rewrite? : boolean?
+;; -> void?
 (define (rewrite-tree-add-binary-Clause! rwtree C Conv #:? [rewrite? #true])
   (cond
     [(Clause-binary-rewrite-rule? C) ; already added as a rule in the past?
@@ -392,7 +507,7 @@
                         (displayln "Refutation found while adding rules!")
                         (display-Clause-ancestor-graph C))
           ; TODO: Let's just discard it for now. A refutation will probably be found very early
-          ; at the next saturation iteration.
+          ; TODO: at the next saturation iteration.
           '()]
          [else
           (define atom<=> (rewrite-tree-atom<=> rwtree))
@@ -407,7 +522,7 @@
           ; because the purpose of this bit is to avoid considering
           ; C later again to save time.
           ; TODO: We could set Conv as a rewrite-rule too but ONLY if C also subsumes the converse
-          ; of conv.
+          ; TODO: of conv.
           (set-Clause-binary-rewrite-rule?! C #true)
           rls]))]))
 
@@ -419,35 +534,68 @@
 ;;   B->A because we provide it with the converse equivalence (that is, the proof that B->A is valid).
 ;;   Hence even converse implications can safely be rewritten to tautologies without losing rules.
 ;; Conv: MUST Subsumes the converse clause of each of Cs.
+;;
+;; rwtree : rewrite-tree?
+;; Cs : (listof Clause?)
+;; Conv : Clause?
+;; rewrite? : boolean?
+;; -> void?
 (define (rewrite-tree-add-binary-Clauses! rwtree Cs Conv #:? rewrite?)
   (for/fold ([rules '()])
             ([C (in-list Cs)])
     (define rls (rewrite-tree-add-binary-Clause! rwtree C Conv #:rewrite? rewrite?))
     (append rls rules)))
 
+;; Returns the list of rules (without duplicates) of rwtree.
+;;
+;; rwtree : rewrite-tree?
+;; -> (listof rule?)
 (define (rewrite-tree-rules rwtree)
   (remove-duplicates (append* (trie-values rwtree)) eq?))
 
+;; Returns the list of rule groups (without duplicates) of rwtree.
+;;
+;; rwtree : rewrite-tree?
+;; -> (listof rule-group?)
 (define (rewrite-tree-rule-groups rwtree)
   (remove-duplicates (map rule-rule-group (append* (trie-values rwtree))) eq?))
 
+;; Returns the list of unique Clauses that have been used to create the rules
+;; held by the given rule groups.
+;;
+;; groups : (listof rule-group?)
+;; -> (listof Clause?)
 (define (rule-groups-original-Clauses groups)
   (remove-duplicates (append (map rule-group-Clause groups)
                              (map rule-group-Converse groups))
                      eq?))
 
+;; Returns the list of unique Clauses that have been used to create the rules.
+;;
+;; rules : (listof rule?)
+;; -> (listof Clause?)
 (define (rules-original-Clauses rules)
   (rule-groups-original-Clauses (map rule-rule-group rules)))
 
+;; Returns the list of unique Clauses that have been used to create the rules
+;; of the rewrite tree.
+;;
+;; rwtree : rewrite-tree?
+;; -> (listof Clause?)
 (define (rewrite-tree-original-Clauses rwtree)
   (rule-groups-original-Clauses (rewrite-tree-rule-groups rwtree)))
 
-(define (rule->clause r)
-  (list (lnot (rule-from-literal r)) (rule-to-literal r)))
-
+;; Returns the number of rules in the rewrite tree.
+;;
+;; rwtree : rewrite-tree?
+;; -> exact-nonnegative-integer?
 (define (rewrite-tree-count rwtree)
   (length (rewrite-tree-rules rwtree))) ; not efficient
 
+;; Returns a dictionary of statistics about the rewrite tree.
+;;
+;; rwtree : rewrite-tree?
+;; -> list?
 (define (rewrite-tree-stats rwtree)
   (define rules (rewrite-tree-rules rwtree))
   (define n-rules (length rules))
@@ -460,12 +608,14 @@
     (binary-rules-static . ,(- n-bin n-dyn))
     (binary-rules-dynamic . ,n-dyn)))
 
-
 ;; Attempts to simplify the rules by successively removing each rule,
 ;; rewrite its underlying Clause and add the rule again—checking for subsumption.
 ;; Since all rules are processed, the new set of rules can be obtained via rewrite-tree-rules.
-;; WARNING: Not (currently) suitable for use *inside* the saturation loop because the new Clauses
+;; Notice: Not (currently) suitable for use *inside* the saturation loop because the new Clauses
 ;; (as per `eq?` are not part of the active set or candidates.
+;;
+;; rwtree : rewrite-tree?
+;; -> void?
 (define (re-add-rules! rwtree)
   (define groups (rewrite-tree-rule-groups rwtree))
   (for ([gp (in-list groups)])
@@ -479,6 +629,11 @@
 ;===================;
 
 ;; Save the rules to file f (as clauses).
+;;
+;; rwtree : rewrite-tree?
+;; rules-file : file?
+;; exists : symbol? ; see `display-to-file`.
+;; -> void?
 (define (save-rules! rwtree #:! rules-file #:? [exists 'replace])
   (define groups (rewrite-tree-rule-groups rwtree))
   ; We use hash to avoid duplicating clauses, so that we also avoid loading
@@ -503,6 +658,9 @@
                                (get-clause Conv))))))))
 
 ;; Private.
+;;
+;; rules-file : file?
+;; -> (listof Clause?)
 (define (load-rule-Clause-lists #:! rules-file)
   (define-counter idx 0)
   ; Each clause has a number (local to the file) and if a number appears while reading
@@ -521,7 +679,13 @@
     (map get-Clause! cls)))
 
 ;; Load the rules from file into the rewrite-tree.
-;; Optionally: rewrites the rules before adding them; returns the set of new rules.
+;; Optionally: rewrites the rules before adding them
+;; Returns the set of new rules.
+;;
+;; rwtree : rewrite-tree?
+;; rules-file : file?
+;; rewrite? : boolean?
+;; -> (listof rule?)
 (define (load-rules! rwtree #:! rules-file #:? [rewrite? #true])
   (define Crules (load-rule-Clause-lists #:rules-file rules-file))
   (for/fold ([rules '()])
@@ -539,6 +703,10 @@
 ;=======================;
 
 ;; Returns a new rwtree containing only the filtered rules
+;;
+;; rwtree : rewrite-tree?
+;; proc : rule-group? -> boolean?
+;; -> rewrite-tree?
 (define (filter-rule-groups rwtree proc)
   (define rwtree2 (make-rewrite-tree #:atom<=> (rewrite-tree-atom<=> rwtree)
                                      #:dynamic-ok? (rewrite-tree-dynamic? rwtree)))
@@ -560,6 +728,11 @@
 ;; If bounded? is not #false, then Clauses which have a literal
 ;; that is heavier (in literal-size) than a `from' literal of its parent rules
 ;; are discarded.
+;;
+;; rwtree : rewrite-tree?
+;; rl : rule?
+;; bounded? : boolean?
+;; -> (listof Clause?)
 (define (find-critical-pairs rwtree rl #:? [bounded? (*bounded-confluence?*)])
   (define lnot-from-lit1 (lnot (rule-from-literal rl)))
   (define to-lit1 (rule-to-literal rl))
@@ -591,6 +764,10 @@
 
 ;; This is a bad fix. Instead we should find the correct converse Clause (via rule groups)
 ;; Returns the list of rules that were added, or '() if none.
+;;
+;; rwtree : rewrite-tree?
+;; C : Clause?
+;; -> void?
 (define (force-add-binary-Clause! rwtree C)
   (define Conv (make-converse-Clause C))
   (rewrite-tree-add-binary-Clause! rwtree C (if (Clause-equivalence? C Conv) C Conv)))
@@ -600,6 +777,10 @@
 ;; as some rules can be inductive.
 ;; It is recommended to call `simplify-rewrite-tree!` before and after calling this procedure.
 ;; Returns #true if any rules has been added.
+;;
+;; rwtree : rewrite-tree?
+;; bounded? : boolean?
+;; -> boolean?
 (define (rewrite-tree-confluence-step! rwtree #:? bounded?)
   (define rules (rewrite-tree-rules rwtree))
   (for/fold ([any-change? #false])
@@ -612,11 +793,16 @@
 
 ;; Performs several steps of confluence until no more change happens.
 ;; Returns whether any change has been made.
-;; Warning: if bounded? is #false, this may loop forever.
+;; Notice: if bounded? is #false, this may loop forever.
 ;; If it does halt however, the system is confluent, but may not be minimal;
 ;; call re-add-rules! to remove unnecessary rules and simplify rhs of rules
 ;; (this should help make rewriting faster).
 ;; It is advised to call re-add-rules! once before and once after rewrite-tree-confluence!.
+;;
+;; rwtree : rewrite-tree?
+;; bounded? : boolean?
+;; max-steps : exact-nonnegative-integer?
+;; -> boolean?
 (define (rewrite-tree-confluence! rwtree #:? bounded? #:? [max-steps (*confluence-max-steps*)])
   (let loop ([step 1] [any-change? #false])
     (define changed? (rewrite-tree-confluence-step! rwtree #:bounded? bounded?))
@@ -629,11 +815,15 @@
 ;=== Printing ===;
 ;================;
 
+;; Returns a list representing the rule.
+;;
+;; rule? -> list?
 (define (rule->list rl)
   (cons (Clause-idx (rule-Clause rl))
         (Vars->symbols (list (rule-from-literal rl)
                              (rule-to-literal rl)))))
 
+;; A comparator to sort the rules for printing
 (define display-rule<=>
   (make-chain<=> boolean<=> rule-static?
                  boolean<=> unit-rule?
@@ -643,12 +833,18 @@
                  number<=> (λ (r) (tree-size (rule-to-literal r)))
                  length<=> rule-to-fresh))
 
+;; (listof rule?) -> (listof rule?)
 (define (sort-rules rls)
   (sort rls (λ (a b) (order>? (display-rule<=> a b)))))
 
 ;; Human-readable output
 ;; Notice: Since unit rules are asymmetric (only one rule per unit clause),
 ;; if positive-only is not #false it may not display some unit rules.
+;;
+;; rls : (listof rule?)
+;; sort? : boolean?
+;; positive-only? : boolean?
+;; unit? : boolean?
 (define (rules->string rls #:? [sort? #true] #:? [positive-only? #false] #:? [unit? #true])
   (string-join
    (for/list ([rl (in-list (if sort? (sort-rules rls) rls))]
@@ -663,6 +859,12 @@
                            (rule-to-literal rl))))
    "\n"))
 
+;; Like rules->string but directly displays the result.
+;;
+;; rls : (listof rule?)
+;; sort? : boolean?
+;; positive-only? : boolean?
+;; unit? : boolean?
 (define-wrapper (display-rules (rules->string rls #:? sort? #:? positive-only? #:? unit?))
   #:call-wrapped call
   (displayln (call)))

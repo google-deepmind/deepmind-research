@@ -3,7 +3,18 @@
 (require (submod bazaar/order test)
          racket/match
          rackunit
-         "../unification.rkt")
+         satore/unification)
+
+(define (subst/#false->imsubst s)
+  (cond [(subst? s)
+         (subst->list s)]
+        [(list? s)
+         (sort (map (λ (p) (cons (Var-name (Varify (car p)))
+                                 (Varify (cdr p))))
+                    s)
+               Var-name<? #:key car)]
+        [else s]))
+
 
 (check-eq? (Var-name->symbol (symbol->Var-name 'C)) 'C)
 (check-eq? (Var-name->symbol (symbol->Var-name 'X0)) 'X0)
@@ -312,7 +323,7 @@
                      '(p A B)
                      #false)
     ; This MUST return false because of the circularity.
-    ; The found substitution must be specializing, that is C2[σ] = C2 (and C1[σ] = C2),
+    ; The found substitution must be specializing, that is C2σ = C2 (and C1σ = C2),
     ; otherwise safe factoring can fail, in particular.
     ; Hence we must ensure that vars(C2) ∩ dom(σ) = ø.
     (test-left-unify '(p A B)
@@ -330,7 +341,7 @@
     (test-left-unify '(p a)
                      '(p a)
                      '())
-    (test-left-unify '(p A X) ;; WARNING
+    (test-left-unify '(p A X)
                      '(p X Y)
                      #false))
 
