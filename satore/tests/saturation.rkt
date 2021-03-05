@@ -58,12 +58,13 @@
       ; encapsulated to avoid collisions
       (let () body ...))))
 
-(for-in-list* ([l-res-pruning? #true #false]
-               [neg-lit-select? #true #false]
-               [atom<=> KBO1lex<=> atom1<=>]
-               [dynamic-ok? #true #false]
-               [rwtree-in=out? #true #false] ; false means no search for new rules
-               ;#:unless (and l-res-pruning? neg-lit-select?) ; can't have both at the same time
+(for-in-list* ([neg-lit-select? #true #false]
+               [l-res-pruning? #true #false]
+               [atom<=> #false KBO1lex<=> atom1<=>]
+               [dynamic-ok? #;#true #false]
+               [parent-discard? #false]
+               ; notice: if parent-discard? is #true, then can't have both rewriting and
+               ; neg-lit-select.
                )
 
   (define-wrapper (saturation
@@ -73,10 +74,11 @@
                                    #:? [cpu-limit (*cpu-limit*)] ; in seconds
                                    #:? [rwtree (make-rewrite-tree #:atom<=> atom<=>
                                                                   #:dynamic-ok? dynamic-ok?)]
-                                   #:? [rwtree-out (and rwtree-in=out? rwtree)]
+                                   #:? [rwtree-out (and atom<=> rwtree)]
                                    #:? backward-rewrite?
                                    #:? age:cost
                                    #:? cost-type
+                                   #:? [parent-discard? parent-discard?]
                                    #:? [disp-proof? #false]
                                    #:? [L-resolvent-pruning? l-res-pruning?]
                                    #:? [negative-literal-selection? neg-lit-select?]))
@@ -86,7 +88,7 @@
       (check-equal? (dict-ref res 'L-resolvent-pruning) 0))
     (unless dynamic-ok?
       (check-equal? (dict-ref res 'binary-rules-dynamic) 0))
-    (unless rwtree-in=out?
+    (unless atom<=>
       (check-equal? (dict-ref res 'binary-rules) 0)
       (check-true (= (dict-ref res 'binary-rewrites) 0)))
     res)
@@ -142,7 +144,6 @@
 
 
 
-  ; TPTP 100k idx = 348
   (check-equal?
    (dict-ref (saturation (Vars+clausify-list
                           '( [(big_f T0_0 T0_1) (big_g T0_0 T0_2)]
@@ -153,7 +154,6 @@
    'refuted)
 
 
-  ; TPTP 100k idx = 784
   (check-equal?
    (dict-ref (saturation (Vars+clausify-list '( [p1 p2]
                                                 [p1 (not p2)]
@@ -162,8 +162,20 @@
              'status)
    'refuted)
 
+  (check-equal?
+   (dict-ref (saturation
+              '((p1 p2 p3)
+                (p1 p3 (not p2))
+                (p2 p3 (not p1))
+                (p1 p2 (not p3))
+                (p1 (not p2) (not p3))
+                (p2 (not p1) (not p3))
+                (p3 (not p1) (not p2))
+                ((not p1) (not p2) (not p3))))
+             'status)
+   'refuted)
 
-  ; TPTP 100k idx = 117
+
   (check-equal?
    (dict-ref (saturation
               (Vars+clausify-list
@@ -230,7 +242,7 @@
               ((not (s D d)))
               ))))
     (check-equal? (dict-ref res 'status) 'refuted)
-    (when rwtree-in=out?
+    (when atom<=>
       (check > (dict-ref res 'unit-rules) 0)
       (check-equal? (dict-ref res 'binary-rules) 2)
       (check > (dict-ref res 'binary-rewrites) 0)))
@@ -250,7 +262,7 @@
               [(not (remove-me X y))] ; defeats urw
               ))))
     (check-equal? (dict-ref res 'status) 'refuted)
-    (when rwtree-in=out?
+    (when atom<=>
       (check-equal? (dict-ref res 'binary-rules) 4)
       (check-true (> (dict-ref res 'binary-rewrites) 0))))
   ;; TODO: Same test but with rules loaded from a file
@@ -275,7 +287,7 @@
               [(not (remove-me X y))] ; defeats urw
               ))))
     (check-equal? (dict-ref res 'status) 'refuted)
-    (when rwtree-in=out?
+    (when atom<=>
       (check-equal? (dict-ref res 'binary-rules) 6)
       (check-true (> (dict-ref res 'binary-rewrites) 0))))
 
@@ -298,7 +310,7 @@
               [(not (remove-me X y))] ; defeats urw
               ))))
     (check-equal? (dict-ref res 'status) 'refuted)
-    (when rwtree-in=out?
+    (when atom<=>
       (check-equal? (dict-ref res 'binary-rules) 6)
       (check-true (> (dict-ref res 'binary-rewrites) 0))))
 
@@ -323,6 +335,6 @@
               [(not (remove-me X y))] ; defeats urw
               ))))
     (check-equal? (dict-ref res 'status) 'refuted)
-    (when rwtree-in=out?
+    (when atom<=>
       (check-equal? (dict-ref res 'binary-rules) 8)
       (check-true (> (dict-ref res 'binary-rewrites) 0)))))

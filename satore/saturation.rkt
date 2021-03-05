@@ -69,12 +69,17 @@
   '(weight-fair weight)
   "Cost type.")
 
+(define-global *cost-depth-factor* 1.5
+  "Cost = weight + cost-depth-factor * depth"
+  (λ (x) #true)
+  string->number)
+
 (define-global *cost-noise* 0.
   "Noise factor to add to costs"
   (λ (x) (and (real? x) (>= x 0)))
   string->number)
 
-(define-global:boolean *parent-discard?* #true
+(define-global:boolean *parent-discard?* #false
   "Discard clauses when at least one parent has been discarded?")
 
 (define-global:boolean *discover-online?* #true
@@ -224,7 +229,7 @@
        (set-Clause-cost! C
          (if (empty? (Clause-clause C))
              -inf.0 ; empty clause should always be top of the list
-             (+ (* (Clause-depth C) 1.5)
+             (+ (* (Clause-depth C) (*cost-depth-factor*))
                 (Clause-size C)))))])
 
   ;; Add noise to the cost so as to potentially solve more later.
@@ -363,7 +368,7 @@
 
   (define step 0)
   (reset-n-tautologies!)
-  (define n-parent-pruning 0)
+  (define n-parent-discard 0)
   (define n-forward-subsumed 0)
   (define n-backward-subsumed 0)
   (reset-n-binary-rewrites!)
@@ -390,7 +395,7 @@
       (subsumes-checks . ,n-subsumes-checks)
       (subsumes-steps . ,n-subsumes-steps)
       (subsumes-breaks . ,n-subsumes-breaks)
-      (parent-pruning . ,n-parent-pruning)
+      (parent-discard . ,n-parent-discard)
       (L-resolvent-pruning . ,n-L-resolvent-pruning)
       (memory . ,(current-memory-use)) ; doesn't account for GC---this would take too much time
       (time . ,(- stop-time start-time))
@@ -486,7 +491,7 @@
        [(and parent-discard? (ormap Clause-discarded? (Clause-parents selected-Clause)))
         (when-debug>= steps (displayln "At least one parent has been discarded. Discard too."))
         (discard-Clause! selected-Clause)
-        (++ n-parent-pruning)
+        (++ n-parent-discard)
         (loop)]
        #:else
        (set-Clause-candidate?! selected-Clause #false)
@@ -615,6 +620,10 @@
              (utree-resolve+unsafe-factors utree selected-Clause
                                            #:rewriter (λ (C) (binary-rewrite-Clause rwtree C))
                                            #:L-resolvent-pruning? L-resolvent-pruning-allowed?)))
+
+       (when-debug>= interact
+                      (displayln "New candidates:")
+                      (print-Clauses new-Candidates))
 
        ;; If a clause has no resolvent with the active set (when complete)
        ;; then it will never resolve with anything and can thus be discarded.
@@ -877,6 +886,8 @@
   (define clauses (tptp-prog->clauses tptp-program))
   (define quiet? (*quiet-json?*))
 
+  (define n-rules-init (rewrite-tree-count rwtree-in))
+
   (let loop ([iter 1] [uncapped-current-cpu-limit cpu-first-limit] [rwtree-in rwtree-in])
     (define remaining-cpu (- cpu-limit (- (current-inexact-seconds) cpu-start)))
     (define current-cpu-limit (min remaining-cpu uncapped-current-cpu-limit))
@@ -887,7 +898,8 @@
               current-cpu-limit))
 
     ; Simplify the set of rules (only once)
-    (begin ; unless (= 1 iter) ; don't do this if no restarting
+    (unless (and (= 1 iter)
+                 (= 0 n-rules-init)) ; don't do this if no restarting
       ; Note that these steps destroy the Clause ancestry, and proofs will be incomplete.
       (unless quiet?
         (printf "; Rules stats: ~v\n" (rewrite-tree-stats rwtree-in))

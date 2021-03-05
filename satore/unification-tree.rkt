@@ -4,13 +4,13 @@
 ;****                               Unification Tree                               ****;
 ;**************************************************************************************;
 
-;;; A trie specialized for unifying literals.
-;;; This is *different* from "substitution trees"
+;;; An imperfect discrimination tree specialized for unifying literals and other
+;;; operations. This is *different* from "substitution trees"
 ;;; (https://link.springer.com/chapter/10.1007%2F3-540-59200-8_52)
-;;; TODO: This should be probably named a Clause-trie instead, since the
-;;; TODO: major difference with the trie is that we are dealing with Clauses, which
-;;; TODO: are lists of literals, and the same Clause can appear in different leaves
-;;; TODO: of the trie. Unification is only one of the operations performed on Clauses.
+;;; Note: This should be probably named a Clause-trie instead, since the
+;;;   major difference with the trie is that we are dealing with Clauses, which
+;;;   are lists of literals, and the same Clause can appear in different leaves
+;;;   of the trie. Unification is only one of the operations performed on Clauses.
 
 (require bazaar/cond-else
          bazaar/debug

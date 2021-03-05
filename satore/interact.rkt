@@ -17,8 +17,6 @@
 ;; variables set via the (list 'var val) pattern are set in the main namespace.
 ;; Even though the namespace is at the module level, the variables
 ;; are set in the namespace with their value so they can be used with eval.
-;; TODO: When a ns-anchor is given, commands are eval'ed by default, and to directly modify
-;; TODO: variables one must use ! (where the second argument is evaled)
 (define-syntax (interact stx)
   (syntax-parse stx
     #:literals (list)

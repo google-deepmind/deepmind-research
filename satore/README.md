@@ -1,6 +1,6 @@
-# Satore: First-order logic saturation with atomic rewriting
+# Satore: First-order logic saturation with atom rewriting
 
-This is a first-order logic resolution based theorem prover in CNF without
+Satore is a first-order logic resolution based theorem prover in CNF without
 equality, but with atom rewrite rules. New rewrite rules can be
 discovered during the proof search, potentially reducing exponentially the
 search space.
@@ -9,25 +9,26 @@ Satore stands for Saturation with Atom Rewriting.
 
 ## Installation
 
-### Install racket (Apache2/MIT):
-* Windows, MacOS X: https://download.racket-lang.org
-* Ubuntu/Debian: `[sudo] apt install racket`
-* Linux (other): [Download](https://download.racket-lang.org) the `.sh` and
-  install it with `[sudo] sh racket-<something>.sh`
+First, install the **Racket** programming language (Apache2/MIT):
+https://download.racket-lang.org
 
-You may need to configure the PATH environment variable to include the
-directory containing the `racket` and `raco` executables.
-For Windows this directory should be something like
-`C:>Program Files\Racket`.
+Note for Linux users: Do read the comments on the download page.
 
-### Install satore and its dependencies (all are Apache2/MIT licensed):
+You may need to
+[configure the PATH environment variable](https://github.com/racket/racket/wiki/Set-your-PATH-environment-variable)
+to include the directory containing the `racket` and `raco` executables.
 
-In a directory of your choice, type:
+To install **satore** and its dependencies (all are Apache2/MIT licensed),
+in a directory of your choice, type:
 
 ```shell
 git clone https://github.com/deepmind/deepmind-research/tree/master/satore
-raco pkg install --auto --link satore
+raco pkg install --auto --update-deps --link satore
 ```
+<!--
+We use git clone instead of the git facility of `raco` so that
+the code is available at a location of the user's choice.
+-->
 
 ## Running Satore
 

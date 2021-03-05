@@ -1,8 +1,10 @@
 #lang racket/base
 
 (require (submod bazaar/order test)
+         racket/list
          racket/match
          rackunit
+         satore/clause
          satore/unification)
 
 (define (subst/#false->imsubst s)
@@ -362,6 +364,20 @@
    (match-anywhere (match-lambda [`(_not_ (_not_ ,x)) `([x . ,x])] [else #false])
                    t)
    '([x . (f A B)])))
+
+(let ([c1 (clausify '((theorem (or A B)) (not (theorem (or A (or (or A B) B))))))]
+      [c2 (clausify '((theorem (or (_not_ A) (or B A)))))])
+  (define s1 (unify (first c2) (lnot (second c1))))
+  (define s2 (unify (lnot (second c1)) (first c2)))
+  (list c1
+        c2
+        s1
+        (substitute (first c1) s1)
+        s2
+        (substitute (first c1) s2))
+  (check clause-equivalence?
+         (substitute (list (first c1)) s1)
+         (substitute (list (first c1)) s2)))
 
 ;; Stress test for unification
 ;; This should take 0ms

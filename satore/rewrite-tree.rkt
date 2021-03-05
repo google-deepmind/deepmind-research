@@ -749,7 +749,7 @@
                         (define to-lit2 (rule-to-literal rl2))
                         (define s (unify lnot-from-lit1 from-lit2))
                         (when s
-                          (define cl (clausify (substitute (list to-lit1 to-lit2) s)))
+                          (define cl (clause-normalize (substitute (list to-lit1 to-lit2) s)))
                           (define C (make-Clause cl (list (rule-Clause rl) (rule-Clause rl2))
                                                  #:type 'c-p)) ; critical-pair
                           (define max-size (max (literal-size (rule-from-literal rl))

@@ -309,6 +309,10 @@
   (provide Clausify
            check-Clause-set-equivalent?)
 
+  ;; Takes a symbol tree, turns symbol variables into actual `Var`s, freshes them,
+  ;; sorts the literals and makes a new Clause.
+  ;;
+  ;; tree? -> Clause?
   (define Clausify (compose make-Clause clausify))
 
   ;; Returns whether for every clause of Cs1 there is an α-equivalent clause in Cs2.

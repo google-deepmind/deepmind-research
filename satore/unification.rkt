@@ -629,16 +629,36 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
 ;; Also, it's not necessary.
 (define reduce-mgu? #false)
 
+;; Returns a term where the substitution s is applied to the term t.
+;; The substitution `s` may not be 'reduced' in the sense that variables
+;; of the domain may appear in the range.
+;;
+;; term? subst? -> term?
+(define (substitute/slow t s)
+  (define t-orig t)
+  (let loop ([t t])
+    (cond
+      [(null? t) t]
+      [(pair? t)
+       (cons (loop (car t))
+             (loop (cdr t)))]
+      [(and (Var? t)
+            (subst-ref s t #false))
+       ; Recur into the substitution.
+       => loop]
+      [else t])))
+
 ;; A simple box to signify that there is no need to attempt to substitute
 ;; inside `term` as this has already been done.
 (struct already-substed (term) #:prefab)
 
-;; Returns a term where the substitution s is applied to the term t.
-;; The substitution `s` may not be 'reduced' in the sense that variables
-;; of the domain may appear in the range.
+;; Like `substitute/slow` but avoids unnecessary work.
 ;; Such substitutions are performed 'on-demand', if needed.
 ;; Once a substitution has been applied recursively to a rhs, the resulting
 ;; term is marked with `already-substed` to avoid attempting it again.
+;;
+;; Notice: This function can only be used if `s` is *not* going to be extended,
+;; otherwise it may not produce the correct result.
 ;;
 ;; term? subst? -> term?
 (define (substitute t s)
@@ -678,7 +698,7 @@ For simplicity, we sometimes use 'term' to mean 'atom or term', or even
 ;;
 ;; Var? term? subst? -> (or/c #false subst?)
 (define (occurs?/extend V t2 subst)
-  (define t2c (substitute t2 subst))
+  (define t2c (substitute/slow t2 subst))
   (if (occurs? V t2c)
     #false
     (begin
