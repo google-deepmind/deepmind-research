@@ -49,3 +49,24 @@ The .p file is assumed to be a standalone file with only comments and
 parentheses. All axioms must be included. (This will likely be improved soon.)
 
 Note that `racket -l- satore` can be invoked from anywhere.
+
+## Results on TPTP 7.2.0 (corrected)
+
+Corrected results on TPTP 7.2.0, on a 2-2.5GHz CPU, with a limit of 5 minutes
+and 32GB per problem, either with the default settings, or with
+`--no-discover-online` to disable atom rewriting.
+
+```
+┌────────────────────────────┬───────┬───────┬───────┬───────┬───────┬────────┐
+│Strategy                    │   UEQ │   CNE │   CEQ │   FNE │   FEQ │    All │
+│                 Class size→│  1092 │  2212 │  4436 │  1784 │  5860 │  15384 │
+├────────────────────────────┼───────┼───────┼───────┼───────┼───────┼────────┤
+│Satore               (all)  │   177 │  1140 │   956 │   822 │  1324 │   4419 │
+│                    (proof) │   177 │  1078 │   952 │   766 │  1324 │   4297 │
+│                     (sat)  │     0 │    62 │     4 │    56 │     0 │    122 │
+├────────────────────────────┼───────┼───────┼───────┼───────┼───────┼────────┤
+│Satore w/o atom rw   (all)  │   128 │   967 │   674 │   711 │   843 │   3323 │
+│                    (proof) │   128 │   913 │   670 │   658 │   843 │   3212 │
+│                     (sat)  │     0 │    54 │     4 │    53 │     0 │    111 │
+└────────────────────────────┴───────┴───────┴───────┴───────┴───────┴────────┘
+```

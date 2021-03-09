@@ -212,8 +212,12 @@
 ;; Cs : (listof Clause?)
 ;; cost-type: symbol?
 ;; parent : Clause?
+;; cost-depth-factor : number?
 ;; -> void?
-(define (Clauses-calculate-cost! Cs cost-type parent)
+(define (Clauses-calculate-cost! Cs
+                                 cost-type
+                                 parent
+                                 #:! cost-depth-factor)
   (case cost-type
     ;; Very simple cost function that uses the weight of the Clause. May not be fair.
     [(weight)
@@ -229,7 +233,7 @@
        (set-Clause-cost! C
          (if (empty? (Clause-clause C))
              -inf.0 ; empty clause should always be top of the list
-             (+ (* (Clause-depth C) (*cost-depth-factor*))
+             (+ (* (Clause-depth C) cost-depth-factor)
                 (Clause-size C)))))])
 
   ;; Add noise to the cost so as to potentially solve more later.
@@ -333,10 +337,12 @@
       (set-Clause-candidate?! C #true)
       (enqueue! priority C)))
 
+  (define cost-depth-factor (*cost-depth-factor*)) ; immutable value
+
   (define (add-candidates! parent Cs)
     ;; Calculate costs and add to candidate heap.
     (unless (empty? Cs)
-      (Clauses-calculate-cost! Cs cost-type parent)
+      (Clauses-calculate-cost! Cs cost-type parent #:cost-depth-factor cost-depth-factor)
 
       (for ([C (in-list Cs)])
         (set-Clause-candidate?! C #true))
