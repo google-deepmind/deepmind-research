@@ -22,8 +22,7 @@ To install **satore** and its dependencies (all are Apache2/MIT licensed),
 in a directory of your choice, type:
 
 ```shell
-git clone https://github.com/deepmind/deepmind-research/tree/master/satore
-raco pkg install --auto --update-deps --link satore
+raco pkg install --auto --update-deps satore
 ```
 <!--
 We use git clone instead of the git facility of `raco` so that

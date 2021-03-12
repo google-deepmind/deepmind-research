@@ -723,7 +723,7 @@
       (pretty-print (make-return-dict 'running))]
      [(list 'save-rules)
       "Save the binary rules from the default rules-file"
-      (save-rules! rwtree)])))
+      (save-rules! rwtree #:rules-file (*output-rules*))])))
 
 ;; Prints the set of active Clauses (held in utree).
 ;;
