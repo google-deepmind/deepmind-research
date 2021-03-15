@@ -4,8 +4,7 @@
 
 `dendritic_gated_network.ipynb` implements a Dendritic Gated Network (DGN) solving a regression (using quadratic loss) or a binary classification problem (using Bernoulli log loss).
 
-See our paper titled "A rapid and efficient learning rule for biological neural circuits" for details of the DGN model.
-
+See our paper titled ["A rapid and efficient learning rule for biological neural circuits"](https://www.biorxiv.org/content/10.1101/2021.03.10.434756v1) for details of the DGN model.
 
 ### Instructions for running the `dendritic_gated_network.ipynb` colab/notebook.
 
