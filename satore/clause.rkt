@@ -5,7 +5,6 @@
 ;***************************************************************************************;
 
 (require bazaar/cond-else
-         bazaar/debug
          bazaar/list
          bazaar/loop
          bazaar/mutation
@@ -13,14 +12,11 @@
          define2
          global
          racket/file
-         racket/format
          racket/list
-         racket/pretty
          satore/misc
          satore/trie
          satore/unification
-         syntax/parse/define
-         text-table)
+         syntax/parse/define)
 
 (provide (all-defined-out))
 

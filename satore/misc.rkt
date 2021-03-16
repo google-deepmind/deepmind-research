@@ -4,16 +4,10 @@
 ;****                               Various Utilities                               ****;
 ;***************************************************************************************;
 
-(require (for-syntax racket/base racket/port racket/syntax syntax/parse)
-         (except-in bazaar/order atom<=>)
+(require (for-syntax racket/base racket/port racket/syntax)
          global
-         racket/contract
          racket/format
-         racket/list
-         racket/match
-         racket/port
-         racket/struct
-         racket/stxparam)
+         racket/port)
 
 (provide (all-defined-out))
 

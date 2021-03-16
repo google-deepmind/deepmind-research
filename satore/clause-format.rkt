@@ -10,7 +10,6 @@
          racket/format
          racket/list
          racket/pretty
-         satore/clause
          satore/tptp
          satore/unification
          text-table)

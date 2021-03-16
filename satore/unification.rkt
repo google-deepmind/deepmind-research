@@ -18,8 +18,7 @@
          racket/dict
          racket/list
          racket/match
-         (submod racket/performance-hint begin-encourage-inline)
-         satore/misc)
+         (submod racket/performance-hint begin-encourage-inline))
 
 (provide (all-defined-out))
 

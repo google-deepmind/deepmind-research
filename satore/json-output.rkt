@@ -4,8 +4,7 @@
 ;****                                  Json Output                                  ****;
 ;***************************************************************************************;
 
-(require bazaar/debug
-         racket/dict
+(require racket/dict
          racket/string)
 
 (provide (all-defined-out))

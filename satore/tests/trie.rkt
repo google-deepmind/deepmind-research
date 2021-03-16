@@ -1,7 +1,6 @@
 #lang racket/base
 
-(require racket/pretty
-         rackunit
+(require rackunit
          satore/trie
          (only-in satore/unification symbol-variable?))
 

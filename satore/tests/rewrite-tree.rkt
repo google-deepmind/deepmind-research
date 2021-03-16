@@ -4,7 +4,6 @@
          (except-in bazaar/order atom<=>)
          racket/file
          racket/list
-         racket/pretty
          racket/random
          rackunit
          (submod satore/Clause test)

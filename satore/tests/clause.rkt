@@ -1,8 +1,6 @@
 #lang racket/base
 
-(require global
-         racket/dict
-         racket/list
+(require racket/dict
          rackunit
          satore/clause
          satore/misc

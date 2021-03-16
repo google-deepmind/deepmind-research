@@ -1,17 +1,13 @@
 #lang racket/base
 
 (require (for-syntax racket/base syntax/parse)
-         bazaar/debug
          define2
-         define2/define-wrapper
          global
          racket/list
          racket/pretty
          rackunit
-         (submod satore/Clause test)
          satore/Clause
          satore/clause
-         satore/clause-format
          satore/rewrite-tree
          satore/unification)
 

@@ -15,45 +15,51 @@ https://download.racket-lang.org
 Note for Linux users: Do read the comments on the download page.
 
 You may need to
-[configure the PATH environment variable](https://github.com/racket/racket/wiki/Set-your-PATH-environment-variable)
+[configure the PATH environment variable](https://github.com/racket/racket/wiki/Configure-Command-Line-for-Racket)
 to include the directory containing the `racket` and `raco` executables.
 
 To install **satore** and its dependencies (all are Apache2/MIT licensed),
-in a directory of your choice, type:
+type:
 
 ```shell
 raco pkg install --auto --update-deps satore
 ```
+
 <!--
-We use git clone instead of the git facility of `raco` so that
-the code is available at a location of the user's choice.
+Cloning only the correct subdirectory of the deemind-research repository is
+inconvenient, but the Racket package does that itself rather nicely.
 -->
 
 ## Running Satore
 
-Run a trivial example:
-
-```shell
-racket -l- satore -p satore/examples/socrates.p --proof
-```
-
-To see the various flags:
+First, you can check that satore is correctly installed by typing:
 
 ```shell
 racket -l- satore --help
 ```
 
-The .p file is assumed to be a standalone file with only comments and
+There are some examples in the `examples` subdirectory of the `satore`
+directory, and its location can be found with
+
+```shell
+racket -e '(displayln (collection-file-path "examples" "satore"))'
+```
+
+Run a trivial example:
+
+```shell
+racket -l- satore -p path-to-satore/examples/socrates.p --proof
+```
+
+The `.p` file is assumed to be a standalone file with only comments and
 `cnf(…).` lines without equality, where the logic clause must be surrounded by
 parentheses. All axioms must be included. (This will likely be improved soon.)
-
-Note that `racket -l- satore` can be invoked from anywhere.
 
 ## Results on TPTP 7.2.0 (corrected)
 
 Corrected results on TPTP 7.2.0, on a 2-2.5GHz CPU, with a limit of 5 minutes
 and 32GB per problem, either with the default settings, or with
-`--no-discover-online` to disable atom rewriting.
+`--no-discover-online` to disable atom rewriting:
 
 ```
 ┌────────────────────────────┬───────┬───────┬───────┬───────┬───────┬────────┐

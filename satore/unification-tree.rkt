@@ -12,12 +12,9 @@
 ;;;   are lists of literals, and the same Clause can appear in different leaves
 ;;;   of the trie. Unification is only one of the operations performed on Clauses.
 
-(require bazaar/cond-else
-         bazaar/debug
-         bazaar/list
+(require bazaar/list
          bazaar/loop
          bazaar/mutation
-         (except-in bazaar/order atom<=>)
          define2
          global
          racket/list

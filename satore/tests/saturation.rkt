@@ -1,6 +1,6 @@
 #lang racket/base
 
-(require (for-syntax racket/base syntax/parse)
+(require (for-syntax racket/base)
          define2
          define2/define-wrapper
          global

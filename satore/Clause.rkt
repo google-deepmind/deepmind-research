@@ -6,7 +6,6 @@
 
 (require define2
          define2/define-wrapper
-         global
          racket/format
          racket/list
          racket/string
