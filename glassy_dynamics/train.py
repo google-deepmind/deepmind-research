@@ -180,7 +180,7 @@ def train_model(train_file_pattern: Text,
                 mlp_kwargs: Optional[Dict[Text, Any]] = None,
                 edge_threshold: float = 2.0,
                 measurement_store_interval: int = 1000,
-                checkpoint_path: Optional[Text] = None) -> float:
+                checkpoint_path: Optional[Text] = None) -> float:  # pytype: disable=annotation-type-mismatch
   """Trains GraphModel using tensorflow.
 
   Args:
