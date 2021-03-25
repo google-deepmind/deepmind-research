@@ -197,11 +197,11 @@ class MultiheadAttention(snt.Module):
           w_init=self._initializer)
       self._r_w_bias = tf.Variable(
           self._initializer([1, self._num_heads, 1, self._key_size],
-                            dtype=tf.float64),
+                            dtype=tf.float32),
           name='r_w_bias')
       self._r_r_bias = tf.Variable(
           self._initializer([1, self._num_heads, 1, self._key_size],
-                            dtype=tf.float64),
+                            dtype=tf.float32),
           name='r_r_bias')
 
   def _multihead_output(self, linear, inputs):
@@ -254,7 +254,7 @@ class MultiheadAttention(snt.Module):
       content_logits = tf.matmul(q + self._r_w_bias, k, transpose_b=True)
       # [B, H, T', 2T-1]
       relative_logits = tf.matmul(
-          q + self._r_r_bias, tf.cast(r_k, tf.float64), transpose_b=True)
+          q + self._r_r_bias, r_k, transpose_b=True)
       #  [B, H, T', T]
       relative_logits = relative_shift(relative_logits)
       logits = content_logits + relative_logits

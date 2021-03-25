@@ -289,7 +289,7 @@ def one_hot_encode(sequence: str,
                    alphabet: str = 'ACGT',
                    neutral_alphabet: str = 'N',
                    neutral_value: Any = 0,
-                   dtype=np.float64) -> np.ndarray:
+                   dtype=np.float32) -> np.ndarray:
   """One-hot encode sequence."""
   def to_uint8(string):
     return np.frombuffer(string.encode('ascii'), dtype=np.uint8)

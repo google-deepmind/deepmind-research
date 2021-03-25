@@ -38,7 +38,7 @@ class TestEnformer(unittest.TestCase):
 def _get_random_input():
   seq = ''.join(
       [random.choice('ACGT') for _ in range(enformer.SEQUENCE_LENGTH)])
-  return np.expand_dims(enformer.one_hot_encode(seq), 0)
+  return np.expand_dims(enformer.one_hot_encode(seq), 0).astype(np.float32)
 
 
 if __name__ == '__main__':
