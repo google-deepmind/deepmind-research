@@ -9,15 +9,9 @@ cite the following publication:
 "Effective gene expression prediction from sequence by integrating long-range
 interactions"
 
-Žiga Avsec1, Vikram Agarwal2,4, Daniel Visentin1,4, Joseph R. Ledsam1,3,
-Agnieszka Grabska-Barwinska1, Kyle R. Taylor1, Yannis Assael1, John Jumper1,
-Pushmeet Kohli1, David R. Kelley2*
-
-1 DeepMind, London, UK
-2 Calico Life Sciences, South San Francisco, CA, USA
-3 Google, Tokyo, Japan
-4 These authors contributed equally.
-* correspondence: avsec@google.com, pushmeet@google.com, drk@calicolabs.com
+Žiga Avsec, Vikram Agarwal, Daniel Visentin, Joseph R. Ledsam,
+Agnieszka Grabska-Barwinska, Kyle R. Taylor, Yannis Assael, John Jumper,
+Pushmeet Kohli, David R. Kelley
 
 ## Setup
 
@@ -46,7 +40,7 @@ python -m enformer_test
 We precomputed variant effect scores for all frequent variants (MAF>0.5%, in any
 population) present in the 1000 genomes project. Variant scores in HDF5 file
 format per chromosome for HG19 reference genome can be found
-[here](TODO).
+[here](https://console.cloud.google.com/storage/browser/dm-enformer/variant-scores/1000-genomes/enformer).
 The HDF5 file has the same format as the output of
 [this](https://github.com/calico/basenji/blob/738321c85f8925ae6ac318a6cd4901a42ea6bc3f/bin/basenji_sad.py#L264)
 script and contains the following arrays:
@@ -66,8 +60,8 @@ script and contains the following arrays:
     model(reference_sequence))`
 
 Furthermore, we provide the top 20 principal components of variant-effect scores
-in the PC20
-folder stored as a tabix-indexed TSV file per chromosome (HG19 reference
+in the [PC20 folder](https://console.cloud.google.com/storage/browser/dm-enformer/variant-scores/1000-genomes/enformer/PC20)
+stored as a tabix-indexed TSV file per chromosome (HG19 reference
 genome). The format of these files has the following columns:
 
 *   #CHROM - chromosome (chr1)
@@ -92,14 +86,14 @@ zeros.
 import tensorflow as tf
 import tensorflow_hub as hub
 
-enformer = hub.Module("https://tfhub.dev/deepmind/enformer/...")
+enformer = hub.Module('https://tfhub.dev/deepmind/enformer/1')
 
 SEQ_LENGTH = 393_216
 
 # Numpy array [batch_size, SEQ_LENGTH, 4] one hot encoded in order 'ACGT'. The
 # `one_hot_encode` function is available in `enformer.py` and outputs can be
 # stacked to form a batch.
-inputs = …
+inputs = tf.zeros((1, SEQ_LENGTH, 4), dtype=tf.float32)
 predictions = enformer.predict_on_batch(inputs)
 predictions['human'].shape  # [batch_size, 896, 5313]
 predictions[mouse].shape  # [batch_size, 896, 1643]
@@ -121,24 +115,33 @@ df_targets = pd.read_csv(targets_txt, sep='\t')
 df_targets.shape  # (5313, 8) With rows match output shape above.
 ```
 
-## Modeling Code
+## Training Code
 
 The model is implemented using [Sonnet](https://github.com/deepmind/sonnet). The
-full sonnet module is defined in `enformer.py` called Enformer. See the Sonnet
-documentation on distributed training
-[here](https://github.com/deepmind/sonnet#distributed-training).
+full sonnet module is defined in `enformer.py` called Enformer. See
+[enformer-training.ipynb](https://colab.research.google.com/github/deepmind/deepmind_research/blob/master/enformer/enformer-training.ipynb).
+on how to train the model on Basenji2 data.
 
 ## Colab
 
-Further examples are given in the notebooks `enformer-example.ipynb`
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/deepmind/deepmind_research/blob/master/enformer/enformer-example.ipynb).
+Further usage and training examples are given in the following colab notebooks:
+
+### `enformer-usage.ipynb` [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/deepmind/deepmind_research/blob/master/enformer/enformer-usage.ipynb).
 
 This shows how to:
 
-*   Make predictions with Enformer and reproduce Fig. 1d
-*   Compute contribution scores and reproduce parts of Fig. 2a
-*   Predict the effect of a genetic variant and reproduce parts of Fig. 3g
+*   **Make predictions** with pre-trained Enformer and reproduce Fig. 1d
+*   **Compute contribution scores** and reproduce parts of Fig. 2a
+*   **Predict the effect of genetic variants** and reproduce parts of Fig. 3g
 *   Score multiple variants in a VCF
+
+### `enformer-training.ipynb` [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/deepmind/deepmind_research/blob/master/enformer/enformer-training.ipynb).
+
+This colab shows how to:
+
+* Setup training data by directly accessing the Basenji2 data on GCS
+* Train the model for a few steps on both human and mouse genomes
+* Evaluate the model on human and mouse genomes
 
 ## Disclaimer
 

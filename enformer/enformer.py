@@ -45,24 +45,31 @@ class Enformer(snt.Module):
   def __init__(self,
                channels: int = 1536,
                num_transformer_layers: int = 11,
+               num_heads: int = 8,
+               pooling_type: str = 'attention',
                name: str = 'enformer'):
     """Enformer model.
 
     Args:
-      channels: Number of convolutional filters.
+      channels: Number of convolutional filters and the overall 'width' of the
+        model.
       num_transformer_layers: Number of transformer layers.
+      num_heads: Number of attention heads.
+      pooling_type: Which pooling function to use. Options: 'attention' or max'.
       name: Name of sonnet module.
     """
     super().__init__(name=name)
     # pylint: disable=g-complex-comprehension,g-long-lambda,cell-var-from-loop
     heads_channels = {'human': 5313, 'mouse': 1643}
     dropout_rate = 0.4
+    assert channels % num_heads == 0, ('channels needs to be divisible '
+                                       f'by {num_heads}')
     whole_attention_kwargs = {
         'attention_dropout_rate': 0.05,
         'initializer': None,
         'key_size': 64,
-        'num_heads': 8,
-        'num_relative_position_features': 192,
+        'num_heads': num_heads,
+        'num_relative_position_features': channels // num_heads,
         'positional_dropout_rate': 0.01,
         'relative_position_functions': [
             'positional_features_exponential',
@@ -71,7 +78,7 @@ class Enformer(snt.Module):
         ],
         'relative_positions': True,
         'scaling': True,
-        'value_size': 192,
+        'value_size': channels // num_heads,
         'zero_initialize': True
     }
 
@@ -91,7 +98,7 @@ class Enformer(snt.Module):
     stem = Sequential(lambda: [
         snt.Conv1D(channels // 2, 15),
         Residual(conv_block(channels // 2, 1, name='pointwise_conv_block')),
-        SoftmaxPooling1D(pool_size=2, per_channel=True, w_init_scale=2.0)
+        pooling_module(pooling_type, pool_size=2),
     ], name='stem')
 
     filter_list = exponential_linspace_int(start=channels // 2, end=channels,
@@ -100,7 +107,7 @@ class Enformer(snt.Module):
         Sequential(lambda: [
             conv_block(num_filters, 5),
             Residual(conv_block(num_filters, 1, name='pointwise_conv_block')),
-            SoftmaxPooling1D(pool_size=2, per_channel=True, w_init_scale=2.0)
+            pooling_module(pooling_type, pool_size=2),
             ],
                    name=f'conv_tower_block_{i}')
         for i, num_filters in enumerate(filter_list)], name='conv_tower')
@@ -214,6 +221,17 @@ class Sequential(snt.Module):
       else:
         outputs = mod(outputs, **kwargs)
     return outputs
+
+
+def pooling_module(kind, pool_size):
+  """Pooling module wrapper."""
+  if kind == 'attention':
+    return SoftmaxPooling1D(pool_size=pool_size, per_channel=True,
+                            w_init_scale=2.0)
+  elif kind == 'max':
+    return tf.keras.layers.MaxPool1D(pool_size=pool_size, padding='same')
+  else:
+    raise ValueError(f'Invalid pooling kind: {kind}.')
 
 
 class SoftmaxPooling1D(snt.Module):
