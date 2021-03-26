@@ -44,7 +44,7 @@ LibAppArmor==2.13.4
 linecache2==1.0.0
 lockfile==0.12.2
 louis==3.14.0
-lxml==4.5.0
+lxml==4.6.3
 lz4==3.0.2+dfsg
 mercurial==5.5.1+348.80bf7b1ada15
 monotonic==1.5
