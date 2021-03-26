@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Effective gene expression prediction from sequence by integrating long-range interactions](enformer)
 *   [Satore: First-order logic saturation with atom rewriting](satore)
 *   [Characterizing signal propagation to close the performance gap in unnormalized ResNets](nfnets), ICLR 2021
 *   [Uncovering the Limits of Adversarial Training against Norm-Bounded Adversarial Examples](adversarial_robustness)
