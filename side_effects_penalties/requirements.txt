@@ -69,7 +69,7 @@ pycairo==1.16.2
 pycrypto==2.6.1
 pycups==1.9.73
 pycurl==7.43.0.2
-Pygments==2.3.1
+Pygments==2.7.4
 PyGObject==3.36.0
 pyinotify==0.9.6
 PyJWT==1.7.1
