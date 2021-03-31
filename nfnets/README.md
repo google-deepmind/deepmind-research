@@ -1,7 +1,7 @@
 # Code for Normalizer-Free Networks
 This repository contains code for the ICLR 2021 paper
 ["Characterizing signal propagation to close the performance gap in unnormalized
-ResNets,"](https://arxiv.org/abs/2102.06171) by Andrew Brock, Soham De, and
+ResNets,"](https://arxiv.org/abs/2101.08692) by Andrew Brock, Soham De, and
 Samuel L. Smith, and the arXiv preprint ["High-Performance Large-Scale Image
 Recognition Without Normalization"](http://dpmd.ai/06171) by
 Andrew Brock, Soham De, Samuel L. Smith, and Karen Simonyan.
