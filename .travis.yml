@@ -15,6 +15,7 @@ env:
     - PROJECT="polygen"
     - PROJECT="learning_to_simulate"
     - PROJECT="avae"
+    - PROJECT="kfac_ferminet_alpha"
 before_script:
   - sudo apt-get update -qq
   - pip install --upgrade pip
