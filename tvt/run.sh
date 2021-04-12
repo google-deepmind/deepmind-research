@@ -13,8 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-python3 -m venv tvt_venv
-source tvt_venv/bin/activate
+python3 -m venv /tmp/tvt_venv
+source /tmp/tvt_venv/bin/activate
+pip install -U pip
 pip install -r tvt/requirements.txt
 
-python3 -m tvt.main
+python3 -m tvt.main --num_episodes=1
