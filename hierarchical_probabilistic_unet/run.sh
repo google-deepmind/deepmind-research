@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-python3 -m venv hpu-net-venv
-source hpu-net-venv/bin/activate
-pip3 install .
-python3 model_test.py
-deactivate
+python3 -m venv /tmp/hpu-net-venv
+source /tmp/hpu-net-venv/bin/activate
+pip3 install -U pip
+pip3 install hierarchical_probabilistic_unet/
+python3 hierarchical_probabilistic_unet/model_test.py
