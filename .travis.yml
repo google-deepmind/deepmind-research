@@ -25,6 +25,7 @@ env:
     - PROJECT="sketchy"
     - PROJECT="transporter"
     - PROJECT="tvt"
+    # - PROJECT="unrestricted_advx"  # TODO(b/184862249): Fix and enable
 before_script:
   - sudo apt-get update -qq
   - pip install --upgrade pip
