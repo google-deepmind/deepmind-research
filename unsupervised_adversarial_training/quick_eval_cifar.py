@@ -30,7 +30,6 @@ import cleverhans
 from cleverhans import attacks
 import numpy as np
 import tensorflow.compat.v1 as tf
-from tensorflow.python.ops import math_grad
 import tensorflow_hub as hub
 
 UAT_HUB_URL = ('https://tfhub.dev/deepmind/unsupervised-adversarial-training/'
@@ -79,10 +78,6 @@ def eval_cifar():
 
   _, data_test = tf.keras.datasets.cifar10.load_data()
   data = _build_dataset(data_test, batch_size=batch_size, shuffle=False)
-
-  # Necessary for backwards-compatibility
-  # Earlier versions of TF don't have a registered gradient for the AddV2 op
-  tf.RegisterGradient('AddV2')(math_grad._AddGrad)  # pylint: disable=protected-access
 
   # Generate adversarial images.
   if attack_fn_name == 'fgsm':

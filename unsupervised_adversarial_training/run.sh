@@ -17,9 +17,11 @@
 # user@host:/path/to/deepmind_research$ unsupervised_adversarial_training/run.sh
 
 # Sets up virtual environment, install dependencies, and runs evaluation script
-python3 -m venv uat_venv
-source uat_venv/bin/activate
+python3 -m venv /tmp/uat_venv
+source /tmp/uat_venv/bin/activate
+pip install -U pip
 pip install -r unsupervised_adversarial_training/requirements.txt
 
 python -m unsupervised_adversarial_training.quick_eval_cifar \
-  --attack_fn_name=fgsm
+  --attack_fn_name=fgsm \
+  --num_batches=1
