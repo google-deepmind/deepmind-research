@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Object-based attention for spatio-temporal reasoning](object_attenion_for_reasoning)
 *   [Effective gene expression prediction from sequence by integrating long-range interactions](enformer)
 *   [Satore: First-order logic saturation with atom rewriting](satore)
 *   [Characterizing signal propagation to close the performance gap in unnormalized ResNets](nfnets), ICLR 2021
