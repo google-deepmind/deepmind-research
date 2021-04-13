@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-python3 -m venv geomancer-venv
-source geomancer-venv/bin/activate
-pip3 install .
-python3 geomancer_test.py
-python3 train.py
-deactivate
+python3 -m venv /tmp/geomancer-venv
+source /tmp/geomancer-venv/bin/activate
+pip3 install -U pip
+pip3 install geomancer/
+python3 -m geomancer.geomancer_test
+python3 geomancer/train.py --plot=False
