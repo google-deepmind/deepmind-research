@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Better, Faster Fermionic Neural Networks](kfac_ferminet_alpha) (KFAC implementation)
 *   [Object-based attention for spatio-temporal reasoning](object_attenion_for_reasoning)
 *   [Effective gene expression prediction from sequence by integrating long-range interactions](enformer)
 *   [Satore: First-order logic saturation with atom rewriting](satore)
