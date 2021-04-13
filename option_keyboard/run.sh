@@ -13,8 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-python3 -m venv ok_venv
-source ok_venv/bin/activate
+python3 -m venv /tmp/ok_venv
+source /tmp/ok_venv/bin/activate
+pip install -U pip
 pip install -r option_keyboard/requirements.txt
 
 python3 -m option_keyboard.run_dqn_test
