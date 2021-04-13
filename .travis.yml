@@ -13,6 +13,7 @@ env:
     - PROJECT="iodine"
     - PROJECT="kfac_ferminet_alpha"
     - PROJECT="learning_to_simulate"
+    - PROJECT="noise_covariance"
     # - PROJECT="polygen"  # TODO(b/184847339): Fix and re-enable
     - PROJECT="transporter"
     - PROJECT="tvt"
