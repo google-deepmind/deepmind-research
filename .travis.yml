@@ -17,6 +17,7 @@ env:
     - PROJECT="iodine"
     - PROJECT="kfac_ferminet_alpha"
     - PROJECT="learning_to_simulate"
+    - PROJECT="nfnets"
     - PROJECT="noise_covariance"
     - PROJECT="option_keyboard"
     # - PROJECT="polygen"  # TODO(b/184847339): Fix and re-enable

@@ -14,9 +14,9 @@
 # limitations under the License.
 set -e
 
-python3 -m venv nfnets_venv
-source nfnets_venv/bin/activate
-pip3 install --upgrade setuptools wheel
+python3 -m venv /tmp/nfnets_venv
+source /tmp/nfnets_venv/bin/activate
+pip3 install --upgrade pip setuptools wheel
 pip3 install -r nfnets/requirements.txt
 
 python3 -m nfnets.test
