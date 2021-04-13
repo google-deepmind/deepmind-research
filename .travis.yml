@@ -11,6 +11,7 @@ env:
     - PROJECT="adversarial_robustness"
     - PROJECT="avae"
     # - PROJECT="cs_gan"  # TODO(b/184845450): Fix and re-enable
+    - PROJECT="gated_linear_networks"
     - PROJECT="iodine"
     - PROJECT="kfac_ferminet_alpha"
     - PROJECT="learning_to_simulate"

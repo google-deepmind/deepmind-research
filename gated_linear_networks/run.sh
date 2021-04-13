@@ -14,13 +14,14 @@
 # limitations under the License.
 set -e
 
-python3 -m venv gln_venv
-source gln_venv/bin/activate
-pip3 install --upgrade setuptools wheel
+python3 -m venv /tmp/gln_venv
+source /tmp/gln_venv/bin/activate
+pip3 install --upgrade pip setuptools wheel
 pip3 install -r gated_linear_networks/requirements.txt
 
 # Run MNIST example with Bernoulli GLN
 python3 -m gated_linear_networks.examples.bernoulli_mnist \
   --num_layers=2 \
   --neurons_per_layer=100 \
-  --context_dim=1
+  --context_dim=1 \
+  --max_train_steps=2000
