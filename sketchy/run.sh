@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-python3 -m venv .sketchy_env
-source .sketchy_env/bin/activate
+python3 -m venv /tmp/sketchy_env
+source /tmp/sketchy_env/bin/activate
 pip install --upgrade pip
 pip install -r sketchy/requirements.txt
 python -m sketchy.dataset_example --noshow_images
