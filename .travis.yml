@@ -21,6 +21,7 @@ env:
     - PROJECT="noise_covariance"
     - PROJECT="option_keyboard"
     # - PROJECT="polygen"  # TODO(b/184847339): Fix and re-enable
+    # - PROJECT="scratchgan"  # TODO(b/184856293): Fix and enable
     - PROJECT="transporter"
     - PROJECT="tvt"
 before_script:
