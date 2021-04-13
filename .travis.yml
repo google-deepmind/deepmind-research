@@ -8,6 +8,7 @@ python:
   - "3.6"
 env:
   matrix:
+    - PROJECT="adversarial_robustness"
     - PROJECT="avae"
     # - PROJECT="cs_gan"  # TODO(b/184845450): Fix and re-enable
     - PROJECT="iodine"

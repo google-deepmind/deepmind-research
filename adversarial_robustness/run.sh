@@ -13,20 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-python3 -m venv adversarial_robustness_venv
-source adversarial_robustness_venv/bin/activate
+python3 -m venv /tmp/adversarial_robustness_venv
+source /tmp/adversarial_robustness_venv/bin/activate
+pip install -U pip
 pip install -r adversarial_robustness/requirements.txt
 
 python3 -m adversarial_robustness.jax.eval \
   --ckpt=dummy \
-  --arch=wrn-10-1 \
   --dataset=cifar10 \
   --batch_size=1 \
   --num_batches=1
 
 python3 -m adversarial_robustness.pytorch.eval \
   --ckpt=dummy \
-  --arch=wrn-10-1 \
   --dataset=cifar10 \
   --batch_size=1 \
   --num_batches=1 \
