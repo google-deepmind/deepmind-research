@@ -1,0 +1,7 @@
+jax>=0.2.10
+dataclasses>=0.6
+networkx>=2.1
+numpy>=1.16.4
+typing>=3.7.4.3
+ordered-set>=4.0.2
+absl-py>=0.12.0

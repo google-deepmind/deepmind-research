@@ -1,0 +1,4 @@
+absl-py==0.11.0
+dm-sonnet==1.36
+numpy==1.20.1
+tensorflow==1.15.0
