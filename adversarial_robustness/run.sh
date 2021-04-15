@@ -21,12 +21,16 @@ pip install -r adversarial_robustness/requirements.txt
 python3 -m adversarial_robustness.jax.eval \
   --ckpt=dummy \
   --dataset=cifar10 \
+  --width=1 \
+  --depth=10 \
   --batch_size=1 \
   --num_batches=1
 
 python3 -m adversarial_robustness.pytorch.eval \
   --ckpt=dummy \
   --dataset=cifar10 \
+  --width=1 \
+  --depth=10 \
   --batch_size=1 \
   --num_batches=1 \
   --nouse_cuda
