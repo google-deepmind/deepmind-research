@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [A Deep Learning Approach for Characterizing Major Galaxy Mergers](galaxy_mergers)
 *   [Better, Faster Fermionic Neural Networks](kfac_ferminet_alpha) (KFAC implementation)
 *   [Object-based attention for spatio-temporal reasoning](object_attention_for_reasoning)
 *   [Effective gene expression prediction from sequence by integrating long-range interactions](enformer)
