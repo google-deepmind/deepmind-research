@@ -31,6 +31,7 @@ https://deepmind.com/research/publications/
 *   [Satore: First-order logic saturation with atom rewriting](satore)
 *   [Characterizing signal propagation to close the performance gap in unnormalized ResNets](nfnets), ICLR 2021
 *   [Uncovering the Limits of Adversarial Training against Norm-Bounded Adversarial Examples](adversarial_robustness)
+*   [Learning rich touch representations through cross-modal self-supervision](cmtouch), CoRL 2020
 *   [Functional Regularisation for Continual Learning](functional_regularisation_for_continual_learning), ICLR 2020
 *   [Self-Supervised MultiModal Versatile Networks](mmv), NeurIPS 2020
 *   [ODE-GAN: Training GANs by Solving Ordinary Differential Equations](ode_gan), NeurIPS 2020
