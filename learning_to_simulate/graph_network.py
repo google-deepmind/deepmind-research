@@ -155,6 +155,7 @@ class EncodeProcessDecode(snt.AbstractModule):
     # Do `m` message passing steps in the latent graphs.
     # (In the shared parameters case, just reuse the same `processor_network`)
     latent_graph_prev_k = latent_graph_0
+    latent_graph_k = latent_graph_0
     for processor_network_k in self._processor_networks:
       latent_graph_k = self._process_step(
           processor_network_k, latent_graph_prev_k)
