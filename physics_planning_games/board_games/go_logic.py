@@ -366,8 +366,7 @@ class GoGameLogic(logic_base.OpenSpielBasedLogic):
     self._gtp_player.gtp_command('clear_board', log=False)
     self._gtp_player.set_board_size(self._board_size)
     self._gtp_player.set_komi(self._komi)
-    game = pyspiel.load_game(
-        'go', {'board_size': pyspiel.GameParameter(self._board_size)})
+    game = pyspiel.load_game('go', {'board_size': self._board_size})
     self._open_spiel_state = game.new_initial_state()
 
     self._moves = np.ones(
