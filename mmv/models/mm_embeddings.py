@@ -16,7 +16,7 @@
 # Lint as: python3.
 """Model for text-video-audio embeddings."""
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import haiku as hk
 import jax
@@ -358,7 +358,7 @@ class EmbeddingModule(hk.Module):
                embedding_dim: int,
                mode: str = "linear",
                use_bn_out: bool = False,
-               bn_config: Dict[str, Any] = None,
+               bn_config: Optional[Dict[str, Any]] = None,
                use_xreplica_bn: bool = True,
                name="embedding_module"):
     self._embedding_dim = embedding_dim

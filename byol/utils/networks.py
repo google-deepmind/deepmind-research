@@ -56,7 +56,7 @@ class ResNetTorso(hk.Module):
   def __init__(
       self,
       blocks_per_group: Sequence[int],
-      num_classes: int = None,
+      num_classes: Optional[int] = None,
       bn_config: Optional[Mapping[str, float]] = None,
       resnet_v2: bool = False,
       bottleneck: bool = True,
