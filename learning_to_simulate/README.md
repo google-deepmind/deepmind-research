@@ -2,7 +2,7 @@
 
 ICML poster: [icml.cc/virtual/2020/poster/6849](https://icml.cc/virtual/2020/poster/6849)
 
-Video site: [sites.google.com/corp/view/learning-to-simulate](https://sites.google.com/corp/view/learning-to-simulate)
+Video site: [sites.google.com/view/learning-to-simulate](https://sites.google.com/view/learning-to-simulate)
 
 ArXiv: [arxiv.org/abs/2002.09405](https://arxiv.org/abs/2002.09405)
 
