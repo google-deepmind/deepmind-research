@@ -1,0 +1,23 @@
+wheel
+absl-py>=0.12.0
+chex>=0.0.7
+dill>=0.3.3
+dm-haiku>=0.0.4
+# jaxline
+git+https://github.com/deepmind/jaxline@927695a0b88e480d085590736e2daa36c2f2c68b
+optax>=0.0.8
+ml_collections
+numpy>=1.16.4
+tensorflow>=2.5.0
+tensorflow-datasets>=4.3.0
+dm-tree>=0.1.6
+ogb>=1.3.1
+# graph_nets
+git+git://github.com/deepmind/graph_nets.git@64771dff0d74ca8e77b1f1dcd5a7d26634356d61
+scipy>=1.2.1
+jaxlib>=0.1.57+cuda110
+tqdm>=4.28.1
+annoy>=1.0.3
+# jraph
+git+git://github.com/deepmind/jraph.git@80d2f9e4d82f841a71d56ba44fa9e8781e93ae1f
+google-cloud-storage

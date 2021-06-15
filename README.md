@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Open Graph Benchmark - Large-Scale Challenge (OGB-LSC)](ogb_lsc)
 *   [Synthetic Returns for Long-Term Credit Assignment](synthetic_returns)
 *   [A Deep Learning Approach for Characterizing Major Galaxy Mergers](galaxy_mergers)
 *   [Better, Faster Fermionic Neural Networks](kfac_ferminet_alpha) (KFAC implementation)
@@ -70,7 +71,6 @@ https://deepmind.com/research/publications/
     Objects](graph_matching_networks), ICML 2019
 *   [REGAL: Transfer Learning for Fast Optimization of Computation Graphs](regal)
 *   [Deep Ensembles: A Loss Landscape Perspective](ensemble_loss_landscape)
-
 
 
 
