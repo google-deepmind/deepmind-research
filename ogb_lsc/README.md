@@ -1,6 +1,6 @@
-# DeepMind entry for PCQM4M-LSC
+# DeepMind entry for OGB-LSC
 
-This repository contains DeepMind's entry to the [PCWM4M-LSC](https://ogb.stanford.edu/kddcup2021/pcqm4m/) (quantum chemistry) and
+This repository contains DeepMind's entry to the [PCQM4M-LSC](https://ogb.stanford.edu/kddcup2021/pcqm4m/) (quantum chemistry) and
 [MAG240M-LSC](https://ogb.stanford.edu/kddcup2021/mag240m/) (academic graph)
 tracks of the [OGB Large-Scale Challenge](https://ogb.stanford.edu/kddcup2021/)
 (OGB-LSC).

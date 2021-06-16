@@ -60,7 +60,7 @@ See https://github.com/google/jax/issues/5231 for details.
 `ROOT`.**
 
 **2. Run this script to reorganize the data into a flat directory structure with
-transparent names**
+transparent names.**
 
 ```bash
 /bin/bash organize_data.sh -r ROOT
@@ -81,12 +81,13 @@ created, with contents:
 
 We refer to this as the "raw" data.
 
-**3. To run the preprocessing code**
+**3. Run the preprocessing code.**
+
 ```bash
 /bin/bash run_preprocessing.sh -r ROOT
 ```
 
-The pre-processing is very time- and memory-consuming, and should only be run
+The pre-processing is both time- and memory-consuming, and should only be run
 to verify the full pipeline. You can download the pre-processed data using the
 following script, for use in training and evaluating models:
 
@@ -99,11 +100,16 @@ python3 download_mag.py --task_root=${HOME}/mag --payload="data"
 
 We have provided pre-trained weights of our final submission for convenience.
 They can be downloaded with:
-```
+
+```bash
 python3 download_mag.py --task_root=${HOME}/mag --payload="models"
 ```
-Then to reproduce our final results, please run `bash run_pretrain_eval.sh`.
 
+Then to reproduce our final results, please run:
+
+```bash
+/bin/bash run_preprocessing.sh -r ${HOME}/mag/
+```
 
 ## Retraining our model
 
@@ -111,9 +117,14 @@ Disclaimer: This script is provided for illustrative purposes. It is not
 practical for actual training since it only uses a single machine, and likely
 requires reducing the batch size and/or model size to fit on a single GPU.
 
-If you still want to train a model, please run `run_training.sh`. To simply
-validate that the code is running correctly on your hardware setup, consider
-setting `debug=True` in `config.py`, which trains a smaller model.
+To train a model, please run:
+
+```bash
+/bin/bash run_training.sh -r ${HOME}/mag/
+```
+
+To simply validate that the code is running correctly on your hardware setup,
+consider setting `debug=True` in `config.py`, which trains a smaller model.
 
 
 # Citation
