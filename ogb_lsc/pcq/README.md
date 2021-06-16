@@ -48,6 +48,13 @@ pip3 install --upgrade pip setuptools wheel
 pip3 install -r ogb_lsc/pcq/requirements.txt
 ```
 
+Use the following command to get a jaxlib version built compatible with V100 GPUs.
+```bash
+pip install --upgrade jax jaxlib==0.1.67+cuda110 -f https://storage.googleapis.com/jax-releases/jax_releases.html
+```
+See https://github.com/google/jax/issues/5231 for details.
+
+
 ## Downloading data and model weights
 
 All necessary data and pre-trained model weights can be downloaded by running
