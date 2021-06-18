@@ -6,4 +6,4 @@ tensorflow-probability==0.7.0
 tensorflow-gan == 1.0.0.dev0
 tensorflow-hub == 0.6.0
 tensorflow-io == 0.8.0
-tensorflow-gpu==1.15
+tensorflow-gpu==2.4.2
