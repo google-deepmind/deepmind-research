@@ -1,0 +1,5 @@
+tensorflow-gpu>=1.15,<2
+dm-sonnet<2
+matplotlib
+absl-py
+numpy

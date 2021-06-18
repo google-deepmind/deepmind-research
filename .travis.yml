@@ -25,6 +25,7 @@ env:
     - PROJECT="tvt"
     # - PROJECT="unrestricted_advx"  # TODO(b/184862249): Fix and enable
     - PROJECT="unsupervised_adversarial_training"
+    - PROJECT="meshgraphnets"
 before_script:
   - pip install --upgrade pip
   - pip install --upgrade virtualenv

@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Learning Mesh-Based Simulation with Graph Networks](meshgraphnets), ICLR 2021
 *   [Open Graph Benchmark - Large-Scale Challenge (OGB-LSC)](ogb_lsc)
 *   [Synthetic Returns for Long-Term Credit Assignment](synthetic_returns)
 *   [A Deep Learning Approach for Characterizing Major Galaxy Mergers](galaxy_mergers)
