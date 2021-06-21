@@ -35,4 +35,5 @@ James Martens, Roger Grosse
 URL: https://arxiv.org/abs/1503.05671
 
 [FermiNet Project]: https://github.com/deepmind/ferminet/
-[example training script]: https://github.com/deepmind/deepmind-research/kfac_ferminet_alpha/example.py
+[example training script]:
+https://github.com/deepmind/deepmind-research/blob/master/kfac_ferminet_alpha/example.py
