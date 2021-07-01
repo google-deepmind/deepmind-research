@@ -154,8 +154,8 @@ class Experiment(experiment.AbstractExperiment):
   ):
     """Initializes experiment."""
     super(Experiment, self).__init__(mode=mode, init_rng=init_rng)
-    tf.config.experimental.set_visible_devices([], device_type='gpu')
-    tf.config.experimental.set_visible_devices([], device_type='tpu')
+    tf.config.experimental.set_visible_devices([], device_type='GPU')
+    tf.config.experimental.set_visible_devices([], device_type='TPU')
 
     if mode not in ('train', 'eval', 'train_eval_multithreaded'):
       raise ValueError(f'Invalid mode {mode}.')

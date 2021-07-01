@@ -90,8 +90,8 @@ class Experiment(experiment.AbstractExperiment):
       raise ValueError(f'Invalid mode {mode}.')
 
     # Do not use accelerators in data pipeline.
-    tf.config.experimental.set_visible_devices([], device_type='gpu')
-    tf.config.experimental.set_visible_devices([], device_type='tpu')
+    tf.config.experimental.set_visible_devices([], device_type='GPU')
+    tf.config.experimental.set_visible_devices([], device_type='TPU')
 
     self.mode = mode
     self.init_rng = init_rng
