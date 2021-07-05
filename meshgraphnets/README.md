@@ -16,6 +16,17 @@ If you use the code here please cite this paper:
       year={2021}
     }
 
+## Overview
+
+This release contains the full datasets used in the paper, as well as data
+loaders (dataset.py), and the learned model core (core_model.py).
+These components are designed to work with all of our domains.
+
+We also include demonstration code for a full training and evaluation pipeline,
+for the `cylinder_flow` and `flag_simple` domains only. This
+includes graph encoding, evaluation, rollout and plotting trajectory.
+Refer to the respective `cfd_*` and `cloth_*` files for details.
+
 ## Setup
 
 Prepare environment, install dependencies:
@@ -46,6 +57,9 @@ Plot a trajectory:
 
     python -m meshgraphnets.plot_cloth --rollout_path=${DATA}/rollout_flag.pkl
 
+The instructions above train a model for the `flag_simple` domain; for
+the `cylinder_flow` dataset, use `--model=cfd` and the `plot_cfd` script.
+
 ## Datasets
 
 Datasets can be downloaded using the script `download_dataset.sh`. They contain
@@ -60,8 +74,13 @@ The following datasets are available:
     flag_minimal
     flag_simple
     flag_dynamic
+    flag_dynamic_sizing
     sphere_simple
     sphere_dynamic
+    sphere_dynamic_sizing
 
 `flag_minimal` is a truncated version of flag_simple, and is only used for
-integration tests.
+integration tests. `flag_dynamic_sizing` and `sphere_dynamic_sizing` can be
+used to learn the sizing field. These datasets have the same structure as
+the other datasets, but contain the meshes in their state before remeshing,
+and define a matching `sizing_field` target for each mesh.
