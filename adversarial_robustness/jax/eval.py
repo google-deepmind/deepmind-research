@@ -14,14 +14,19 @@
 
 """Evaluates a JAX checkpoint on CIFAR-10/100 or MNIST."""
 
+import functools
+
 from absl import app
 from absl import flags
 import haiku as hk
 import numpy as np
+import optax
 import tensorflow.compat.v2 as tf
 import tensorflow_datasets as tfds
 import tqdm
 
+from adversarial_robustness.jax import attacks
+from adversarial_robustness.jax import datasets
 from adversarial_robustness.jax import model_zoo
 
 _CKPT = flags.DEFINE_string(
@@ -48,14 +53,14 @@ def main(unused_argv):
   # Create dataset.
   if _DATASET.value == 'mnist':
     _, data_test = tf.keras.datasets.mnist.load_data()
-    normalize_fn = model_zoo.mnist_normalize
+    normalize_fn = datasets.mnist_normalize
   elif _DATASET.value == 'cifar10':
     _, data_test = tf.keras.datasets.cifar10.load_data()
-    normalize_fn = model_zoo.cifar10_normalize
+    normalize_fn = datasets.cifar10_normalize
   else:
     assert _DATASET.value == 'cifar100'
     _, data_test = tf.keras.datasets.cifar100.load_data()
-    normalize_fn = model_zoo.cifar100_normalize
+    normalize_fn = datasets.cifar100_normalize
 
   # Create model.
   @hk.transform_with_state
@@ -83,22 +88,53 @@ def main(unused_argv):
   else:
     params, state = np.load(_CKPT.value, allow_pickle=True)
 
+  # Create adversarial attack. We run a PGD-40 attack with margin loss.
+  epsilon = 8 / 255
+  eval_attack = attacks.UntargetedAttack(
+      attacks.PGD(
+          attacks.Adam(learning_rate_fn=optax.piecewise_constant_schedule(
+              init_value=.1,
+              boundaries_and_scales={20: .1, 30: .01})),
+          num_steps=40,
+          initialize_fn=attacks.linf_initialize_fn(epsilon),
+          project_fn=attacks.linf_project_fn(epsilon, bounds=(0., 1.))),
+      loss_fn=attacks.untargeted_margin)
+
+  def logits_fn(x, rng):
+    return model_fn.apply(params, state, rng, x)[0]
+
   # Evaluation.
   correct = 0
+  adv_correct = 0
   total = 0
   batch_count = 0
   total_batches = min((10_000 - 1) // _BATCH_SIZE.value + 1, _NUM_BATCHES.value)
   for images, labels in tqdm.tqdm(test_loader, total=total_batches):
-    outputs = model_fn.apply(params, state, next(rng_seq), images)[0]
+    rng = next(rng_seq)
+    loop_logits_fn = functools.partial(logits_fn, rng=rng)
+
+    # Clean examples.
+    outputs = loop_logits_fn(images)
+    correct += (np.argmax(outputs, 1) == labels).sum().item()
+
+    # Adversarial examples.
+    adv_images = eval_attack(loop_logits_fn, next(rng_seq), images, labels)
+    outputs = loop_logits_fn(adv_images)
     predicted = np.argmax(outputs, 1)
+    adv_correct += (predicted == labels).sum().item()
+
     total += labels.shape[0]
-    correct += (predicted == labels).sum().item()
     batch_count += 1
     if _NUM_BATCHES.value > 0 and batch_count >= _NUM_BATCHES.value:
       break
   print(f'Accuracy on the {total} test images: {100 * correct / total:.2f}%')
+  print(f'Robust accuracy: {100 * adv_correct / total:.2f}%')
 
 
 if __name__ == '__main__':
   flags.mark_flag_as_required('ckpt')
+  try:
+    tf.config.set_visible_devices([], 'GPU')  # Prevent TF from using the GPU.
+  except tf.errors.NotFoundError:
+    pass
   app.run(main)

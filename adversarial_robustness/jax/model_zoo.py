@@ -14,17 +14,12 @@
 
 """WideResNet implementation in JAX using Haiku."""
 
-from typing import Any, Mapping, Optional, Text
+from typing import Any, Dict, Optional
 
+import chex
 import haiku as hk
 import jax
 import jax.numpy as jnp
-
-
-CIFAR10_MEAN = (0.4914, 0.4822, 0.4465)
-CIFAR10_STD = (0.2471, 0.2435, 0.2616)
-CIFAR100_MEAN = (0.5071, 0.4865, 0.4409)
-CIFAR100_STD = (0.2673, 0.2564, 0.2762)
 
 
 class _WideResNetBlock(hk.Module):
@@ -89,16 +84,16 @@ class WideResNet(hk.Module):
                num_classes: int = 10,
                depth: int = 28,
                width: int = 10,
-               activation: Text = 'relu',
-               norm_args: Optional[Mapping[Text, Any]] = None,
-               name: Optional[Text] = None):
+               activation: str = 'relu',
+               norm_args: Optional[Dict[str, Any]] = None,
+               name: Optional[str] = None):
     super(WideResNet, self).__init__(name=name)
     if (depth - 4) % 6 != 0:
       raise ValueError('depth should be 6n+4.')
     self._activation = getattr(jax.nn, activation)
     if norm_args is None:
       norm_args = {
-          'create_offset': False,
+          'create_offset': True,
           'create_scale': True,
           'decay_rate': .99,
       }
@@ -113,6 +108,7 @@ class WideResNet(hk.Module):
         **norm_args)
     self._linear = hk.Linear(
         num_classes,
+        w_init=jnp.zeros,
         name='logits')
 
     blocks_per_layer = (depth - 4) // 6
@@ -132,7 +128,7 @@ class WideResNet(hk.Module):
             name='resnet_lay_{}_block_{}'.format(layer_num, i)))
       self._blocks.append(blocks_of_layer)
 
-  def __call__(self, inputs, **norm_kwargs):
+  def __call__(self, inputs: chex.Array, **norm_kwargs) -> chex.Array:
     net = inputs
     net = self._conv(net)
 
@@ -145,21 +141,3 @@ class WideResNet(hk.Module):
 
     net = jnp.mean(net, axis=[1, 2])
     return self._linear(net)
-
-
-def mnist_normalize(image: jnp.array) -> jnp.array:
-  image = jnp.pad(image, ((0, 0), (2, 2), (2, 2), (0, 0)), 'constant',
-                  constant_values=0)
-  return (image - .5) * 2.
-
-
-def cifar10_normalize(image: jnp.array) -> jnp.array:
-  means = jnp.array(CIFAR10_MEAN, dtype=image.dtype)
-  stds = jnp.array(CIFAR10_STD, dtype=image.dtype)
-  return (image - means) / stds
-
-
-def cifar100_normalize(image: jnp.array) -> jnp.array:
-  means = jnp.array(CIFAR100_MEAN, dtype=image.dtype)
-  stds = jnp.array(CIFAR100_STD, dtype=image.dtype)
-  return (image - means) / stds

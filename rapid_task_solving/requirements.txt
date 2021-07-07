@@ -1,0 +1,6 @@
+dm-env>=1.2
+dm-haiku>=0.0.3
+jax>=0.2.8
+matplotlib>=3.1.2
+networkx>=2.3
+numpy>=1.18.0
