@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [WikiGraphs: A Wikipedia - Knowledge Graph Paired Dataset](wikigraphs), TextGraphs 2021
 *   [Behavior Priors for Efficient Reinforcement Learning](box_arrangement)
 *   [Learning Mesh-Based Simulation with Graph Networks](meshgraphnets), ICLR 2021
 *   [Open Graph Benchmark - Large-Scale Challenge (OGB-LSC)](ogb_lsc)
