@@ -53,6 +53,6 @@ tf-estimator-nightly==2.4.0.dev2020070701
 tf-nightly==2.3.0.dev20200616
 tfp-nightly==0.11.0.dev20200707
 trfl==1.1.0
-urllib3==1.25.9
+urllib3==1.26.5
 Werkzeug==1.0.1
 wrapt==1.12.1
