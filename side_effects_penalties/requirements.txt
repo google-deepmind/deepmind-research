@@ -110,6 +110,6 @@ tinycss2==1.0.2
 traceback2==1.4.0
 ufw==0.36
 unittest2==1.1.0
-urllib3==1.25.9
+urllib3==1.26.5
 webencodings==0.5.1
 youtube-dl==2020.6.16.1
