@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Rapid Task-Solving in Novel Environments](rapid_task_solving), ICLR 2021
 *   [WikiGraphs: A Wikipedia - Knowledge Graph Paired Dataset](wikigraphs), TextGraphs 2021
 *   [Behavior Priors for Efficient Reinforcement Learning](box_arrangement)
 *   [Learning Mesh-Based Simulation with Graph Networks](meshgraphnets), ICLR 2021
