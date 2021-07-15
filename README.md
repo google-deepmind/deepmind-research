@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [A Realistic Simulation Framework for Learning with Label Noise](noisy_label)
 *   [Rapid Task-Solving in Novel Environments](rapid_task_solving), ICLR 2021
 *   [WikiGraphs: A Wikipedia - Knowledge Graph Paired Dataset](wikigraphs), TextGraphs 2021
 *   [Behavior Priors for Efficient Reinforcement Learning](box_arrangement)
