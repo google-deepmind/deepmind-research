@@ -21,6 +21,7 @@ env:
     # - PROJECT="polygen"  # TODO(b/184847339): Fix and re-enable
     # - PROJECT="scratchgan"  # TODO(b/184856293): Fix and enable
     - PROJECT="sketchy"
+    - PROJECT="tandem_dqn"
     - PROJECT="transporter"
     - PROJECT="tvt"
     # - PROJECT="unrestricted_advx"  # TODO(b/184862249): Fix and enable
