@@ -33,7 +33,7 @@ from setuptools import setup
 
 setup(
     name='wikigraphs',
-    version='0.0.1',
+    version='0.0.2',
     description='A Wikipedia - knowledge graph paired dataset.',
     url='https://github.com/deepmind/deepmind-research/tree/master/wikigraphs',
     author='DeepMind',

@@ -30,6 +30,7 @@
 """Tests for wikigraphs.data.paired_dataset."""
 
 from absl.testing import absltest
+import jraph
 from wikigraphs.data import io_tools
 from wikigraphs.data import paired_dataset
 from wikigraphs.data import tokenizers
@@ -145,16 +146,16 @@ class PairedDatasetTest(absltest.TestCase):
     self.assertIsInstance(batch['graphs'], list)
     self.assertLen(batch['graphs'], batch_size)
     for i in range(batch_size):
-      self.assertIsInstance(batch['graphs'][i], paired_dataset.ParsedGraph)
+      self.assertIsInstance(batch['graphs'][i], jraph.GraphsTuple)
 
       # +1 for the center_node mask
       self.assertEqual(
           batch['graphs'][i].nodes.shape[-1], graph_tokenizer.vocab_size + 1)
       self.assertEqual(
           batch['graphs'][i].edges.shape[-1], graph_tokenizer.vocab_size)
-      n_edges = batch['graphs'][i].edges.shape[0]
-      self.assertEqual(batch['graphs'][i].sender.shape, (n_edges,))
-      self.assertEqual(batch['graphs'][i].receiver.shape, (n_edges,))
+      n_edges = batch['graphs'][i].n_edge
+      self.assertEqual(batch['graphs'][i].senders.shape, (n_edges,))
+      self.assertEqual(batch['graphs'][i].receivers.shape, (n_edges,))
 
     # Make sure the token count matches across the tokenized data and the raw
     # data set.

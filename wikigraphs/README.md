@@ -10,14 +10,15 @@ conditioned on graph and generate graphs given text.
 ## Setup Jax environment
 
 [Jax](https://github.com/google/jax#installation),
-[Haiku](https://github.com/deepmind/dm-haiku#installation), and
-[Optax](https://github.com/deepmind/dm-haiku#installation) are needed for this
-package. It has been developed and tested on python 3 with the following
-packages:
+[Haiku](https://github.com/deepmind/dm-haiku#installation),
+[Optax](https://github.com/deepmind/dm-haiku#installation), and
+[Jraph](https://github.com/deepmind/jraph) are needed for this package. It has
+been developed and tested on python 3 with the following packages:
 
 *   Jax==0.2.13
 *   Haiku==0.0.5
 *   Optax==0.0.6
+*   Jraph==0.0.1.dev
 
 Other packages required can be installed via:
 

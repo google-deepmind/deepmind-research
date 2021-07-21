@@ -35,6 +35,7 @@ from typing import List, Tuple, NamedTuple, Any, Dict, Optional, Union
 
 from absl import logging
 import jax.numpy as jnp
+import jraph
 import numpy as np
 
 from wikigraphs.data import dataset
@@ -203,57 +204,6 @@ class ParsedGraphTextPair(NamedTuple):
   title: str
   text: str
   graph: Graph
-
-
-class ParsedGraph(NamedTuple):
-  """Data structure for representing a batch of graphs."""
-  # [n_nodes, node_feat_dim] tensor.
-  nodes: ArrayType
-  # [n_edges, edge_feat_dim] tensor.
-  edges: ArrayType
-  # [n_edges] int tensor, index of the sender nodes for each edge.
-  sender: ArrayType
-  # [n_edges] int tensor, index of the receiver nodes for each edge.
-  receiver: ArrayType
-  # [n_graphs] int tensor, graph size (num nodes) for each graph in the batch.
-  graph_sizes: ArrayType
-
-
-def batch_graphs(graphs: List[ParsedGraph]) -> ParsedGraph:
-  """Batch a list of graphs into a single graph.
-
-  This method also updates the sender and receiver node indices as well as the
-  graph_sizes.
-
-  Args:
-    graphs: a list of graphs to be merged.
-
-  Returns:
-    graph: a single merged graph.
-  """
-  for g in graphs:
-    if g.graph_sizes.size != 1:
-      raise ValueError('Each individual element in the list must contain only a'
-                       ' single graph.')
-  node_idx_start = 0
-  nodes = []
-  edges = []
-  sender = []
-  receiver = []
-  graph_sizes = []
-  for g in graphs:
-    nodes.append(g.nodes)
-    edges.append(g.edges)
-    sender.append(g.sender + node_idx_start)
-    receiver.append(g.receiver + node_idx_start)
-    graph_sizes.append(g.graph_sizes)
-    node_idx_start += g.graph_sizes[0]
-
-  return ParsedGraph(nodes=np.concatenate(nodes, axis=0),
-                     edges=np.concatenate(edges, axis=0),
-                     sender=np.concatenate(sender, axis=0),
-                     receiver=np.concatenate(receiver, axis=0),
-                     graph_sizes=np.concatenate(graph_sizes, axis=0))
 
 
 class ParsedDataset(dataset.Dataset):
@@ -588,46 +538,6 @@ class Bow2TextDataset(BaseGraph2TextDataset):
                 graphs=graphs)
 
 
-def pack_graphs(graphs: List[Tuple[List[np.ndarray],
-                                   List[Tuple[int, int, np.ndarray]]]],
-                truncate_node: int,
-                truncate_edge: int,
-                pad_value=0) -> ParsedGraph:
-  """Pack a list of graphs into a batched ParsedGraph instance with truncation."""
-  converted_graphs = []
-  for nodes, edges in graphs:
-    converted_nodes = []
-    for n in nodes:
-      if n.size < truncate_node:
-        node = tools.pad_to(n, truncate_node, axis=0, pad_value=pad_value)
-      else:
-        node = n[:truncate_node]
-      converted_nodes.append(node)
-
-    sender = []
-    receiver = []
-    converted_edges = []
-    for s, t, e in edges:
-      if e.size < truncate_edge:
-        edge = tools.pad_to(e, truncate_edge, axis=0, pad_value=pad_value)
-      else:
-        edge = e[:truncate_edge]
-      converted_edges.append(edge)
-      sender.append(s)
-      receiver.append(t)
-
-    converted_graphs.append(ParsedGraph(
-        nodes=np.array(converted_nodes, dtype=np.int32),
-        edges=(np.array(converted_edges, dtype=np.int32)
-               if converted_edges else
-               np.zeros((0, truncate_edge), dtype=np.int32)),
-        sender=np.array(sender, dtype=np.int32),
-        receiver=np.array(receiver, dtype=np.int32),
-        graph_sizes=np.array([len(converted_nodes)], dtype=np.int32)))
-
-  return batch_graphs(converted_graphs)
-
-
 class Graph2TextDataset(BaseGraph2TextDataset):
   """Graph-to-text dataset.
 
@@ -717,7 +627,7 @@ class Graph2TextDataset(BaseGraph2TextDataset):
 
   def _to_graph_with_features(
       self, nodes_bow, edges_bow, sender, receiver, center_node_id):
-    """Convert the input to a `ParsedGraph` instance."""
+    """Convert the input to a `jraph.GraphsTuple` instance."""
     n_nodes = len(nodes_bow)
     n_edges = len(edges_bow)
 
@@ -733,9 +643,10 @@ class Graph2TextDataset(BaseGraph2TextDataset):
       for t, c in bow.items():
         edges[i][t] = c
 
-    return ParsedGraph(nodes=nodes, edges=edges, sender=sender,
-                       receiver=receiver,
-                       graph_sizes=np.array([n_nodes], dtype=np.int32))
+    return jraph.GraphsTuple(
+        nodes=nodes, edges=edges, senders=sender, receivers=receiver,
+        globals=None, n_node=np.array([n_nodes], dtype=np.int32),
+        n_edge=np.array([n_edges], dtype=np.int32))
 
   def _process_graph_batch(self, graphs: List[Any]):
     """Process a batch of graph data.
@@ -757,11 +668,13 @@ class Graph2TextDataset(BaseGraph2TextDataset):
     mask = np.zeros_like(obs, np.float32)
     # A batch should contain `batch_size` graphs.  Here we make sure each graph
     # has one node and one edge.
-    graphs = self._batch_size * [ParsedGraph(
+    graphs = self._batch_size * [jraph.GraphsTuple(
         nodes=np.zeros([1, self._graph_feature_dim + 1], dtype=np.float32),
         edges=np.zeros([1, self._graph_feature_dim], dtype=np.float32),
-        sender=np.zeros([1], dtype=np.int32),
-        receiver=np.zeros([1], dtype=np.int32),
-        graph_sizes=np.ones(1, dtype=np.int32))]
+        senders=np.zeros([1], dtype=np.int32),
+        receivers=np.zeros([1], dtype=np.int32),
+        n_node=np.ones(1, dtype=np.int32),
+        n_edge=np.ones(1, dtype=np.int32),
+        globals=None)]
     return dict(obs=obs, target=target, mask=mask, should_reset=should_reset,
                 graphs=graphs)
