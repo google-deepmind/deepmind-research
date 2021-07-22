@@ -52,6 +52,11 @@ engines such as <a href="https://g.co/datasetsearch">Google Dataset Search</a>.
       inputs. The MIPs are encoded in LP format.</code></td>
   </tr>
   <tr>
+    <td>license</td>
+    <td><code itemprop="license">https://creativecommons.org/licenses/by/4.0/legalcode
+  </code></td>
+  </tr>
+  <tr>
     <td>provider</td>
     <td>
       <div itemscope itemtype="http://schema.org/Organization" itemprop="provider">
@@ -94,6 +99,13 @@ If you use this dataset in your work, we ask you to cite this paper:
       primaryClass={math.OC}
 }
 ```
+
+## License
+
+This dataset is made available under the terms of the Creative Commons
+Attribution 4.0 International (CC BY 4.0) license.
+
+You can find details at: https://creativecommons.org/licenses/by/4.0/legalcode
 
 ## Disclaimer
 
