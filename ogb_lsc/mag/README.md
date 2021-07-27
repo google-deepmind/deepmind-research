@@ -63,7 +63,7 @@ See https://github.com/google/jax/issues/5231 for details.
 transparent names.**
 
 ```bash
-/bin/bash organize_data.sh -r ROOT
+/bin/bash organize_data.sh -i ROOT -o ROOT
 ```
 
 Once this completes, a new directory `ROOT/mag240m_kddcup2021/raw` will be
