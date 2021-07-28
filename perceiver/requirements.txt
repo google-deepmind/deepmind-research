@@ -1,0 +1,16 @@
+absl-py==0.13.0
+dill==0.3.4
+dm-haiku==0.0.4
+einops==0.3.0
+flatbuffers==2.0
+imageio==2.9.0
+immutabledict==2.0.0
+jax==0.2.16
+jaxlib==0.1.68+cuda111
+numpy==1.21.0
+opencv-python==4.5.2.54
+opt-einsum==3.3.0
+Pillow==8.3.1
+scipy==1.7.0
+six==1.16.0
+tabulate==0.8.9
