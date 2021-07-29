@@ -738,3 +738,27 @@ class ProjectionPostprocessor(hk.Module):
                modality_sizes: Optional[ModalitySizeT] = None) -> jnp.ndarray:
     logits = hk.Linear(self._num_outputs)(inputs)
     return logits
+
+
+class EmbeddingDecoder(hk.Module):
+  """Haiku module to decode embeddings."""
+
+  def __init__(self, embedding_matrix: jnp.ndarray, name='embedding_decoder'):
+    """Constructs the module.
+
+    Args:
+      embedding_matrix: Array of shape [vocab_size, d_model].
+      name: Name of the module.
+    """
+    super().__init__(name=name)
+    self._embedding_matrix = embedding_matrix
+    self._vocab_size, self._d_model = embedding_matrix.shape
+
+  def __call__(self, embeddings: jnp.ndarray) -> jnp.ndarray:
+    batch_size, seq_len, _ = embeddings.shape
+    output = jnp.matmul(
+        embeddings.reshape([-1, self._d_model]),  # Flatten batch dim
+        jnp.transpose(self._embedding_matrix))
+    bias = hk.get_parameter('bias', shape=[self._vocab_size], init=jnp.zeros)
+    output = output + bias
+    return output.reshape([batch_size, seq_len, self._vocab_size])
