@@ -71,6 +71,72 @@ def space_to_depth(
         ' or rank 5 (batch, time, height, width, channels)')
 
 
+def extract_patches(images: jnp.ndarray,
+                    sizes: Sequence[int],
+                    strides: Sequence[int],
+                    rates: Sequence[int],
+                    padding: str = 'VALID') -> jnp.ndarray:
+  """Extract patches from images.
+
+  This function is a wrapper for jax.lax.conv_general_dilated_patches
+  to conforms to the same interface as tf.image.extract_patches.
+  The function extracts patches of shape sizes from the input images in the same
+  manner as a convolution with kernel of shape sizes, stride equal to strides,
+  and the given padding scheme.
+  The patches are stacked in the channel dimension.
+
+  Args:
+    images: input batch of images of shape [B, H, W, C].
+    sizes: size of extracted patches. Must be [1, size_rows, size_cols, 1].
+    strides: strides, must be [1, stride_rows, stride_cols, 1].
+    rates: sampling rate (as in dilated convolutions),
+      must be [1, rate_rows, rate_cols, 1].
+    padding: padding algorithm to use.
+  Returns:
+    Tensor of shape [B, patch_rows, patch_cols, size_rows * size_cols * C]
+  """
+
+  if len(sizes) != 4 or sizes[0] != 1 or sizes[3] != 1:
+    raise ValueError(
+        f'Shape of sizes must be [1, size_rows, size_cols, 1], got {sizes}.')
+  if len(strides) != 4 or strides[0] != 1 or strides[3] != 1:
+    raise ValueError(
+        f'Shape of strides must be [1, size_rows, size_cols, 1], '
+        f'got {strides}.')
+  if len(rates) != 4 or rates[0] != 1 or rates[3] != 1:
+    raise ValueError(
+        f'Shape of rates must be [1, size_rows, size_cols, 1], got {rates}.')
+  if images.ndim != 4:
+    raise ValueError(
+        f'Rank of images must be 4 (got tensor of shape {jnp.shape(images)})')
+  # Rearrange axes of images to NCHW for conv_general_dilated_patches
+  images = einops.rearrange(images, 'n h w c -> n c h w')
+  channels = images.shape[1]
+  patches = jax.lax.conv_general_dilated_patches(
+      images, sizes[1:-1], strides[1:-1], padding, rhs_dilation=rates[1:-1])
+  # conv_general_dilated_patches returns patches in channel-major order.
+  # Rearrange to match interface of tf.image.extract_patches.
+  patches = einops.rearrange(patches, 'n (c ph pw) h w -> n h w (ph pw c)',
+                             c=channels, ph=sizes[1], pw=sizes[2])
+  return patches
+
+
+def patches_for_flow(inputs: jnp.ndarray) -> jnp.ndarray:
+  """Extract 3x3x2 image patches for flow inputs."""
+
+  def pad_and_extract_patches(inputs):
+    padded_inputs = jnp.pad(inputs, [[0, 0], [1, 1], [1, 1], [0, 0]],
+                            mode='constant')
+    return extract_patches(
+        padded_inputs,
+        sizes=[1, 3, 3, 1],
+        strides=[1, 1, 1, 1],
+        padding='VALID',
+        rates=[1, 1, 1, 1])
+
+  return jax.vmap(pad_and_extract_patches, in_axes=1, out_axes=1)(inputs)
+
+
 #  ------------------------------------------------------------
 #  -------------------  Up/down-sampling  ---------------------
 #  ------------------------------------------------------------
