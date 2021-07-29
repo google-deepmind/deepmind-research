@@ -45,6 +45,15 @@ First, install dependencies following these instructions:
 After install dependencies, you can open the notebooks in the `colabs` directory
 using Jupyter or Colab.
 
+### Colabs
+We provide the following colabs:
+
+* colabs/optical_flow.ipynb: Colab for running a pre-trained optical flow
+  Perceiver model and visualizing the output flow (Section 4.2 in [2]).
+* colabs/video_autoencoding.ipynb: Colab for running a pre-trained
+  video autoencoding Perceiver model and visualizing video reconstructions
+  (Section 4.3 in [2]).
+
 ## References
 
 [1] Andrew Jaegle, Felix Gimeno, Andrew Brock, Andrew Zisserman, Oriol Vinyals,
