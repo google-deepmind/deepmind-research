@@ -96,17 +96,17 @@ def layer_norm(x, name=None):
                       name=name)(x)
 
 
-#  -----------------------------------------------------------
-#  -----------------------  Modules  -------------------------
-#  -----------------------------------------------------------
-
-
 def make_cross_attention_mask(query_mask, kv_mask):
   batch_size, query_len = query_mask.shape
   _, key_len = kv_mask.shape
   mask = jax.vmap(jnp.outer)(query_mask, kv_mask)
   assert mask.shape == (batch_size, query_len, key_len)
   return mask
+
+
+#  -----------------------------------------------------------
+#  -----------------------  Modules  -------------------------
+#  -----------------------------------------------------------
 
 
 class Attention(hk.Module):
