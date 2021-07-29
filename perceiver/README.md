@@ -43,21 +43,68 @@ First, install dependencies following these instructions:
 4. Install other dependencies: `pip install -f requirements.txt`
 
 After install dependencies, you can open the notebooks in the `colabs` directory
-using Jupyter or Colab.
+using Jupyter or Colab, and you can run our example training script.
+Our colabs and training script assume that you are running from the
+`deepmind_research` directory.
 
 ### Colabs
 We provide the following colabs:
 
+* colabs/masked_language_modelling.ipynb: Colab for running a pre-trained
+  Perceiver masked-language model (Section 4.1 in [2]).
 * colabs/optical_flow.ipynb: Colab for running a pre-trained optical flow
   Perceiver model and visualizing the output flow (Section 4.2 in [2]).
 * colabs/video_autoencoding.ipynb: Colab for running a pre-trained
   video autoencoding Perceiver model and visualizing video reconstructions
   (Section 4.3 in [2]).
 
+### Training scripts
+We also provide an example training script to train a Perceiver IO model for
+ImageNet classification.
+The provided hyperparameters are the settings used to train Perceiver IO
+with 2D Fourier position encodings, as described in
+section 4.5 and supplemental section I.1 of the paper [2].
+
+To run the script locally and train a miniature Perceiver model,
+use the `./launch_local.sh` script: `perceiver/train/launch_local.sh`.
+The script would need to be adapted to run on a distributed training setup
+in order to train a full-scale model.
+
+## Attributions and Disclaimers
+
+The file `perceiver/train/autoaugment.py` originates from the `tensorflow/tpu`
+repository (https://github.com/tensorflow/tpu/blob/b24729de804fdb751b06467d3dce0637fa652060/models/official/efficientnet/autoaugment.py),
+copyright (c) The Tensorflow Authors.
+
+Sintel data is provided by and available from Sintel.org (https://durian.blender.org/),
+copyright (c) Blender Foundation/www.sintel.org.
+
+Imagenet data is provided by and available from https://image-net.org/
+(for researchers and educators who wish to use the images for
+non-commercial research and/or educational purposes,
+see https://image-net.org/about.php for details about access,
+conditions and terms).
+
+Video content may include clips provided as part of the THUMOS Challenge datasets,
+which may be accessed at http://crcv.ucf.edu/THUMOS14/download.html,
+copyrights held by the creators.
+
+All data and parameters included with Perceiver are made available
+under the terms of the CC BY 4.0 license,
+available at https://creativecommons.org/licenses/by/4.0/legalcode.
+
+This is not an officially supported Google product.
+
 ## References
 
 [1] Andrew Jaegle, Felix Gimeno, Andrew Brock, Andrew Zisserman, Oriol Vinyals,
-Joao Carreira.
+João Carreira.
 *Perceiver: General Perception with Iterative Attention*. ICML 2021.
+https://arxiv.org/abs/2103.03206
 
-[2] TODO: Add citation after paper is published on ArXiv.
+[2] Andrew Jaegle, Sebastian Borgeaud, Jean-Baptiste Alayrac, Carl Doersch,
+Catalin Ionescu, David Ding, Skanda Koppula, Andrew Brock, Evan Shelhamer,
+Olivier Hénaff, Matthew M. Botvinick, Andrew Zisserman, Oriol Vinyals,
+João Carreira.
+*Perceiver IO: A General Architecture for Structured Inputs & Outputs*.
+arXiv, 2021.
