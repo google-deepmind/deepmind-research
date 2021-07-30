@@ -30,7 +30,8 @@ The `perceiver.py` file contains our implementation of Perceiver IO,
 and `io_processors.py` contains domain-specific input and output processors
 for the experiments we ran.
 We provide example colabs in the `colabs` directory to demonstrate
-how our models can be used and show the qualitative performance of Perceiver IO.
+how our models can be used and show the qualitative performance of Perceiver IO
+on a diverse collection of tasks.
 
 ## Usage
 
@@ -42,7 +43,7 @@ First, install dependencies following these instructions:
    https://github.com/google/jax#installation
 4. Install other dependencies: `pip install -f requirements.txt`
 
-After install dependencies, you can open the notebooks in the `colabs` directory
+After installing dependencies, you can open the notebooks in the `colabs` directory
 using Jupyter or Colab, and you can run our example training script.
 Our colabs and training script assume that you are running from the
 `deepmind_research` directory.
@@ -51,12 +52,14 @@ Our colabs and training script assume that you are running from the
 We provide the following colabs:
 
 * colabs/masked_language_modelling.ipynb: Colab for running a pre-trained
-  Perceiver masked-language model (Section 4.1 in [2]).
+  Perceiver IO masked-language model (Section 4.1 in [2]).
 * colabs/optical_flow.ipynb: Colab for running a pre-trained optical flow
-  Perceiver model and visualizing the output flow (Section 4.2 in [2]).
+  Perceiver IO model and visualizing the output flow (Section 4.2 in [2]).
 * colabs/video_autoencoding.ipynb: Colab for running a pre-trained
-  video autoencoding Perceiver model and visualizing video reconstructions
+  video autoencoding Perceiver IO model and visualizing video reconstructions
   (Section 4.3 in [2]).
+* colabs/imagenet_classification.ipynb: Colab for running three pre-trained
+  ImageNet classification Perceiver IO models (Section 4.5 in [2]).
 
 ### Training scripts
 We also provide an example training script to train a Perceiver IO model for
@@ -66,9 +69,9 @@ with 2D Fourier position encodings, as described in
 section 4.5 and supplemental section I.1 of the paper [2].
 
 To run the script locally and train a miniature Perceiver model,
-use the `./launch_local.sh` script: `perceiver/train/launch_local.sh`.
+run: `perceiver/train/launch_local.sh`.
 The script would need to be adapted to run on a distributed training setup
-in order to train a full-scale model.
+in order to train a full-scale model with the full batch size.
 
 ## Attributions and Disclaimers
 
