@@ -82,11 +82,8 @@ copyright (c) The Tensorflow Authors.
 Sintel data is provided by and available from Sintel.org (https://durian.blender.org/),
 copyright (c) Blender Foundation/www.sintel.org.
 
-Imagenet data is provided by and available from https://image-net.org/
-(for researchers and educators who wish to use the images for
-non-commercial research and/or educational purposes,
-see https://image-net.org/about.php for details about access,
-conditions and terms).
+The sample image in `imagenet_classification.ipynb` is obtained from
+Getty Images under license (https://www.gettyimages.co.uk/eula#RF).
 
 Video content may include clips provided as part of the THUMOS Challenge datasets,
 which may be accessed at http://crcv.ucf.edu/THUMOS14/download.html,
