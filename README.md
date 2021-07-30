@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Perceiver IO: A General Architecture for Structured Inputs & Outputs](perceiver)
 *   [Solving Mixed Integer Programs Using Neural Networks](neural_mip_solving)
 *   [A Realistic Simulation Framework for Learning with Label Noise](noisy_label)
 *   [Rapid Task-Solving in Novel Environments](rapid_task_solving), ICLR 2021
