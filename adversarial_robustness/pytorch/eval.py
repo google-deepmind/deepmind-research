@@ -30,9 +30,9 @@ _DATASET = flags.DEFINE_enum(
     'dataset', 'cifar10', ['cifar10', 'cifar100', 'mnist'],
     'Dataset on which the checkpoint is evaluated.')
 _WIDTH = flags.DEFINE_integer(
-    'width', 16, 'Width of WideResNet.')
+    'width', 16, 'Width of WideResNet (if set to zero uses a PreActResNet).')
 _DEPTH = flags.DEFINE_integer(
-    'depth', 70, 'Depth of WideResNet.')
+    'depth', 70, 'Depth of WideResNet or PreActResNet.')
 _USE_CUDA = flags.DEFINE_boolean(
     'use_cuda', True, 'Whether to use CUDA.')
 _BATCH_SIZE = flags.DEFINE_integer(
@@ -44,25 +44,30 @@ _NUM_BATCHES = flags.DEFINE_integer(
 
 def main(unused_argv):
   print(f'Loading "{_CKPT.value}"')
-  print(f'Using a WideResNet with depth {_DEPTH.value} and width '
-        f'{_WIDTH.value}.')
 
   # Create model and dataset.
+  if _WIDTH.value == 0:
+    print(f'Using a PreActResNet with depth {_DEPTH.value}.')
+    model_ctor = model_zoo.PreActResNet
+  else:
+    print(f'Using a WideResNet with depth {_DEPTH.value} and width '
+          f'{_WIDTH.value}.')
+    model_ctor = model_zoo.WideResNet
   if _DATASET.value == 'mnist':
-    model = model_zoo.WideResNet(
+    model = model_ctor(
         num_classes=10, depth=_DEPTH.value, width=_WIDTH.value,
         activation_fn=model_zoo.Swish, mean=.5, std=.5, padding=2,
         num_input_channels=1)
     dataset_fn = datasets.MNIST
   elif _DATASET.value == 'cifar10':
-    model = model_zoo.WideResNet(
+    model = model_ctor(
         num_classes=10, depth=_DEPTH.value, width=_WIDTH.value,
         activation_fn=model_zoo.Swish, mean=model_zoo.CIFAR10_MEAN,
         std=model_zoo.CIFAR10_STD)
     dataset_fn = datasets.CIFAR10
   else:
     assert _DATASET.value == 'cifar100'
-    model = model_zoo.WideResNet(
+    model = model_ctor(
         num_classes=100, depth=_DEPTH.value, width=_WIDTH.value,
         activation_fn=model_zoo.Swish, mean=model_zoo.CIFAR100_MEAN,
         std=model_zoo.CIFAR100_STD)
