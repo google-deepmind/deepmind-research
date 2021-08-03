@@ -70,7 +70,7 @@ We also provide an example training script to train a Perceiver IO model for
 ImageNet classification.
 The provided hyperparameters are the settings used to train Perceiver IO
 with 2D Fourier position encodings, as described in
-section 4.5 and supplemental section I.1 of the paper [2].
+section 4.5 and supplemental section H of the paper [2].
 
 To run the script locally and train a miniature Perceiver model,
 run: `perceiver/train/launch_local.sh`.
@@ -107,9 +107,9 @@ João Carreira.
 https://arxiv.org/abs/2103.03206
 
 [2] Andrew Jaegle, Sebastian Borgeaud, Jean-Baptiste Alayrac, Carl Doersch,
-Catalin Ionescu, David Ding, Skanda Koppula, Andrew Brock, Evan Shelhamer,
-Olivier Hénaff, Matthew M. Botvinick, Andrew Zisserman, Oriol Vinyals,
-João Carreira.
+Catalin Ionescu, David Ding, Skanda Koppula, Daniel Zoran, Andrew Brock,
+Evan Shelhamer, Olivier Hénaff, Matthew M. Botvinick, Andrew Zisserman,
+Oriol Vinyals, João Carreira.
 *Perceiver IO: A General Architecture for Structured Inputs & Outputs*.
 arXiv, 2021.
 https://arxiv.org/abs/2107.14795
