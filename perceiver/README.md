@@ -51,14 +51,18 @@ Our colabs and training script assume that you are running from the
 ### Colabs
 We provide the following colabs:
 
-* colabs/masked_language_modelling.ipynb: Colab for running a pre-trained
+* [colabs/masked_language_modelling.ipynb](https://colab.research.google.com/github/deepmind/deepmind_research/blob/master/perceiver/colabs/masked_language_modelling.ipynb):
+  Colab for running a pre-trained
   Perceiver IO masked-language model (Section 4.1 in [2]).
-* colabs/optical_flow.ipynb: Colab for running a pre-trained optical flow
+* [colabs/optical_flow.ipynb](https://colab.research.google.com/github/deepmind/deepmind_research/blob/master/perceiver/colabs/optical_flow.ipynb):
+  Colab for running a pre-trained optical flow
   Perceiver IO model and visualizing the output flow (Section 4.2 in [2]).
-* colabs/video_autoencoding.ipynb: Colab for running a pre-trained
+* [colabs/video_autoencoding.ipynb](https://colab.research.google.com/github/deepmind/deepmind_research/blob/master/perceiver/colabs/video_autoencoding.ipynb):
+  Colab for running a pre-trained
   video autoencoding Perceiver IO model and visualizing video reconstructions
   (Section 4.3 in [2]).
-* colabs/imagenet_classification.ipynb: Colab for running three pre-trained
+* [colabs/imagenet_classification.ipynb](https://colab.research.google.com/github/deepmind/deepmind_research/blob/master/perceiver/colabs/imagenet_classification.ipynb):
+  Colab for running three pre-trained
   ImageNet classification Perceiver IO models (Section 4.5 in [2]).
 
 ### Training scripts
