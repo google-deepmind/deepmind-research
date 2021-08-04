@@ -1,16 +1,15 @@
-Implementation of the object-based transformer model from
-["Object-based attention for spatio-temporal reasoning"](https://arxiv.org/abs/2012.08508)
+Implementation of the ALOE model
+["Attention over learned object embeddings enables complex visual reasoning"](https://arxiv.org/abs/2012.08508)
 [1].
 
-This package includes source code for the transformer model,
+This package includes source code for the ALOE transformer model,
 pre-trained model parameters for the CLEVRER task,
 and MONet [2] latent variables for all videos in the training
 and validation sets. It does not include the model training code.
 See Section 2 of [1] for details.
 
-[1] David Ding, Felix Hill, Adam Santoro, Matt Botvinick. *Object-based
-attention for spatio-temporal reasoning: Outperforming neuro-symbolic models
-with flexible distributed architectures*.
+[1] David Ding, Felix Hill, Adam Santoro, Malcolm Reynolds, Matt Botvinick.
+*Attention over learned object embeddings enables complex visual reasoning*.
 arXiv preprint arXiv:2012.08508, 2020.
 
 [2] Chris P. Burgess, Loic Matthey, Nick Watters, Rishabh Kabra, Irina Higgins,
@@ -43,10 +42,9 @@ answers should be correct.
 
 If you find the provided code useful, please cite this paper:
 ```
-@article{objectattention2020,
-  title={Object-based attention for spatio-temporal reasoning: Outperforming
-         neuro-symbolic models with flexible distributed architectures},
-  author={David Ding and Felix Hill and Adam Santoro and Matt Botvinick},
+@article{aloe2020,
+  title={Attention over learned object embeddings enables complex visual reasoning},
+  author={David Ding and Felix Hill and Adam Santoro and Malcolm Reynolds and Matt Botvinick},
   journal={arXiv preprint arXiv:2012.08508},
   year={2020}
 }
