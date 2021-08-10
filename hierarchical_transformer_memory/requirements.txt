@@ -1,0 +1,7 @@
+absl-py
+chex>=0.0.8
+dm-env
+dm-haiku>=0.0.5.dev
+jax>=0.2.17
+numpy
+pycolab
