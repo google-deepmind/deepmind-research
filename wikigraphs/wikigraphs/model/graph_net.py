@@ -41,7 +41,7 @@ import numpy as np
 ArrayType = Union[np.ndarray, jnp.ndarray]
 
 
-def pad_size(in_size):
+def pad_size(in_size: int):
   out_size = 1
   while out_size < in_size:
     out_size *= 2

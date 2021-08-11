@@ -30,5 +30,6 @@
 """WikiGraphs model modules."""
 from . import embedding
 from . import graph_net
+from . import sampler
 from . import transformer
 from . import transformer_block

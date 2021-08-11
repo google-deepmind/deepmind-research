@@ -167,7 +167,74 @@ it elsewhere.
 
 ## Run baseline models
 
-Note: baseline models will be available soon.
+Note: our code supports training with multiple GPUs.
+
+To run the default baseline GNN-based TransformerXL on Wikigraphs with 8
+GPUs:
+
+```base
+python main.py --model_type=graph2text \
+  --dataset=freebase2wikitext \
+  --checkpoint_dir=/tmp/graph2text \
+  --job_mode=train \
+  --train_batch_size=64 \
+  --gnn_num_layers=1 \
+  --num_gpus=8
+```
+
+We ran our experiments in the paper using 8 Nvidia V100 GPUs. To allow for
+batch parallization for the GNN-based (graph2text) model, we pad graphs to
+the largest graph in the batch. The full run takes almost 4 days. BoW- and
+nodes-based models can be trained within 14 hours because there is no
+additional padding.
+
+Or to quickly test-run a small model:
+
+```base
+python main.py --model_type=graph2text \
+  --dataset=freebase2wikitext \
+  --checkpoint_dir=/tmp/graph2text \
+  --job_mode=train \
+  --train_batch_size=2 \
+  --gnn_num_layers=1
+```
+
+To evaluate the model on the validation set (this only uses 1 GPU):
+
+```base
+python main.py --model_type=graph2text \
+  --dataset=freebase2wikitext \
+  --checkpoint_dir=/tmp/graph2text \
+  --job_mode=eval \
+  --eval_subset=valid
+```
+
+To generate 960 samples from the model using the graphs in the validation set (using 8 GPUs):
+
+```base
+python main.py --model_type=graph2text \
+  --dataset=freebase2wikitext \
+  --checkpoint_dir=/tmp/graph2text \
+  --job_mode=sample \
+  --eval_subset=valid \
+  --num_gpus=8 \
+  --num_samples=960
+```
+
+To compute the rBLEU score of the generated samples:
+
+```base
+python scripts/compute_bleu_score.py --dataset=freebase2wikitext \
+  --checkpoint_dir=/tmp/graph2text
+```
+
+To compute the retrieval scores:
+
+```base
+python main.py --dataset=freebase2wikitext \
+  --job_mode=retrieve \
+  --checkpoint_dir=/tmp/graph2text
+```
 
 ## Citing WikiGraphs
 
