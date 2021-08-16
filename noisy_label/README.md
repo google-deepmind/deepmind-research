@@ -14,7 +14,7 @@ predict and correct against noisy labels. We show that by adding LQM as a label
 correction step before applying existing noisy label techniques, we can further
 improve the models' performance.
 
-[A Realistic Simulation Framework for Learning with Label Noise](https://openreview.net/pdf?id=e9P6bypUFd).
+[A Realistic Simulation Framework for Learning with Label Noise](https://arxiv.org/pdf/2107.11413.pdf).
 
 In this repository, we provide the link to the datasets that we used in Sections
 4 and 5 of the above paper, along with a colab that demonstrates how to load the
@@ -127,7 +127,7 @@ engines such as <a href="https://g.co/datasetsearch">Google Dataset Search</a>.
   </tr>
   <tr>
     <td>citation</td>
-    <td><code itemprop="citation">https://openreview.net/pdf?id=e9P6bypUFd</code></td>
+    <td><code itemprop="citation">https://identifiers.org/arxiv:2107.11413</code></td>
   </tr>
 </table>
 </div>

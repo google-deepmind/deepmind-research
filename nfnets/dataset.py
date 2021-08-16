@@ -122,7 +122,6 @@ def load(
   options.experimental_threading.max_intra_op_parallelism = 1
   options.experimental_optimization.map_parallelization = True
   options.experimental_optimization.parallel_batch = True
-  options.experimental_optimization.autotune = True
   options.experimental_optimization.hoist_random_uniform = True
 
   if is_training:
