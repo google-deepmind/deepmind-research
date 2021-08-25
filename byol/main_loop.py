@@ -30,7 +30,8 @@ from byol import eval_experiment
 from byol.configs import byol as byol_config
 from byol.configs import eval as eval_config
 
-
+import tensorflow as tf
+tf.config.experimental.set_visible_devices([], "GPU")
 
 flags.DEFINE_string('experiment_mode',
                     'pretrain', 'The experiment, pretrain or linear-eval')
