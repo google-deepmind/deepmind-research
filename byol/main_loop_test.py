@@ -24,7 +24,6 @@ from byol import main_loop
 from byol.configs import byol as byol_config
 from byol.configs import eval as eval_config
 
-
 FLAGS = flags.FLAGS
 
 
