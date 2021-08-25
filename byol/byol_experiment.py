@@ -17,6 +17,7 @@
 
 Use this experiment to pre-train a self-supervised representation.
 """
+import wandb 
 
 import functools
 from typing import Any, Generator, Mapping, NamedTuple, Text, Tuple, Union

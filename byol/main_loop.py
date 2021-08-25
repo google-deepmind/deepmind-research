@@ -14,6 +14,7 @@
 # limitations under the License.
 
 """Training and evaluation loops for an experiment."""
+import wandb 
 
 import time
 from typing import Any, Mapping, Text, Type, Union
@@ -29,6 +30,8 @@ from byol import eval_experiment
 from byol.configs import byol as byol_config
 from byol.configs import eval as eval_config
 
+
+
 flags.DEFINE_string('experiment_mode',
                     'pretrain', 'The experiment, pretrain or linear-eval')
 flags.DEFINE_string('worker_mode', 'train', 'The mode, train or eval')
@@ -41,6 +44,8 @@ flags.DEFINE_integer('log_tensors_interval', 60, 'Log tensors every n seconds.')
 
 FLAGS = flags.FLAGS
 
+wandb.init()
+wandb.config.update(flags.FLAGS)
 
 Experiment = Union[
     Type[byol_experiment.ByolExperiment],
@@ -81,7 +86,14 @@ def train_loop(experiment_class: Experiment, config: Mapping[Text, Any]):
 
     # Perform a training step and get scalars to log.
     scalars = experiment.step(global_step=step_device, rng=step_rng_device)
-
+    wandb.log({"classif_loss": scalars['classif_loss'],
+               "repr_loss": scalars['repr_loss'],
+               "loss": scalars['loss'],
+               "top1_accuracy": scalars['top1_accuracy'],
+               "top5_accuracy": scalars['top5_accuracy'],
+               "learning_rate": scalars['learning_rate'],
+               "tau": scalars['tau']
+                })
     # Checkpointing and logging.
     if config['checkpointing_config']['use_checkpointing']:
       experiment.save_checkpoint(step, rng)

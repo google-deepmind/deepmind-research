@@ -32,7 +32,7 @@ def get_config(num_epochs: int, batch_size: int):
   config = dict(
       random_seed=0,
       num_classes=10,
-      batch_size=25,
+      batch_size=batch_size,
       max_steps=num_epochs * train_images_per_epoch // batch_size,
       enable_double_transpose=True,
       base_target_ema=_EMA_PRESETS[num_epochs],
@@ -65,7 +65,7 @@ def get_config(num_epochs: int, batch_size: int):
       ),
       evaluation_config=dict(
           subset='test',
-          batch_size=100,
+          batch_size=25,
       ),
       checkpointing_config=dict(
           use_checkpointing=True,
