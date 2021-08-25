@@ -46,10 +46,10 @@ class Split(enum.Enum):
   @property
   def num_examples(self):
     return {
-        Split.TRAIN_AND_VALID: 1281167,
-        Split.TRAIN: 1271167,
-        Split.VALID: 10000,
-        Split.TEST: 50000
+        Split.TRAIN_AND_VALID: 9469,
+        Split.TRAIN: 9469,
+        Split.VALID: 0,
+        Split.TEST: 3925
     }[self]
 
 
@@ -83,7 +83,7 @@ def load(split: Split,
   tfds_split = tfds.core.ReadInstruction(
       _to_tfds_split(split), from_=start, to=end, unit='abs')
   ds = tfds.load(
-      'imagenet2012:5.*.*',
+      'imagenette/160px-v2',
       split=tfds_split,
       decoders={'image': tfds.decode.SkipDecoding()})
 
@@ -198,13 +198,13 @@ def _preprocess_image(
   # clamping overshoots. This means values returned will be outside the range
   # [0.0, 255.0] (e.g. we have observed outputs in the range [-51.1, 336.6]).
   assert image.dtype == tf.uint8
-  image = tf.image.resize(image, [224, 224], tf.image.ResizeMethod.BICUBIC)
+  image = tf.image.resize(image, [128, 128], tf.image.ResizeMethod.BICUBIC)
   image = tf.clip_by_value(image / 255., 0., 1.)
   return image
 
 
 def _decode_and_random_crop(image_bytes: tf.Tensor) -> tf.Tensor:
-  """Make a random crop of 224."""
+  """Make a random crop of 128."""
   img_size = tf.image.extract_jpeg_shape(image_bytes)
   area = tf.cast(img_size[1] * img_size[0], tf.float32)
   target_area = tf.random.uniform([], 0.08, 1.0, dtype=tf.float32) * area
@@ -255,7 +255,7 @@ def _decode_and_center_crop(
   image_width = jpeg_shape[1]
 
   padded_center_crop_size = tf.cast(
-      ((224 / (224 + 32)) *
+      ((128 / (128 + 32)) *
        tf.cast(tf.minimum(image_height, image_width), tf.float32)), tf.int32)
 
   offset_height = ((image_height - padded_center_crop_size) + 1) // 2
