@@ -18,12 +18,12 @@ import jax.numpy as jnp
 import optax
 
 
-def compute_norm(x, axis, keepdims):
+def compute_norm(x: jnp.ndarray, axis, keepdims: bool) -> jnp.ndarray:
   """Axis-wise euclidean norm."""
-  return jnp.sum(x ** 2, axis=axis, keepdims=keepdims) ** 0.5
+  return jnp.sum(x ** 2, axis=axis, keepdims=keepdims) ** 0.5 
 
 
-def unitwise_norm(x):
+def unitwise_norm(x: jnp.ndarray, eps: float) -> jnp.ndarray:
   """Compute norms of each output unit separately, also for linear layers."""
   if len(jnp.squeeze(x).shape) <= 1:  # Scalars and vectors
     axis = None
@@ -35,20 +35,11 @@ def unitwise_norm(x):
     axis = [0, 1, 2,]
     keepdims = True
   else:
-    raise ValueError(f'Got a parameter with shape not in [1, 2, 4]! {x}')
-  return compute_norm(x, axis, keepdims)
+    raise ValueError(f'Got a parameter with shape not in [0, 1, 2, 3, 4]! {x}')
+  return jnp.maximum(compute_norm(x, axis, keepdims), eps)
 
 
-def my_clip(g_norm, max_norm, grad):
-  """Applies my gradient clipping unit-wise."""
-  trigger = g_norm < max_norm
-  # This little max(., 1e-6) is distinct from the normal eps and just prevents
-  # division by zero. It technically should be impossible to engage.
-  clipped_grad = grad * (max_norm / jnp.maximum(g_norm, 1e-6))
-  return jnp.where(trigger, grad, clipped_grad)
-
-
-def adaptive_grad_clip(clip, eps=1e-3) -> optax.GradientTransformation:
+def adaptive_grad_clip(clip: float, eps: float = 1e-3) -> optax.GradientTransformation:
   """Clip updates to be at most clipping * parameter_norm.
 
   References:
@@ -66,13 +57,14 @@ def adaptive_grad_clip(clip, eps=1e-3) -> optax.GradientTransformation:
   def init_fn(_):
     return optax.ClipByGlobalNormState()
 
+  def _clip_fn(g_norm: jnp.ndarray, p_norm: jnp.ndarray, grad: jnp.ndarray) -> jnp.ndarray:
+    return grad * jnp.minimum(p_norm / g_norm * clip, 1)
+  
   def update_fn(updates, state, params):
-    g_norm = jax.tree_map(unitwise_norm, updates)
-    p_norm = jax.tree_map(unitwise_norm, params)
-    # Maximum allowable norm
-    max_norm = jax.tree_map(lambda x: clip * jnp.maximum(x, eps), p_norm)
+    g_norm = jax.tree_map(lambda x: unitwise_norm(x, 1e-6), updates)
+    p_norm = jax.tree_map(lambda x: unitwise_norm(x, eps), params)
     # If grad norm > clipping * param_norm, rescale
-    updates = jax.tree_multimap(my_clip, g_norm, max_norm, updates)
+    updates = jax.tree_multimap(_clip_fn, g_norm, p_norm, updates)
     return updates, state
 
   return optax.GradientTransformation(init_fn, update_fn)
