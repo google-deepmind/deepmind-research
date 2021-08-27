@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Towards mental time travel: a hierarchical memory for reinforcement learning agents](hierarchical_transformer_memory)
 *   [Perceiver IO: A General Architecture for Structured Inputs & Outputs](perceiver)
 *   [Solving Mixed Integer Programs Using Neural Networks](neural_mip_solving)
 *   [A Realistic Simulation Framework for Learning with Label Noise](noisy_label)
