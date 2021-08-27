@@ -17,6 +17,7 @@
 import wandb 
 
 import time
+import datetime
 from typing import Any, Mapping, Text, Type, Union
 
 from absl import app
@@ -35,6 +36,10 @@ tf.config.experimental.set_visible_devices([], "GPU")
 
 FLAGS = flags.FLAGS
 
+flags.DEFINE_string('id',
+                    'microsecond', 'The id of this run(wandb log)')
+flags.DEFINE_string('project_name',
+                    'byol_jax', 'The project name of wandb log')
 flags.DEFINE_string('experiment_mode',
                     'pretrain', 'The experiment, pretrain or linear-eval')
 flags.DEFINE_string('worker_mode', 'train', 'The mode, train or eval')
@@ -141,8 +146,12 @@ def eval_loop(experiment_class: Experiment, config: Mapping[Text, Any]):
 
 
 def main(_):
-  wandb.init()
-  wandb.config.update(flags.FLAGS)
+  dt_now = datetime.datetime.now()
+  if FLAGS.id == 'microsecond':
+    ID = f'{dt_now.year}-{dt_now.month}-{dt_now.day}-{dt_now.microsecond}'
+  else:
+    ID = f'{FLAGS.id}'
+  wandb.init(project=FLAGS.project_name, config=flags.FLAGS, id=ID)
   if FLAGS.worker_tpu_driver:
     jax.config.update('jax_xla_backend', 'tpu_driver')
     jax.config.update('jax_backend_target', FLAGS.worker_tpu_driver)
