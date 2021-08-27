@@ -33,6 +33,8 @@ from byol.configs import eval as eval_config
 import tensorflow as tf
 tf.config.experimental.set_visible_devices([], "GPU")
 
+FLAGS = flags.FLAGS
+
 flags.DEFINE_string('experiment_mode',
                     'pretrain', 'The experiment, pretrain or linear-eval')
 flags.DEFINE_string('worker_mode', 'train', 'The mode, train or eval')
@@ -42,11 +44,6 @@ flags.DEFINE_integer('batch_size', 4096, 'Total batch size')
 flags.DEFINE_string('checkpoint_root', '/tmp/byol',
                     'The directory to save checkpoints to.')
 flags.DEFINE_integer('log_tensors_interval', 60, 'Log tensors every n seconds.')
-
-FLAGS = flags.FLAGS
-
-wandb.init()
-wandb.config.update(flags.FLAGS)
 
 Experiment = Union[
     Type[byol_experiment.ByolExperiment],
@@ -144,6 +141,8 @@ def eval_loop(experiment_class: Experiment, config: Mapping[Text, Any]):
 
 
 def main(_):
+  wandb.init()
+  wandb.config.update(flags.FLAGS)
   if FLAGS.worker_tpu_driver:
     jax.config.update('jax_xla_backend', 'tpu_driver')
     jax.config.update('jax_backend_target', FLAGS.worker_tpu_driver)
