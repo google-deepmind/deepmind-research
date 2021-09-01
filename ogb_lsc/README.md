@@ -5,7 +5,7 @@ This repository contains DeepMind's entry to the [PCQM4M-LSC](https://ogb.stanfo
 tracks of the [OGB Large-Scale Challenge](https://ogb.stanford.edu/kddcup2021/)
 (OGB-LSC).
 
-For full details regarding this entry, please see our [technical report](https://storage.googleapis.com/deepmind-ogb-lsc/reports/OGB_LSC_Tech_Report.pdf).
+For full details regarding this entry, please see our [technical report](https://arxiv.org/abs/2107.09422).
 
 ## Code structure
 
@@ -25,5 +25,6 @@ To cite this work:
   title = {Large-scale graph representation learning with very deep GNNs and
     self-supervision},
   year = {2021},
+  journal={arXiv preprint arXiv:2107.09422},
 }
 ```

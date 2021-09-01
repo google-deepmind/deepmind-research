@@ -4,7 +4,7 @@ This repository contains DeepMind's entry to the [PCQM4M-LSC](https://ogb.stanfo
 track of the [OGB Large-Scale Challenge](https://ogb.stanford.edu/kddcup2021/)
 (OGB-LSC).
 
-For full details regarding this entry, please see our [technical report](https://storage.googleapis.com/deepmind-ogb-lsc/reports/OGB_LSC_Tech_Report.pdf).
+For full details regarding this entry, please see our [technical report](https://arxiv.org/abs/2107.09422).
 
 ## DeepMind PCQ Team ("Quantum")
 
@@ -25,7 +25,7 @@ For full details regarding this entry, please see our [technical report](https:/
 ## Performance
 
 Our final test set performance was achieved by pooling an ensemble of 20 models
-(10 folds x 2 seeds). See [technical report](https://storage.googleapis.com/deepmind-ogb-lsc/reports/OGB_LSC_Tech_Report.pdf) for details.
+(10 folds x 2 seeds). See [technical report](https://arxiv.org/abs/2107.09422) for details.
 
 Each model was trained for < 48 hours using 4x Google Cloud TPUv4 and 1x AMD
 EPYC 7B12 64-core CPU @2.25GHz.
@@ -110,7 +110,8 @@ To cite this work (together with our MAG240M-LSC entry):
   title = {Large-scale graph representation learning with very deep GNNs and
     self-supervision},
   year = {2021},
+  journal={arXiv preprint arXiv:2107.09422},
 }
 ```
 
-Our technical report can be found [here](https://storage.googleapis.com/deepmind-ogb-lsc/reports/OGB_LSC_Tech_Report.pdf).
+Our technical report can be found [here](https://arxiv.org/abs/2107.09422).
