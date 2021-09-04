@@ -564,7 +564,7 @@ class BasicDecoder(AbstractPerceiverDecoder):
     self._concat_preprocessed_input = concat_preprocessed_input
 
   def output_shape(self, inputs):
-    return ((inputs[0], self._subsampled_index_dims, self._output_num_channels),
+    return ((inputs.shape[0], self._subsampled_index_dims, self._output_num_channels),
             None)
 
   def decoder_query(self, inputs, modality_sizes=None,
