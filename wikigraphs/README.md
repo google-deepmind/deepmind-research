@@ -1,6 +1,6 @@
 # WikiGraphs
 
-This package provides tools to download the [WikiGraphs dataset](https://www.aclweb.org/anthology/2021.textgraphs-1.7.pdf)
+This package provides tools to download the [WikiGraphs dataset](https://arxiv.org/abs/2107.09556)
 [1], collected by pairing each Wikipedia article from [WikiText-103](https://arxiv.org/pdf/1609.07843.pdf)
 [2] with a knowledge graph (a subgraph from [Freebase knowledge graph](https://dl.acm.org/doi/pdf/10.1145/1376616.1376746?casa_token=H2ggPTDMoZUAAAAA:7wBhO9hnOzNKoJyMH0PcpVQZ6Vg6Ud6hObiDJTzLCGRiBwmYFjOFSXrG5PcKLStu5-n4_OfkPJtbisQ)
 [3]). The baseline code to reproduce results in [1] is included as well. We hope
@@ -247,7 +247,8 @@ python main.py --model_type=graph2text \
   --eval_subset=valid
 ```
 
-To generate 960 samples from the model using the graphs in the validation set (using 8 GPUs):
+To generate 960 samples from the model using the graphs in the validation set
+(using 8 GPUs):
 
 ```base
 python main.py --model_type=graph2text \
@@ -303,9 +304,9 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 
-[WikiGraphs](https://www.aclweb.org/anthology/2021.textgraphs-1.7.pdf)
-[1] is licensed under the terms of the Creative Commons
-Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) license.
+[WikiGraphs](https://arxiv.org/abs/2107.09556) [1] is licensed under the terms
+of the Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+license.
 
 [WikiText-103 data](https://arxiv.org/pdf/1609.07843.pdf) [2] (unchanged) is
 licensed by Salesforce.com, Inc. under the terms of the Creative Commons
@@ -323,7 +324,7 @@ Commons CC BY 4.0 license. You may obtain a copy of the License at:
 ## References
 
 1.  L. Wang, Y. Li, O. Aslan, and O. Vinyals, "[WikiGraphs: a wikipedia -
-knowledge graph paired dataset](https://www.aclweb.org/anthology/2021.textgraphs-1.7.pdf)",
+knowledge graph paired dataset](https://arxiv.org/abs/2107.09556)",
 in Proceedings of the Graph-based Methods for Natural Language Processing
 (TextGraphs), pages 67-82, 2021.
 2.  S. Merity, C. Xiong, J. Bradbury, and R. Socher, "[Pointer sentinel mixture
