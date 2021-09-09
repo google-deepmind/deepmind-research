@@ -119,7 +119,7 @@ def bcast_local_devices(value):
   def _replicate(x):
     """Replicate an object on each device."""
     x = jnp.array(x)
-    return jax.api.device_put_sharded(len(devices) * [x], devices)
+    return jax.device_put_sharded(len(devices) * [x], devices)
 
   return jax.tree_util.tree_map(_replicate, value)
 

@@ -91,7 +91,7 @@ def _replicate(x, devices=None):
   x = jax.numpy.array(x)
   if devices is None:
     devices = jax.local_devices()
-  return jax.api.device_put_sharded(len(devices) * [x], devices)
+  return jax.device_put_sharded(len(devices) * [x], devices)
 
 
 def broadcast(obj):
@@ -124,5 +124,3 @@ def flatten_haiku_tree(haiku_dict):
       out_key = f'{out_module}.{key}'
       out[out_key] = haiku_dict[module][key]
   return out
-
-
