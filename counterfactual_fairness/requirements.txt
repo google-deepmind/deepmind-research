@@ -1,0 +1,12 @@
+wheel
+absl-py>=0.12.0
+dm-haiku>=0.0.4
+optax>=0.0.8
+ml_collections
+numpy>=1.16.4
+tensorflow>=2.5.0
+tensorflow-datasets>=4.3.0
+tensorflow_probability
+pandas
+sklearn
+jaxlib>=0.1.67+cuda110

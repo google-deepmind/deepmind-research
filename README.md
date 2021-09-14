@@ -60,6 +60,7 @@ https://deepmind.com/research/publications/
 *   [Disentangling by Subspace Diffusion (GEOMANCER)](geomancer), NeurIPS 2020
 *   [What can I do here? A theory of affordances in reinforcement learning](affordances_theory), ICML 2020
 *   [Scaling data-driven robotics with reward sketching and batch reinforcement learning](sketchy), RSS 2020
+*   [Path-Specific Counterfactual Fairness](counterfactual_fairness), AAAI 2019
 *   [The Option Keyboard: Combining Skills in Reinforcement Learning](option_keyboard), NeurIPS 2019
 *   [VISR - Fast Task Inference with Variational Intrinsic Successor Features](visr), ICLR 2020
 *   [Unveiling the predictive power of static structure in glassy systems](glassy_dynamics), Nature Physics 2020
