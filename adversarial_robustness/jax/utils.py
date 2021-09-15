@@ -41,6 +41,23 @@ def get_cosine_schedule(
   ], [warmup_steps])
 
 
+def get_step_schedule(
+    max_learning_rate: float,
+    total_steps: int,
+    warmup_steps: int = 0) -> optax.Schedule:
+  """Builds a step schedule with initial warm-up."""
+  if total_steps < warmup_steps:
+    return optax.linear_schedule(init_value=0., end_value=max_learning_rate,
+                                 transition_steps=warmup_steps)
+  return optax.join_schedules([
+      optax.linear_schedule(init_value=0., end_value=max_learning_rate,
+                            transition_steps=warmup_steps),
+      optax.piecewise_constant_schedule(
+          init_value=max_learning_rate,
+          boundaries_and_scales={total_steps * 2 // 3: .1}),
+  ], [warmup_steps])
+
+
 def sgd_momentum(learning_rate_fn: optax.Schedule,
                  momentum: float = 0.,
                  nesterov: bool = False) -> optax.GradientTransformation:
@@ -118,8 +135,7 @@ def cutmix(rng: chex.PRNGKey,
            split: int = 1) -> Tuple[chex.Array, chex.Array]:
   """Composing two images by inserting a patch into another image."""
   batch_size, height, width, _ = images.shape
-  if split > 1:
-    split_batch_size = batch_size // split
+  split_batch_size = batch_size // split if split > 1 else batch_size
 
   # Masking bounding box.
   box_rng, lam_rng, rng = jax.random.split(rng, num=3)
@@ -158,14 +174,10 @@ def _random_box(rng: chex.PRNGKey,
                 cut_w: chex.Array) -> chex.Array:
   """Sample a random box of shape [cut_h, cut_w]."""
   height_rng, width_rng = jax.random.split(rng)
-  minval_h = 0
-  minval_w = 0
-  maxval_h = height
-  maxval_w = width
   i = jax.random.randint(
-      height_rng, shape=(), minval=minval_h, maxval=maxval_h, dtype=jnp.int32)
+      height_rng, shape=(), minval=0, maxval=height, dtype=jnp.int32)
   j = jax.random.randint(
-      width_rng, shape=(), minval=minval_w, maxval=maxval_w, dtype=jnp.int32)
+      width_rng, shape=(), minval=0, maxval=width, dtype=jnp.int32)
   bby1 = jnp.clip(i - cut_h // 2, 0, height)
   bbx1 = jnp.clip(j - cut_w // 2, 0, width)
   h = jnp.clip(i + cut_h // 2, 0, height) - bby1

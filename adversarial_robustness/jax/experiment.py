@@ -62,12 +62,17 @@ def get_config():
   # https://github.com/deepmind/deepmind-research/tree/master/adversarial_robustness.
   # If the path is set to "cifar10_ddpm.npz" and is not found in the current
   # directory, the corresponding data will be downloaded.
-  extra_npz = 'cifar10_ddpm.npz'
+  extra_npz = 'cifar10_ddpm.npz'  # Can be `None`.
 
   # Learning rate.
   learning_rate = .1 * max(train_batch_size / 256, 1.)
   learning_rate_warmup = steps_from_epochs(10)
-  learning_rate_fn = utils.get_cosine_schedule(learning_rate, num_steps,
+  use_cosine_schedule = True
+  if use_cosine_schedule:
+    learning_rate_fn = utils.get_cosine_schedule(learning_rate, num_steps,
+                                                 learning_rate_warmup)
+  else:
+    learning_rate_fn = utils.get_step_schedule(learning_rate, num_steps,
                                                learning_rate_warmup)
 
   # Model definition.
@@ -120,7 +125,7 @@ def get_config():
           weight_decay=5e-4,
           swa_decay=.995,
           use_cutmix=False,
-          supervised_batch_ratio=.3,
+          supervised_batch_ratio=.3 if extra_npz is not None else 1.,
           extra_data_path=extra_npz,
           extra_label_smoothing=.1,
           attack=train_attack),
@@ -343,7 +348,13 @@ class Experiment(experiment.AbstractExperiment):
   #
 
   def evaluate(self, global_step, rng, *unused_args, **unused_kwargs):
-    return self.eval_epoch(self._avg_params or self._params, self._state, rng)
+    scalars = self.eval_epoch(self._params, self._state, rng)
+    if self._avg_params:
+      avg_scalars = self.eval_epoch(self._avg_params or self._params,
+                                    self._state, rng)
+      for k, v in avg_scalars.items():
+        scalars[k + '_swa'] = v
+    return scalars
 
   def eval_epoch(self, params, state, rng):
     host_id = jax.host_id()
@@ -408,8 +419,11 @@ class Experiment(experiment.AbstractExperiment):
       self._repeat_batch = 1
     self.supervised_train_input = jl_utils.py_prefetch(
         self._supervised_train_dataset)
-    self.extra_train_input = jl_utils.py_prefetch(
-        self._extra_train_dataset)
+    if self.config.training.extra_data_path is None:
+      self.extra_train_input = None
+    else:
+      self.extra_train_input = jl_utils.py_prefetch(
+          self._extra_train_dataset)
     self.normalize_fn = datasets.cifar10_normalize
 
     # Optimizer.
@@ -423,7 +437,8 @@ class Experiment(experiment.AbstractExperiment):
       # Create inputs to initialize the network state.
       images, _, _ = jax.pmap(self.concatenate)(
           next(self.supervised_train_input),
-          next(self.extra_train_input))
+          next(self.extra_train_input) if self.extra_train_input is not None
+          else None)
       images = jax.pmap(self.normalize_fn)(images)
       # Initialize weights and biases.
       init_net = jax.pmap(
