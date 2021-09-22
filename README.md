@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Compute-Aided Design as Language](cadl)
 *   [Encoders and ensembles for continual learning](continual_learning)
 *   [Towards mental time travel: a hierarchical memory for reinforcement learning agents](hierarchical_transformer_memory)
 *   [Perceiver IO: A General Architecture for Structured Inputs & Outputs](perceiver)

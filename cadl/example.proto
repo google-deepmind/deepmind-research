@@ -1,0 +1,63 @@
+// Copyright 2021 Deepmind Technologies Limited.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package deepmind.cad.protos;
+
+import "constraints.proto";
+import "entities.proto";
+
+message Entity {
+  oneof kind {
+    PointEntity point_entity = 1;
+    LineEntity line_entity = 2;
+    CircleArcEntityV2 circle_arc_entity = 3;
+    InterpolatedSplineEntity interpolated_spline_entity = 4;
+  }
+}
+
+message Constraint {
+  oneof kind {
+    FixConstraint fix_constraint = 1;
+    CoincidentConstraint coincident_constraint = 2;
+    ConcentricConstraint concentric_constraint = 3;
+    EqualConstraint equal_constraint = 4;
+    ParallelConstraint parallel_constraint = 5;
+    TangentConstraint tangent_constraint = 6;
+    PerpendicularConstraint perpendicular_constraint = 7;
+    MirrorConstraint mirror_constraint = 8;
+    DistanceConstraint distance_constraint = 9;
+    LengthConstraint length_constraint = 10;
+    DiameterConstraint diameter_constraint = 11;
+    RadiusConstraint radius_constraint = 12;
+    AngleConstraint angle_constraint = 13;
+    HorizontalConstraint horizontal_constraint = 14;
+    VerticalConstraint vertical_constraint = 15;
+    MidpointConstraint midpoint_constraint = 16;
+  }
+}
+
+message EntitySequence {
+  repeated Entity entities = 1;
+}
+
+message ConstraintSequence {
+  repeated Constraint constraints = 1;
+}
+
+message Example {
+  EntitySequence entity_sequence = 1;
+  ConstraintSequence constraint_sequence = 2;
+}

@@ -1,0 +1,85 @@
+// Copyright 2021 Deepmind Technologies Limited.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package deepmind.cad.protos;
+
+import "google/protobuf/empty.proto";
+import "common.proto";
+
+message Vector {
+  double x = 1;
+  double y = 2;
+}
+
+message PointEntity {
+  bool is_construction = 1;
+  Vector point = 2;
+}
+
+message LineEntity {
+  bool is_construction = 1;
+  Vector start = 2;
+  Vector end = 3;
+}
+
+message CircleArcEntity {
+  bool is_construction = 1;
+  Vector center = 2;
+  double radius = 3;
+  message ArcParams {
+    Vector direction = 1;
+    bool is_clockwise = 2;
+    double start_angle = 3;
+    double end_angle = 4;
+  }
+  oneof additional_params {
+    google.protobuf.Empty circle_params = 4;
+    ArcParams arc_params = 5;
+  }
+}
+
+message CircleArcEntityV2 {
+  bool is_construction = 1;
+  Vector center = 2;
+  message CircleParams {
+    double radius = 1;
+  }
+  message ArcParams {
+    Vector start = 1;
+    Vector end = 2;
+    bool is_clockwise = 3;
+  }
+  oneof additional_params {
+    CircleParams circle_params = 3;
+    ArcParams arc_params = 4;
+  }
+}
+
+message InterpolatedSplineEntity {
+  bool is_construction = 1;
+  bool is_periodic = 2;
+  repeated Vector interpolation_points = 3 [(nc_field_options).at_least = 2];
+  Vector start_derivative = 4;
+  Vector end_derivative = 5;
+  message TrimmedParams {
+    double start_phi = 1;
+    double end_phi = 2;
+  }
+  oneof additional_params {
+    google.protobuf.Empty untrimmed_params = 6;
+    TrimmedParams trimmed_params = 7;
+  }
+}

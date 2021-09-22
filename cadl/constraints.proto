@@ -1,0 +1,135 @@
+// Copyright 2021 Deepmind Technologies Limited.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package deepmind.cad.protos;
+
+import "common.proto";
+
+message FixConstraint {
+  repeated uint32 entities = 1
+      [(nc_field_options).is_pointer = true, (nc_field_options).at_least = 1];
+}
+
+message CoincidentConstraint {
+  repeated uint32 entities = 1
+      [(nc_field_options).is_pointer = true, (nc_field_options).at_least = 2];
+}
+
+message ConcentricConstraint {
+  repeated uint32 entities = 1
+      [(nc_field_options).is_pointer = true, (nc_field_options).at_least = 2];
+}
+
+message EqualConstraint {
+  repeated uint32 entities = 1
+      [(nc_field_options).is_pointer = true, (nc_field_options).at_least = 2];
+}
+
+message ParallelConstraint {
+  repeated uint32 entities = 1
+      [(nc_field_options).is_pointer = true, (nc_field_options).at_least = 2];
+}
+
+message TangentConstraint {
+  uint32 first = 1 [(nc_field_options).is_pointer = true];
+  uint32 second = 2 [(nc_field_options).is_pointer = true];
+}
+
+message PerpendicularConstraint {
+  uint32 first = 1 [(nc_field_options).is_pointer = true];
+  uint32 second = 2 [(nc_field_options).is_pointer = true];
+}
+
+message MirrorConstraint {
+  uint32 mirror = 1 [(nc_field_options).is_pointer = true];
+  message MirroredPair {
+    uint32 first = 1 [(nc_field_options).is_pointer = true];
+    uint32 second = 2 [(nc_field_options).is_pointer = true];
+  }
+  repeated MirroredPair mirrored_pairs = 2 [(nc_field_options).at_least = 1];
+}
+
+message DistanceConstraint {
+  uint32 first = 1 [(nc_field_options).is_pointer = true];
+  uint32 second = 2 [(nc_field_options).is_pointer = true];
+  enum Direction {
+    HORIZONTAL = 0;
+    VERTICAL = 1;
+    MINIMUM = 2;
+  }
+  Direction direction = 3;
+  double length = 4;
+  enum Alignment {
+    ALIGNED = 0;
+    ANTI_ALIGNED = 1;
+  }
+  enum HalfSpace {
+    NOT_AVAILABLE = 0;
+    LEFT = 1;
+    RIGHT = 2;
+  }
+  message HalfSpaceParams {
+    HalfSpace half_space_first = 1;
+    HalfSpace half_space_second = 2;
+  }
+  oneof additional_params {
+    Alignment alignment = 5;
+    HalfSpaceParams half_space_params = 6;
+  }
+}
+
+message LengthConstraint {
+  uint32 entity = 1 [(nc_field_options).is_pointer = true];
+  double length = 2;
+}
+
+message DiameterConstraint {
+  uint32 entity = 1 [(nc_field_options).is_pointer = true];
+  double length = 2;
+}
+
+message RadiusConstraint {
+  uint32 entity = 1 [(nc_field_options).is_pointer = true];
+  double length = 2;
+}
+
+message AngleConstraint {
+  uint32 first = 1 [(nc_field_options).is_pointer = true];
+  uint32 second = 2 [(nc_field_options).is_pointer = true];
+  double angle = 3;
+}
+
+message HorizontalConstraint {
+  repeated uint32 entities = 1
+      [(nc_field_options).is_pointer = true, (nc_field_options).at_least = 1];
+}
+
+message VerticalConstraint {
+  repeated uint32 entities = 2
+      [(nc_field_options).is_pointer = true, (nc_field_options).at_least = 1];
+}
+
+message MidpointConstraint {
+  uint32 midpoint = 1 [(nc_field_options).is_pointer = true];
+  message Endpoints {
+    uint32 first = 1 [(nc_field_options).is_pointer = true];
+    uint32 second = 2 [(nc_field_options).is_pointer = true];
+  }
+  oneof additional_params {
+    Endpoints endpoints = 2;
+    uint32 entity = 3 [(nc_field_options).is_pointer = true];
+  }
+}
