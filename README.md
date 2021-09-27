@@ -82,6 +82,7 @@ https://deepmind.com/research/publications/
     Objects](graph_matching_networks), ICML 2019
 *   [REGAL: Transfer Learning for Fast Optimization of Computation Graphs](regal)
 *   [Deep Ensembles: A Loss Landscape Perspective](ensemble_loss_landscape)
+*   [Powerpropagation](powerpropagation)
 
 
 
