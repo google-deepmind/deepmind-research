@@ -7,7 +7,7 @@ model.
 
 Please see the Colab notebook for further details:
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/deepmind/deepmind-research/nowcasting/blob/master/Open_sourced_dataset_and_model_snapshot_for_precipitation_nowcasting.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/deepmind/deepmind-research/blob/master/nowcasting/Open_sourced_dataset_and_model_snapshot_for_precipitation_nowcasting.ipynb)
 
 ## License
 
