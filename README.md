@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Skilful precipitation nowcasting using deep generative models of radar](nowcasting), Nature 2021
 *   [Compute-Aided Design as Language](cadl)
 *   [Encoders and ensembles for continual learning](continual_learning)
 *   [Towards mental time travel: a hierarchical memory for reinforcement learning agents](hierarchical_transformer_memory)
