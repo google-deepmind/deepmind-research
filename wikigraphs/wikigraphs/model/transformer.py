@@ -331,7 +331,7 @@ def unpack_and_pad(
   idx = jnp.arange(total_size)
   idx += repeat_rows(jnp.arange(n_splits), split_sizes, total_size) * pad_size
   idx -= repeat_rows(cumsum, split_sizes, total_size)
-  out = jax.ops.index_update(out, idx, packed)
+  out = out.at[idx].set(packed)
   out = out.reshape([n_splits, pad_size] + out_shape[1:])
   return out, masks
 
