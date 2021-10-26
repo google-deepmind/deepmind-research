@@ -85,6 +85,7 @@ https://deepmind.com/research/publications/
 *   [REGAL: Transfer Learning for Fast Optimization of Computation Graphs](regal)
 *   [Deep Ensembles: A Loss Landscape Perspective](ensemble_loss_landscape)
 *   [Powerpropagation](powerpropagation)
+*   [Physics Inspired Models](physics_inspired_models)
 
 
 
