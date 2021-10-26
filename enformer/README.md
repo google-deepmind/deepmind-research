@@ -96,7 +96,7 @@ SEQ_LENGTH = 393_216
 inputs = tf.zeros((1, SEQ_LENGTH, 4), dtype=tf.float32)
 predictions = enformer.predict_on_batch(inputs)
 predictions['human'].shape  # [batch_size, 896, 5313]
-predictions[mouse].shape  # [batch_size, 896, 1643]
+predictions['mouse'].shape  # [batch_size, 896, 1643]
 ```
 
 ## Outputs
