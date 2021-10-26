@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [The Difficulty of Passive Learning in Deep Reinforcement Learning](tandem_dqn), NeurIPS 2021
 *   [Skilful precipitation nowcasting using deep generative models of radar](nowcasting), Nature 2021
 *   [Compute-Aided Design as Language](cadl)
 *   [Encoders and ensembles for continual learning](continual_learning)
