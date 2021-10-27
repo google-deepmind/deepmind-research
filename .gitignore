@@ -1,0 +1,4 @@
+wandb
+*.out
+*.pyc
+*.cpython-38.pyc

@@ -31,7 +31,7 @@ def get_config(num_epochs: int, batch_size: int):
 
   config = dict(
       random_seed=0,
-      num_classes=1000,
+      num_classes=10,
       batch_size=batch_size,
       max_steps=num_epochs * train_images_per_epoch // batch_size,
       enable_double_transpose=True,
@@ -40,7 +40,7 @@ def get_config(num_epochs: int, batch_size: int):
           projector_hidden_size=4096,
           projector_output_size=256,
           predictor_hidden_size=4096,
-          encoder_class='ResNet50',  # Should match a class in utils/networks.
+          encoder_class='ResNet18',  # Should match a class in utils/networks.
           encoder_config=dict(
               resnet_v2=False,
               width_multiplier=1),
@@ -55,17 +55,17 @@ def get_config(num_epochs: int, batch_size: int):
               'create_offset': True,
           }),
       optimizer_config=dict(
-          weight_decay=_WD_PRESETS[num_epochs],
+          weight_decay=1e-6,
           eta=1e-3,
           momentum=.9,
       ),
       lr_schedule_config=dict(
-          base_learning_rate=_LR_PRESETS[num_epochs],
+          base_learning_rate=2.0,
           warmup_steps=10 * train_images_per_epoch // batch_size,
       ),
       evaluation_config=dict(
           subset='test',
-          batch_size=100,
+          batch_size=25,
       ),
       checkpointing_config=dict(
           use_checkpointing=True,

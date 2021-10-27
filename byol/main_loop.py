@@ -14,8 +14,10 @@
 # limitations under the License.
 
 """Training and evaluation loops for an experiment."""
+import wandb 
 
 import time
+import datetime
 from typing import Any, Mapping, Text, Type, Union
 
 from absl import app
@@ -29,6 +31,15 @@ from byol import eval_experiment
 from byol.configs import byol as byol_config
 from byol.configs import eval as eval_config
 
+import tensorflow as tf
+tf.config.experimental.set_visible_devices([], "GPU")
+
+FLAGS = flags.FLAGS
+
+flags.DEFINE_string('id',
+                    'microsecond', 'The id of this run(wandb log)')
+flags.DEFINE_string('project_name',
+                    'byol_jax', 'The project name of wandb log')
 flags.DEFINE_string('experiment_mode',
                     'pretrain', 'The experiment, pretrain or linear-eval')
 flags.DEFINE_string('worker_mode', 'train', 'The mode, train or eval')
@@ -38,9 +49,6 @@ flags.DEFINE_integer('batch_size', 4096, 'Total batch size')
 flags.DEFINE_string('checkpoint_root', '/tmp/byol',
                     'The directory to save checkpoints to.')
 flags.DEFINE_integer('log_tensors_interval', 60, 'Log tensors every n seconds.')
-
-FLAGS = flags.FLAGS
-
 
 Experiment = Union[
     Type[byol_experiment.ByolExperiment],
@@ -81,7 +89,14 @@ def train_loop(experiment_class: Experiment, config: Mapping[Text, Any]):
 
     # Perform a training step and get scalars to log.
     scalars = experiment.step(global_step=step_device, rng=step_rng_device)
-
+    wandb.log({"classif_loss": scalars['classif_loss'],
+               "repr_loss": scalars['repr_loss'],
+               "loss": scalars['loss'],
+               "top1_accuracy": scalars['top1_accuracy'],
+               "top5_accuracy": scalars['top5_accuracy'],
+               "learning_rate": scalars['learning_rate'],
+               "tau": scalars['tau']
+                })
     # Checkpointing and logging.
     if config['checkpointing_config']['use_checkpointing']:
       experiment.save_checkpoint(step, rng)
@@ -131,6 +146,12 @@ def eval_loop(experiment_class: Experiment, config: Mapping[Text, Any]):
 
 
 def main(_):
+  dt_now = datetime.datetime.now()
+  if FLAGS.id == 'microsecond':
+    ID = f'{dt_now.year}-{dt_now.month}-{dt_now.day}-{dt_now.microsecond}'
+  else:
+    ID = f'{FLAGS.id}'
+  wandb.init(project=FLAGS.project_name, config=flags.FLAGS, id=ID)
   if FLAGS.worker_tpu_driver:
     jax.config.update('jax_xla_backend', 'tpu_driver')
     jax.config.update('jax_backend_target', FLAGS.worker_tpu_driver)

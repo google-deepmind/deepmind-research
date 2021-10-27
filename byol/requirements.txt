@@ -3,6 +3,7 @@ dm-haiku
 dm-tree
 jax
 jaxlib
+optax
 numpy>=1.16
-tensorflow
+tensorflow==2.5.0
 tensorflow_datasets
