@@ -58,7 +58,7 @@ class ModUcf101(tfds.video.Ucf101):
     features = tfds.features.FeaturesDict({
         'video': tfds.features.Video(video_shape,
                                      ffmpeg_extra_args=ffmpeg_extra_args,
-                                     encoding_format='jpeg'),
+                                     encoding_format='jpeg'),  # pytype: disable=wrong-arg-types  # gen-stub-imports
         'label': tfds.features.ClassLabel(names_file=labels_names_file),
     })
     return tfds.core.DatasetInfo(
