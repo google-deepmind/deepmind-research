@@ -145,7 +145,7 @@ def main(_):
                                     FLAGS.batch_size)
   else:
     raise ValueError(f'Unknown experiment mode: {FLAGS.experiment_mode}')
-  config['checkpointing_config']['checkpoint_dir'] = FLAGS.checkpoint_root
+  config['checkpointing_config']['checkpoint_dir'] = FLAGS.checkpoint_root  # pytype: disable=unsupported-operands  # dict-kwargs
 
   if FLAGS.worker_mode == 'train':
     train_loop(experiment_class, config)
