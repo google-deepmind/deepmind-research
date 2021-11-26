@@ -52,8 +52,20 @@ python3 jaxline_train.py \
 
 
 ## Reference
+
 **SyMetric: Measuring the Quality of Learnt Hamiltonian Dynamics Inferred from Vision**
 
+Irina Higgins, Peter Wirnsberger, Andrew Jaegle, Aleksandar Botev
+
+URL: https://openreview.net/forum?id=9Qu0U9Fj7IP
+
+
 **Which priors matter? Benchmarking models for learning latent dynamics**
+
+Aleksandar Botev, Drew Jaegle, Peter Wirnsberger, Daniel Hennes and Irina
+Higgins
+
+URL: https://openreview.net/forum?id=qBl8hnwR0px
+
 
 [DeepMind Hamiltonian Dynamics Suite]: https://github.com/deepmind/dm_hamiltonian_dynamics_suite
