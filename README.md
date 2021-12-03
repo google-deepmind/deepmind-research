@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Mind the Gap: Assessing Temporal Generalization in Neural Language Models](pitfalls_static_language_models), NeurIPS 2021
 *   [The Difficulty of Passive Learning in Deep Reinforcement Learning](tandem_dqn), NeurIPS 2021
 *   [Skilful precipitation nowcasting using deep generative models of radar](nowcasting), Nature 2021
 *   [Compute-Aided Design as Language](cadl)
