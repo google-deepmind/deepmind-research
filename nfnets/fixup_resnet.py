@@ -121,11 +121,8 @@ class FixUp_ResNet(hk.Module):
       flops += [block.count_flops(h, w)]
       if block.stride > 1:
         h, w = h / block.stride, w / block.stride
-    # Head module FLOPs
-    out_ch = self.blocks[-1].out_ch
-    flops += [base.count_conv_flops(out_ch, self.final_conv, h, w)]
     # Count flops for classifier
-    flops += [self.final_conv.output_channels * self.fc.output_size]
+    flops += [self.blocks[-1].out_ch * self.fc.output_size]
     return flops, sum(flops)
 
 
@@ -213,4 +210,3 @@ class ResBlock(hk.Module):
       sc_flops = 0
     contract_flops = base.count_conv_flops(self.width, self.conv2, h, w)
     return sum([expand_flops, dw_flops, contract_flops, sc_flops])
-

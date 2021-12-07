@@ -14,10 +14,17 @@
 # ==============================================================================
 r"""ImageNet experiment with NFNets."""
 
+import sys
+
+from absl import flags
 import haiku as hk
+from jaxline import platform
 from ml_collections import config_dict
+
 from nfnets import experiment
 from nfnets import optim
+
+FLAGS = flags.FLAGS
 
 
 def get_config():
@@ -124,3 +131,8 @@ class Experiment(experiment.Experiment):
       self._opt_state = self.opt.states()
     else:
       self.opt.plugin(self._opt_state)
+
+
+if __name__ == '__main__':
+  flags.mark_flag_as_required('config')
+  platform.main(Experiment, sys.argv[1:])

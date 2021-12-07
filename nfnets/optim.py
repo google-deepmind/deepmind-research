@@ -132,7 +132,7 @@ class Optimizer(object):
     elif '_states' in self.__dict__ and name in self._states:
       return self._states[name]
     else:
-      object.__getattr__(self, name)
+      object.__getattribute__(self, name)
 
   def step(self, params, grads, states, itr=None):
     """Takes a single optimizer step.
