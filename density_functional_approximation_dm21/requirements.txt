@@ -1,0 +1,9 @@
+absl-py==0.13.0
+attrs==21.2.0
+h5py==3.1.0
+numpy==1.19.5
+pyscf==1.7.6.post1
+pytest==6.2.4
+scipy==1.7.1
+tensorflow==2.6.0
+tensorflow-hub==0.12.0

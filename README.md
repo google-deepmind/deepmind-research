@@ -24,6 +24,7 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Pushing the Frontiers of Density Functionals by Solving the Fractional Electron Problem](density_functional_approximation_dm21), Science 2021
 *   [Mind the Gap: Assessing Temporal Generalization in Neural Language Models](pitfalls_static_language_models), NeurIPS 2021
 *   [The Difficulty of Passive Learning in Deep Reinforcement Learning](tandem_dqn), NeurIPS 2021
 *   [Skilful precipitation nowcasting using deep generative models of radar](nowcasting), Nature 2021

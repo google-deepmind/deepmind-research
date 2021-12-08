@@ -1,0 +1,78 @@
+From 76edcc2da8a754cb2b283d7de9a7b37f51f7f380 Mon Sep 17 00:00:00 2001
+From: James Spencer <jamessspencer@google.com>
+Date: Thu, 26 Aug 2021 10:00:53 +0100
+Subject: [PATCH] Set dependencies for saved_model_compile_aot rule,
+ visibility for xla_compiled_cpu_runtime_standalone to work outside of
+ tensorflow, and absl version.
+
+---
+ tensorflow/compiler/tf2xla/BUILD  | 2 +-
+ tensorflow/python/tools/tools.bzl | 4 ++--
+ tensorflow/workspace2.bzl         | 9 +++++----
+ 3 files changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/tensorflow/compiler/tf2xla/BUILD b/tensorflow/compiler/tf2xla/BUILD
+index cfe63b16675..cd273aaf29e 100644
+--- a/tensorflow/compiler/tf2xla/BUILD
++++ b/tensorflow/compiler/tf2xla/BUILD
+@@ -235,7 +235,7 @@ cc_library(
+     copts = runtime_copts() + tf_openmp_copts(),
+     features = ["fully_static_link"],
+     linkstatic = 1,
+-    visibility = [":friends"],
++    visibility = ["//visibility:public"],
+     # Note, we specifically removed MKL and multithreaded dependencies so the
+     # standalone does not require the MKL binary blob or threading libraries.
+     #
+diff --git a/tensorflow/python/tools/tools.bzl b/tensorflow/python/tools/tools.bzl
+index db886746006..bc597e29de9 100644
+--- a/tensorflow/python/tools/tools.bzl
++++ b/tensorflow/python/tools/tools.bzl
+@@ -148,7 +148,7 @@ def saved_model_compile_aot(
+         ),
+         tags = tags,
+         tools = [
+-            "//tensorflow/python/tools:saved_model_cli",
++            "@org_tensorflow//tensorflow/python/tools:saved_model_cli",
+         ],
+     )
+ 
+@@ -170,7 +170,7 @@ def saved_model_compile_aot(
+         tags = tags,
+         deps = _maybe_force_compile(
+             [
+-                "//tensorflow/compiler/tf2xla:xla_compiled_cpu_runtime_standalone",
++                "@org_tensorflow//tensorflow/compiler/tf2xla:xla_compiled_cpu_runtime_standalone",
+             ],
+             force_compile = force_without_xla_support_flag,
+         ),
+diff --git a/tensorflow/workspace2.bzl b/tensorflow/workspace2.bzl
+index df4b687d720..f1173507e72 100644
+--- a/tensorflow/workspace2.bzl
++++ b/tensorflow/workspace2.bzl
+@@ -488,8 +488,8 @@ def _tf_repositories():
+ 
+     tf_http_archive(
+         name = "absl_py",
+-        sha256 = "588a23406b2e28ea368897dbebc1210165414e87212d4fdd4b2ee968f0a772c6",
+-        strip_prefix = "abseil-py-pypi-v0.10.0",
++        sha256 = "0be59b82d65dfa1f995365dcfea2cc57989297b065fda696ef13f30fcc6c8e5b",
++        strip_prefix = "abseil-py-pypi-v0.15.0",
+         system_build_file = "//third_party/systemlibs:absl_py.BUILD",
+         system_link_files = {
+             "//third_party/systemlibs:absl_py.absl.BUILD": "absl/BUILD",
+@@ -498,8 +498,9 @@ def _tf_repositories():
+             "//third_party/systemlibs:absl_py.absl.logging.BUILD": "absl/logging/BUILD",
+         },
+         urls = [
+-            "https://storage.googleapis.com/mirror.tensorflow.org/github.com/abseil/abseil-py/archive/pypi-v0.10.0.tar.gz",
+-            "https://github.com/abseil/abseil-py/archive/pypi-v0.10.0.tar.gz",
++            "https://storage.googleapis.com/mirror.tensorflow.org/github.com/abseil/abseil-py/archive/pypi-v0.15.0.tar.gz",
++            "https://github.com/abseil/abseil-py/archive/pypi-v0.15.0.tar.gz",
++            "https://files.pythonhosted.org/packages/75/c6/ea1b86d2e7068e77f5204f8280edb2434596c1bad59fe03564f3d11d5caf/absl-py-0.15.0.tar.gz",
+         ],
+     )
+ 
+-- 
+2.33.0.259.gc128427fd7-goog
+
