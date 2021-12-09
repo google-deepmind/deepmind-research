@@ -117,15 +117,16 @@ def load(
   else:
     raise ValueError('Only imagenet is presently supported for this dataset.')
 
-  options = ds.options()
+  options = tf.data.Options()
   options.experimental_threading.private_threadpool_size = 48
   options.experimental_threading.max_intra_op_parallelism = 1
   options.experimental_optimization.map_parallelization = True
   options.experimental_optimization.parallel_batch = True
-  options.experimental_optimization.hoist_random_uniform = True
 
   if is_training:
     options.experimental_deterministic = False
+
+  ds = ds.with_options(options)
 
   if is_training:
     if jax.host_count() > 1:
