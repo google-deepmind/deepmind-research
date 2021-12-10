@@ -130,6 +130,83 @@ be found in the paper (reference below). Note that the results in our paper also
 include D3 corrections, which must be
 [included separately](https://pyscf.org/user/dft.html#dispersion-corrections).
 
+
+### Best practices for using the neural functionals.
+
+In this section, we suggest some tips for using the neural functionals in a way
+similar to how they were used for benchmarking in the paper. The tensorflow
+network that we used is running at single precision, and as such it is very
+hard to converge calculations to the high convergence thresholds which are
+default in pyscf. For example, the following script should allow users to
+run an atomization energy calculation for methane.
+
+```python
+import density_functional_approximation_dm21 as dm21
+from pyscf import gto
+from pyscf import dft
+
+# Create the molecule of interest and select the basis set.
+methane = gto.Mole()
+methane.atom = """H 0.000000000000 0.000000000000 0.000000000000
+                  C 0.000000000000 0.000000000000 1.087900000000
+                  H 1.025681956337 0.000000000000 1.450533333333
+                  H -0.512840978169 0.888266630391 1.450533333333
+                  H -0.512840978169 -0.888266630391 1.450533333333"""
+methane.basis = 'def2-qzvp'
+methane.verbose = 4
+methane.build()
+
+carbon = gto.Mole()
+carbon.atom = 'C 0.0 0.0 0.0'
+carbon.basis = 'def2-qzvp'
+carbon.spin = 2
+carbon.verbose = 4
+carbon.build()
+
+hydrogen = gto.Mole()
+hydrogen.atom = 'H 0.0 0.0 0.0'
+hydrogen.basis = 'def2-qzvp'
+hydrogen.spin = 1
+hydrogen.verbose = 4
+hydrogen.build()
+
+energies = []
+for mol in [methane, carbon, hydrogen]:
+  # Create a DFT solver and insert the DM21 functional into the solver.
+  if mol.spin == 0:
+    mf = dft.RKS(mol)
+  else:
+    mf = dft.UKS(mol)
+  # It will make SCF faster to start close to the solution with a cheaper
+  # functional.
+  mf.xc = 'B3LYP'
+  mf.run()
+  dm0 = mf.make_rdm1()
+
+  mf._numint = dm21.NeuralNumInt(dm21.Functional.DM21)
+  # It's wise to relax convergence tolerances.
+  mf.conv_tol = 1E-6
+  mf.conv_tol_grad = 1E-3
+  # Run the DFT calculation.
+  energy = mf.kernel(dm0=dm0)
+  energies.append(energy)
+
+print({'CH4': energies[0], 'C': energies[1], 'H': energies[2]})
+```
+
+This script should produce three energies (in Hartrees) for the water molecule
+and the two atoms of
+`{'CH4': -40.51785372584538, 'C': -37.84542045526023, 'H': -0.5011533955627797}`
+, this leads to an atomization energy of 419.06 kcal/mol, which is then
+corrected with the D3(BJ) correction for methane (1.20 kcal/mol) to yield a
+predicted atomization energy of 420.26 kcal/mol. Comparing this to the
+literature value of 420.42, leads us to deduce an error of around 0.2 kcal/mol.
+
+It should also be noted that if a closed shell system is run unrestricted it
+can give a small difference between spin densities and eigenvalues with a
+negligible effect on the energy.
+
+
 ## Using DM21 from C++
 
 There are two options for using the DM21 from C++.
