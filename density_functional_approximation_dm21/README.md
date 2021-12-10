@@ -12,7 +12,7 @@ dependencies. This is best done inside a
 [virtual environment](https://docs.python-guide.org/dev/virtualenvs/).
 
 Note: using PySCF 2.0 (or later) enables substantially more efficient
-calculation of the load Hartree-Fock features, resulting in a large speed
+calculation of the local Hartree-Fock features, resulting in a large speed
 increase.
 
 ### Installing directly
