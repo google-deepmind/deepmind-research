@@ -76,27 +76,24 @@ All model predictions are licensed under
 
 ## Running Inference
 
-The simplest way to perform inference is to load the model via tfhub.dev (TODO:
-LINK). The input sequence length is 393,216 with the prediction corresponding to
-128 base pair windows of the center 114,688 base pairs. The input sequence is
-one hot encoded using the order of indices being 'ACGT' with N values being all
+The simplest way to perform inference is to load the model via [tfhub.dev](https://tfhub.dev/deepmind/enformer/1). The input sequence length is 393,216 with the prediction corresponding to 128 base pair windows of the center 114,688 base pairs. The input sequence is one hot encoded using the order of indices being 'ACGT' with N values being all
 zeros.
 
 ```python
-import tensorflow as tf
+import tensorflow.compat.v2 as tf
 import tensorflow_hub as hub
 
-enformer = hub.Module('https://tfhub.dev/deepmind/enformer/1')
+enformer= hub.load("https://tfhub.dev/deepmind/enformer/1").model
 
 SEQ_LENGTH = 393_216
 
-# Numpy array [batch_size, SEQ_LENGTH, 4] one hot encoded in order 'ACGT'. The
+# Input Numpy array [batch_size, SEQ_LENGTH, 4] one hot encoded in order 'ACGT'. The
 # `one_hot_encode` function is available in `enformer.py` and outputs can be
 # stacked to form a batch.
 inputs = tf.zeros((1, SEQ_LENGTH, 4), dtype=tf.float32)
 predictions = enformer.predict_on_batch(inputs)
 predictions['human'].shape  # [batch_size, 896, 5313]
-predictions[mouse].shape  # [batch_size, 896, 1643]
+predictions['mouse'].shape  # [batch_size, 896, 1643]
 ```
 
 ## Outputs
