@@ -1,0 +1,8 @@
+absl-py>0.9
+dill==0.3.2
+dm-haiku
+jax
+optax
+tensorflow
+tensorflow_datasets
+
