@@ -179,7 +179,7 @@ def load(
 
   def cast_fn(batch):
     batch = dict(**batch)
-    batch['images'] = tf.cast(batch['images'], _to_tf_dtype(dtype))
+    batch['images'] = tf.cast(batch['images'], tf.dtypes.as_dtype(dtype))
     return batch
 
   for i, batch_size in enumerate(reversed(batch_dims)):
@@ -220,15 +220,7 @@ def load(
 
   ds = ds.prefetch(AUTOTUNE)
   ds = tfds.as_numpy(ds)
-
-  if dtype == jnp.bfloat16:
-    # JAX and TF disagree on the NumPy bfloat16 type so we need to reinterpret
-    # tf_bfloat16->jnp.bfloat16.
-    for batch in ds:
-      batch['images'] = batch['images'].view(jnp.bfloat16)
-      yield batch
-  else:
-    yield from ds
+  yield from ds
 
 
 def cutmix_padding(h, w):
@@ -327,13 +319,6 @@ def my_mixup_cutmix(batch):
           'labels': tf.concat([mixup_labels, cutmix_labels], axis=0),
           'mix_labels': tf.concat([mixup_mix_labels, cutmix_mix_labels], 0),
           'ratio': tf.concat([mixup_ratio[..., 0, 0, 0], cutmix_ratio], axis=0)}
-
-
-def _to_tf_dtype(jax_dtype: jnp.dtype) -> tf.DType:
-  if jax_dtype == jnp.bfloat16:
-    return tf.bfloat16
-  else:
-    return tf.dtypes.as_dtype(jax_dtype)
 
 
 def _to_tfds_split(split: Split) -> tfds.Split:
