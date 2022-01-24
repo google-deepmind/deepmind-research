@@ -198,7 +198,7 @@ class HierarchicalMemoryAttention(hk.Module):
             key=sub_sub_top_k_contents,
             value=sub_sub_top_k_contents)
         return sub_attention_results
-      do_attention = jax.vmap(do_attention, in_axes=0)
+      do_attention = hk.vmap(do_attention, in_axes=0)
       attention_results = do_attention(sub_inputs, top_k_contents)
       attention_results = jnp.squeeze(attention_results, axis=2)
       # Now collapse results across k memories
@@ -207,8 +207,8 @@ class HierarchicalMemoryAttention(hk.Module):
       return attention_results
 
     # vmap across batch
-    batch_within_memory_attention = jax.vmap(_within_memory_attention,
-                                             in_axes=0)
+    batch_within_memory_attention = hk.vmap(_within_memory_attention,
+                                            in_axes=0)
     outputs = batch_within_memory_attention(
         queries,
         jax.lax.stop_gradient(augmented_contents),
