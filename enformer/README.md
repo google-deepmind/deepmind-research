@@ -80,7 +80,8 @@ The simplest way to perform inference is to load the model via tfhub.dev (TODO:
 LINK). The input sequence length is 393,216 with the prediction corresponding to
 128 base pair windows of the center 114,688 base pairs. The input sequence is
 one hot encoded using the order of indices being 'ACGT' with N values being all
-zeros.
+zeros. Note that only the central 196,608 bp of the input sequence will be used
+by the Enformer model. The rest will be cropped within the model.
 
 ```python
 import tensorflow as tf
