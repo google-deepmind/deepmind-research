@@ -44,6 +44,7 @@ def tagged_autoencoder(all_params, x_in):
   return [[h1, t2], [h2, t2]]
 
 
+@jtu.with_config(jax_numpy_rank_promotion="allow")
 class TestGraphMatcher(jtu.JaxTestCase):
   """Class for running all of the tests for integrating the systems."""
 

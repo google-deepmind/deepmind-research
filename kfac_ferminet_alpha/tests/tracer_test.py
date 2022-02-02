@@ -44,6 +44,7 @@ def autoencoder_aux(all_aux, all_params, x_in):
   return [l1, l2 * 0.1], layers_values
 
 
+@jtu.with_config(jax_numpy_rank_promotion="allow")
 class TestTracer(jtu.JaxTestCase):
   """Class for running all of the tests for integrating the systems."""
 
