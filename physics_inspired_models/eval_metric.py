@@ -185,6 +185,7 @@ def find_best_polynomial(data_x, data_y, max_poly_order, rsq_threshold,
       except KeyboardInterrupt:
         time_end = time.perf_counter()
         print(f'Timed out after {time_end-time_start}s of doing grid search.')
+        # pytype: disable=name-error  # py39-upgrade
         print(f'Continuing with previous poly_order={old_poly_order}...')
         regressor = old_regressor
         poly_order = old_poly_order
@@ -192,6 +193,7 @@ def find_best_polynomial(data_x, data_y, max_poly_order, rsq_threshold,
         data_x_exp = old_data_x_exp
         rsq = old_rsq
         clf = old_clf
+        # pytype: enable=name-error  # py39-upgrade
         print(f'Polynomial of order {poly_order} with '
               f' alpha={regressor.best_params_} RSQ: {rsq}')
         break
