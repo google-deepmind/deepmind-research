@@ -20,6 +20,12 @@ The provided post-processed nowcasting dataset is licensed under a
 public sector information licensed by the Met Office under the
 [Open Government Licence v3.0][open-govt-license].
 
+## Pseudocode
+The pseudocode is relased in the same cloud storage bucket as the datasets:
+`gs://dm-nowcasting-example-data/pseudocode.zip`.
+You can access it with e.g. a [gsutil](https://cloud.google.com/storage/docs/gsutil).
+
+
 ## Citation
 
 If you use this work, consider citing our paper:
