@@ -735,10 +735,12 @@ def _build_sequence_example(sequences):
       start_of_episode=(),
       extras=())
 
-  info = reverb.SampleInfo(key=tf.constant(0, tf.uint64),
-                           probability=tf.constant(1.0, tf.float64),
-                           table_size=tf.constant(0, tf.int64),
-                           priority=tf.constant(1.0, tf.float64))
+  info = reverb.SampleInfo(
+      key=tf.constant(0, tf.uint64),
+      probability=tf.constant(1.0, tf.float64),
+      table_size=tf.constant(0, tf.int64),
+      priority=tf.constant(1.0, tf.float64),
+      times_sampled=tf.constant(1.0, tf.int32))
   return reverb.ReplaySample(info=info, data=data)
 
 
@@ -752,10 +754,12 @@ def _build_sarsa_example(sequences):
   r_t = tree.map_structure(lambda t: t[0], sequences['reward'])
   p_t = tree.map_structure(lambda t: t[0], sequences['discount'])
 
-  info = reverb.SampleInfo(key=tf.constant(0, tf.uint64),
-                           probability=tf.constant(1.0, tf.float64),
-                           table_size=tf.constant(0, tf.int64),
-                           priority=tf.constant(1.0, tf.float64))
+  info = reverb.SampleInfo(
+      key=tf.constant(0, tf.uint64),
+      probability=tf.constant(1.0, tf.float64),
+      table_size=tf.constant(0, tf.int64),
+      priority=tf.constant(1.0, tf.float64),
+      times_sampled=tf.constant(1.0, tf.int32))
   return reverb.ReplaySample(info=info, data=(o_tm1, a_tm1, r_t, p_t, o_t, a_t))
 
 

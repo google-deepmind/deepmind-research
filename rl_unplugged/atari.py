@@ -143,10 +143,12 @@ def _make_reverb_sample(o_t: tf.Tensor,
   Returns:
     Replay sample with fake info: key=0, probability=1, table_size=0.
   """
-  info = reverb.SampleInfo(key=tf.constant(0, tf.uint64),
-                           probability=tf.constant(1.0, tf.float64),
-                           table_size=tf.constant(0, tf.int64),
-                           priority=tf.constant(1.0, tf.float64))
+  info = reverb.SampleInfo(
+      key=tf.constant(0, tf.uint64),
+      probability=tf.constant(1.0, tf.float64),
+      table_size=tf.constant(0, tf.int64),
+      priority=tf.constant(1.0, tf.float64),
+      times_sampled=tf.constant(1, tf.int32))
   data = (o_t, a_t, r_t, d_t, o_tp1, a_tp1, extras)
   return reverb.ReplaySample(info=info, data=data)
 
