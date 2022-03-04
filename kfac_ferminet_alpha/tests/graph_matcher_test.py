@@ -12,11 +12,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import unittest
+
 from absl.testing import absltest
 import jax
 import jax.numpy as jnp
 import jax.random as jnr
-import jax.test_util as jtu
 
 from kfac_ferminet_alpha import layers_and_loss_tags
 from kfac_ferminet_alpha import loss_functions
@@ -44,8 +45,7 @@ def tagged_autoencoder(all_params, x_in):
   return [[h1, t2], [h2, t2]]
 
 
-@jtu.with_config(jax_numpy_rank_promotion="allow")
-class TestGraphMatcher(jtu.JaxTestCase):
+class TestGraphMatcher(unittest.TestCase):
   """Class for running all of the tests for integrating the systems."""
 
   def _test_jaxpr(self, init_func, model_func, tagged_model, data_shape):
