@@ -15,6 +15,7 @@
 
 """Composer entities corresponding to game boards."""
 
+import copy
 import os
 
 from dm_control import composer
@@ -179,7 +180,9 @@ class CheckerBoard(composer.Entity):
   def before_substep(self, physics, random_state):
     del random_state  # Unused.
     # Cache a copy of the array of active contacts before each substep.
-    self._contact_from_before_substep = physics.data.contact.copy()
+    self._contact_from_before_substep = [
+        copy.copy(c) for c in physics.data.contact
+    ]
 
   def validate_finger_touch(self, physics, row, col, hand):
     # Geom for the board square
@@ -207,13 +210,14 @@ class CheckerBoard(composer.Entity):
     # longer contains any active contacts involving the board geoms, even though
     # the touch sensors are telling us that one of the squares on the board is
     # being pressed.
-    contact = self._contact_from_before_substep
-    involves_geom = (contact.geom1 == geom_id) | (contact.geom2 == geom_id)
-    [relevant_contact_ids] = np.where(involves_geom)
-    if relevant_contact_ids.size:
+    contacts = self._contact_from_before_substep
+    relevant_contacts = [
+        c for c in contacts if c.geom1 == geom_id or c.geom2 == geom_id
+    ]
+    if relevant_contacts:
       # If there are multiple contacts involving this square of the board, just
       # pick the first one.
-      return contact[relevant_contact_ids[0]].pos.copy()
+      return relevant_contacts[0].pos.copy()
     else:
       print("Touch sensor at ({},{}) doesn't have any active contacts!".format(
           row, col))
