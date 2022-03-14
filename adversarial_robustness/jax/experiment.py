@@ -480,8 +480,9 @@ class Experiment(experiment.AbstractExperiment):
 
   def _extra_train_dataset(self) -> tfds.typing.Tree[np.ndarray]:
     """Creates the training dataset."""
-    load_fn = (datasets.load_dummy_data if self.config.dry_run else
-               datasets.load_extra)
+    load_extra_fn = (self.config.training.get('load_extra_fn', None) or
+                     datasets.load_extra)
+    load_fn = datasets.load_dummy_data if self.config.dry_run else load_extra_fn
     load_fn = functools.partial(
         load_fn, path_npz=self.config.training.extra_data_path)
     ds = _dataset(
