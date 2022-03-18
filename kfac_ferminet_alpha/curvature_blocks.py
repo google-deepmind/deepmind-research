@@ -336,8 +336,8 @@ class ScaleAndShiftDiagonal(CurvatureBlock):
       axis = [i for i, s in enumerate(full_scale_shape) if s == 1 and i != 0]
       d_scale = jnp.sum(x * dy, axis=axis)
       scale_diag_update = jnp.sum(d_scale * d_scale, axis=0) / batch_size
-      self.scale_factor.update(scale_diag_update, ema_old, ema_new)
-      self.scale_factor.sync(pmap_axis_name)
+      self.scale_factor.update(scale_diag_update, ema_old, ema_new)  # pytype: disable=attribute-error  # trace-all-classes
+      self.scale_factor.sync(pmap_axis_name)  # pytype: disable=attribute-error  # trace-all-classes
 
     if self.has_shift:
       assert self.shift_factor is not None
@@ -346,8 +346,8 @@ class ScaleAndShiftDiagonal(CurvatureBlock):
       axis = [i for i, s in enumerate(full_shift_shape) if s == 1 and i != 0]
       d_shift = jnp.sum(dy, axis=axis)
       shift_diag_update = jnp.sum(d_shift * d_shift, axis=0) / batch_size
-      self.shift_factor.update(shift_diag_update, ema_old, ema_new)
-      self.shift_factor.sync(pmap_axis_name)
+      self.shift_factor.update(shift_diag_update, ema_old, ema_new)  # pytype: disable=attribute-error  # trace-all-classes
+      self.shift_factor.sync(pmap_axis_name)  # pytype: disable=attribute-error  # trace-all-classes
 
   def update_curvature_inverse_estimate(
       self,
@@ -363,11 +363,11 @@ class ScaleAndShiftDiagonal(CurvatureBlock):
       diagonal_weight: Union[float, jnp.ndarray]
   ) -> _Arrays:
     if self.has_scale and self.has_shift:
-      factors = (self.scale_factor.value, self.shift_factor.value)
+      factors = (self.scale_factor.value, self.shift_factor.value)  # pytype: disable=attribute-error  # trace-all-classes
     elif self.has_scale:
-      factors = (self.scale_factor.value,)
+      factors = (self.scale_factor.value,)  # pytype: disable=attribute-error  # trace-all-classes
     elif self.has_shift:
-      factors = (self.shift_factor.value,)
+      factors = (self.shift_factor.value,)  # pytype: disable=attribute-error  # trace-all-classes
     else:
       raise ValueError("Neither `has_scale` nor `has_shift`.")
     factors = jax.tree_map(lambda x: x + diagonal_weight, factors)

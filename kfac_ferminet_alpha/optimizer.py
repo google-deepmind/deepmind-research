@@ -449,7 +449,7 @@ class Optimizer(utils.Stateful):
     # The learning rate is defined as the negative of the coefficient by which
     # we multiply the gradients, while the momentum is the coefficient by
     # which we multiply the velocities.
-    neg_learning_rate = -learning_rate
+    neg_learning_rate = -learning_rate  # pytype: disable=unsupported-operands  # trace-all-classes
     # Compute the coefficients of the update vectors
     assert neg_learning_rate is not None and momentum is not None
     coefficients = (neg_learning_rate, momentum)

@@ -130,7 +130,7 @@ class CurvatureEstimator(utils.Stateful):
       if eqn.primitive.name == "generic_tag":
         block_vars = eqn.invars
       else:
-        block_vars = eqn.primitive.split_all_inputs(eqn.invars)[2]
+        block_vars = eqn.primitive.split_all_inputs(eqn.invars)[2]  # pytype: disable=attribute-error  # trace-all-classes
       per_block_vectors.append(tuple(params_dict.pop(v) for v in block_vars))
     if params_dict:
       raise ValueError(f"From the parameters the following structure is not "
@@ -148,7 +148,7 @@ class CurvatureEstimator(utils.Stateful):
       if eqn.primitive.name == "generic_tag":
         block_params = eqn.invars
       else:
-        block_params = eqn.primitive.split_all_inputs(eqn.invars)[2]
+        block_params = eqn.primitive.split_all_inputs(eqn.invars)[2]  # pytype: disable=attribute-error  # trace-all-classes
       assigned_dict.update(zip(block_params, block_values))
     params_vars_flat, params_tree = jax.tree_flatten(params_vars)
     params_values_flat = [assigned_dict[v] for v in params_vars_flat]
