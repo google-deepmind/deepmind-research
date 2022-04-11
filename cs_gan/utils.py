@@ -1,4 +1,3 @@
-# python3
 
 # Copyright 2019 DeepMind Technologies Limited and Google LLC
 #
