@@ -80,6 +80,12 @@ class LossTag(jax_core.Primitive):
     return self.get_outputs(*args, weight=weight, return_loss=return_loss)
 
   def abstract_eval(self, *args, weight: float, return_loss: bool, **kwargs):
+    jax_version = (
+        jax.__version_info__ if hasattr(jax, "__version_info__")
+        else tuple(map(int, jax.__version__.split("."))))
+    if jax_version > (0, 3, 4):
+      return (self.get_outputs(*args, weight=weight, return_loss=return_loss),
+              jax_core.no_effects)
     return self.get_outputs(*args, weight=weight, return_loss=return_loss)
 
   def xla_translation(
@@ -176,6 +182,11 @@ class LayerTag(jax_core.Primitive):
     return self.get_outputs(*operands, **kwargs)
 
   def abstract_eval(self, *abstract_operands, **kwargs):
+    jax_version = (
+        jax.__version_info__ if hasattr(jax, "__version_info__")
+        else tuple(map(int, jax.__version__.split("."))))
+    if jax_version > (0, 3, 4):
+      return self.get_outputs(*abstract_operands, **kwargs), jax_core.no_effects
     return self.get_outputs(*abstract_operands, **kwargs)
 
   def batching(self, batched_operands, batched_dims, **kwargs):
