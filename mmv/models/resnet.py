@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Lint as: python3.
 """ResNet V2 modules.
 
   Equivalent to hk.Resnet except accepting a final_endpoint to return
