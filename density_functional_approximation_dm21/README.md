@@ -47,23 +47,6 @@ pip install '.[testing]'
 py.test
 ```
 
-Alternatively, conda can be used to manage the installation of the dependencies
-instead. Please see the [conda documentation](https://docs.conda.io/en/latest/)
-for install instructions. Both miniconda and anaconda work. Given a working
-conda installation, and having cloned the deepmind_research repository :
-
-```shell
-conda create -n dm21
-conda activate dm21
-conda install absl-py "h5py<3.3.0" numpy pytest scipy tensorflow
-conda install -c pyscf pyscf
-conda install -c conda-forge tensorflow-hub
-git clone https://github.com/deepmind/deepmind-research.git
-cd deepmind-research/density_functional_approximation_dm21
-pip install .
-py.test
-```
-
 ## PySCF interface
 
 A typical DFT calculation with PySCF is set up and run using:
