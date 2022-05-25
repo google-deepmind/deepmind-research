@@ -120,8 +120,9 @@ df_targets.shape  # (5313, 8) With rows match output shape above.
 
 The model is implemented using [Sonnet](https://github.com/deepmind/sonnet). The
 full sonnet module is defined in `enformer.py` called Enformer. See
-[enformer-training.ipynb](https://colab.research.google.com/github/deepmind/deepmind_research/blob/master/enformer/enformer-training.ipynb).
-on how to train the model on Basenji2 data.
+[enformer-training.ipynb](https://colab.research.google.com/github/deepmind/deepmind_research/blob/master/enformer/enformer-training.ipynb)
+on how to train the model on Basenji2 data and how to load the pre-trained
+weights into the Enformer module for fine-tuning.
 
 ## Colab
 
@@ -143,6 +144,7 @@ This colab shows how to:
 * Setup training data by directly accessing the Basenji2 data on GCS
 * Train the model for a few steps on both human and mouse genomes
 * Evaluate the model on human and mouse genomes
+* Restore the model from a checkpoint for fine-tuning
 
 ## Disclaimer
 
