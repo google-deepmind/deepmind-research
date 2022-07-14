@@ -180,7 +180,7 @@ class CurvatureEstimator(utils.Stateful):
     """Executes func for each approximation block on vectors."""
     per_block_vectors = self.vectors_to_blocks(parameter_structured_vector)
     assert len(per_block_vectors) == len(self.blocks)
-    results = jax.tree_multimap(func, tuple(self.blocks.values()),
+    results = jax.tree_map(func, tuple(self.blocks.values()),
                                 per_block_vectors)
     parameter_structured_result = self.blocks_to_vectors(results)
     utils.check_structure_shapes_and_dtype(parameter_structured_vector,

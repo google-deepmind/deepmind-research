@@ -462,7 +462,7 @@ class Optimizer(utils.Stateful):
     )
 
     # Update parameters: params = params + delta
-    params = jax.tree_multimap(jnp.add, params, delta)
+    params = jax.tree_map(jnp.add, params, delta)
 
     # Optionally compute the reduction ratio and update the damping
     self.estimator.damping = None
@@ -607,5 +607,5 @@ class Optimizer(utils.Stateful):
     assert len(vectors) == len(coefficients)
     delta = utils.scalar_mul(vectors[0], coefficients[0])
     for vi, wi in zip(vectors[1:], coefficients[1:]):
-      delta = jax.tree_multimap(jnp.add, delta, utils.scalar_mul(vi, wi))
+      delta = jax.tree_map(jnp.add, delta, utils.scalar_mul(vi, wi))
     return delta, delta

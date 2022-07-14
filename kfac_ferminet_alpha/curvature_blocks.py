@@ -372,9 +372,9 @@ class ScaleAndShiftDiagonal(CurvatureBlock):
       raise ValueError("Neither `has_scale` nor `has_shift`.")
     factors = jax.tree_map(lambda x: x + diagonal_weight, factors)
     if exp == 1:
-      return jax.tree_multimap(jnp.multiply, vec, factors)
+      return jax.tree_map(jnp.multiply, vec, factors)
     elif exp == -1:
-      return jax.tree_multimap(jnp.divide, vec, factors)
+      return jax.tree_map(jnp.divide, vec, factors)
     else:
       raise NotImplementedError()
 

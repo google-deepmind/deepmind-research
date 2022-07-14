@@ -120,7 +120,7 @@ def extract_func_outputs(
 def inner_product(obj1: T, obj2: T) -> jnp.ndarray:
   if jax.tree_structure(obj1) != jax.tree_structure(obj2):
     raise ValueError("The two structures are not identical.")
-  elements_product = jax.tree_multimap(lambda x, y: jnp.sum(x * y), obj1, obj2)
+  elements_product = jax.tree_map(lambda x, y: jnp.sum(x * y), obj1, obj2)
   return sum(jax.tree_flatten(elements_product)[0])
 
 
