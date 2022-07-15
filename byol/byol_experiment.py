@@ -323,7 +323,7 @@ class ByolExperiment:
 
     # cross-device grad and logs reductions
     grads = jax.tree_map(lambda v: jax.lax.pmean(v, axis_name='i'), grads)
-    logs = jax.tree_multimap(lambda x: jax.lax.pmean(x, axis_name='i'), logs)
+    logs = jax.tree_map(lambda x: jax.lax.pmean(x, axis_name='i'), logs)
 
     learning_rate = schedules.learning_schedule(
         global_step,
@@ -339,7 +339,7 @@ class ByolExperiment:
         global_step,
         base_ema=self._base_target_ema,
         max_steps=self._max_steps)
-    target_params = jax.tree_multimap(lambda x, y: x + (1 - tau) * (y - x),
+    target_params = jax.tree_map(lambda x, y: x + (1 - tau) * (y - x),
                                       target_params, online_params)
     logs['tau'] = tau
     logs['learning_rate'] = learning_rate
@@ -518,7 +518,7 @@ class ByolExperiment:
       if summed_scalars is None:
         summed_scalars = scalars
       else:
-        summed_scalars = jax.tree_multimap(jnp.add, summed_scalars, scalars)
+        summed_scalars = jax.tree_map(jnp.add, summed_scalars, scalars)
 
     mean_scalars = jax.tree_map(lambda x: x / num_samples, summed_scalars)
     return mean_scalars

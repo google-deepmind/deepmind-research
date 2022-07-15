@@ -51,7 +51,7 @@ def _partial_update(updates: optax.Updates,
     m = m.astype(g.dtype)
     return g * (1. - m) + t * m
 
-  return jax.tree_multimap(_update_fn, updates, new_updates, params_to_filter)
+  return jax.tree_map(_update_fn, updates, new_updates, params_to_filter)
 
 
 class ScaleByLarsState(NamedTuple):
@@ -78,7 +78,7 @@ def scale_by_lars(
   """
 
   def init_fn(params: optax.Params) -> ScaleByLarsState:
-    mu = jax.tree_multimap(jnp.zeros_like, params)  # momentum
+    mu = jax.tree_map(jnp.zeros_like, params)  # momentum
     return ScaleByLarsState(mu=mu)
 
   def update_fn(updates: optax.Updates, state: ScaleByLarsState,
@@ -95,10 +95,10 @@ def scale_by_lars(
           jnp.where(update_norm > 0,
                     (eta * param_norm / update_norm), 1.0), 1.0)
 
-    adapted_updates = jax.tree_multimap(lars_adaptation, updates, params)
+    adapted_updates = jax.tree_map(lars_adaptation, updates, params)
     adapted_updates = _partial_update(updates, adapted_updates, params,
                                       filter_fn)
-    mu = jax.tree_multimap(lambda g, t: momentum * g + t,
+    mu = jax.tree_map(lambda g, t: momentum * g + t,
                            state.mu, adapted_updates)
     return mu, ScaleByLarsState(mu=mu)
 
@@ -130,7 +130,7 @@ def add_weight_decay(
       state: AddWeightDecayState,
       params: optax.Params,
   ) -> Tuple[optax.Updates, AddWeightDecayState]:
-    new_updates = jax.tree_multimap(lambda g, p: g + weight_decay * p, updates,
+    new_updates = jax.tree_map(lambda g, p: g + weight_decay * p, updates,
                                     params)
     new_updates = _partial_update(updates, new_updates, params, filter_fn)
     return new_updates, state

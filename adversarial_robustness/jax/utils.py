@@ -124,7 +124,7 @@ def ema_update(step: chex.Array,
   def _weighted_average(p1, p2):
     d = decay.astype(p1.dtype)
     return (1 - d) * p1 + d * p2
-  return jax.tree_multimap(_weighted_average, new_params, avg_params)
+  return jax.tree_map(_weighted_average, new_params, avg_params)
 
 
 def cutmix(rng: chex.PRNGKey,

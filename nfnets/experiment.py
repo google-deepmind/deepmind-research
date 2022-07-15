@@ -270,8 +270,8 @@ class Experiment(experiment.AbstractExperiment):
     if ema_params is not None:
       ema_fn = getattr(utils, self.config.get('which_ema', 'tf1_ema'))
       ema = lambda x, y: ema_fn(x, y, self.config.ema_decay, global_step)
-      ema_params = jax.tree_multimap(ema, ema_params, params)
-      ema_states = jax.tree_multimap(ema, ema_states, states)
+      ema_params = jax.tree_map(ema, ema_params, params)
+      ema_states = jax.tree_map(ema, ema_states, states)
     return {
         'params': params,
         'states': states,
@@ -354,7 +354,7 @@ class Experiment(experiment.AbstractExperiment):
       if summed_metrics is None:
         summed_metrics = metrics
       else:
-        summed_metrics = jax.tree_multimap(jnp.add, summed_metrics, metrics)
+        summed_metrics = jax.tree_map(jnp.add, summed_metrics, metrics)
     mean_metrics = jax.tree_map(lambda x: x / num_samples, summed_metrics)
     return jax.device_get(mean_metrics)
 

@@ -829,7 +829,7 @@ class DiscreteDynamicsNetwork(hk.Module):
       if len(yt) == 1:
         yt = yt[0][:, None]
       else:
-        yt = jax.tree_multimap(lambda args: jnp.stack(args, 1), yt)
+        yt = jax.tree_map(lambda args: jnp.stack(args, 1), yt)
     if return_stats:
       return yt, dict()
     else:

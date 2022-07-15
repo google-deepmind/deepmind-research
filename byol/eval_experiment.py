@@ -471,7 +471,7 @@ class EvalExperiment:
       if summed_scalars is None:
         summed_scalars = scalars
       else:
-        summed_scalars = jax.tree_multimap(jnp.add, summed_scalars, scalars)
+        summed_scalars = jax.tree_map(jnp.add, summed_scalars, scalars)
 
     mean_scalars = jax.tree_map(lambda x: x / num_samples, summed_scalars)
     return mean_scalars

@@ -204,7 +204,7 @@ def solve_ivp_dt(
     for t_and_dt_i in zip(t, dt):
       y.append(loop_body(y[-1], t_and_dt_i)[0])
     # Note that we do not return the initial point
-    return t_eval, jax.tree_multimap(lambda *args: jnp.stack(args, axis=0),
+    return t_eval, jax.tree_map(lambda *args: jnp.stack(args, axis=0),
                                      *y[1:])
 
 
@@ -252,7 +252,7 @@ def solve_ivp_dt_two_directions(
     )[1]
     yt.append(yt_fwd)
   if len(yt) > 1:
-    return jax.tree_multimap(lambda *a: jnp.concatenate(a, axis=0), *yt)
+    return jax.tree_map(lambda *a: jnp.concatenate(a, axis=0), *yt)
   else:
     return yt[0]
 

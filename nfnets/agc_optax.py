@@ -72,7 +72,7 @@ def adaptive_grad_clip(clip, eps=1e-3) -> optax.GradientTransformation:
     # Maximum allowable norm
     max_norm = jax.tree_map(lambda x: clip * jnp.maximum(x, eps), p_norm)
     # If grad norm > clipping * param_norm, rescale
-    updates = jax.tree_multimap(my_clip, g_norm, max_norm, updates)
+    updates = jax.tree_map(my_clip, g_norm, max_norm, updates)
     return updates, state
 
   return optax.GradientTransformation(init_fn, update_fn)

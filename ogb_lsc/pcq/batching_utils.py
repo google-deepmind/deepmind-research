@@ -107,7 +107,7 @@ def _batch_np(graphs: Sequence[jraph.GraphsTuple]) -> jraph.GraphsTuple:
 
   def _map_concat(nests):
     concat = lambda *args: np.concatenate(args)
-    return tree.tree_multimap(concat, *nests)
+    return tree.tree_map(concat, *nests)
 
   return jraph.GraphsTuple(
       n_node=np.concatenate([g.n_node for g in graphs]),

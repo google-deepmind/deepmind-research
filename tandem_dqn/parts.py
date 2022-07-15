@@ -277,7 +277,7 @@ class UnbiasedExponentialWeightedAverageAgentTracker:
       # 0 * NaN == NaN just replace self._statistics on the first step.
       self._statistics = dict(agent.statistics)
     else:
-      self._statistics = jax.tree_multimap(
+      self._statistics = jax.tree_map(
           lambda s, x: (1 - final_step_size) * s + final_step_size * x,
           self._statistics, agent.statistics)
 

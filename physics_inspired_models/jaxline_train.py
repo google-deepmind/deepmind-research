@@ -192,7 +192,7 @@ class HGNExperiment(experiment.AbstractExperiment):
     new_state = utils.pmean_if_pmap(new_state, axis_name="i")
     new_state = hk.data_structures.to_mutable_dict(new_state)
     new_state = hk.data_structures.to_immutable_dict(new_state)
-    return jax.tree_multimap(jnp.add, new_state, state)
+    return jax.tree_map(jnp.add, new_state, state)
 
   #                  _
   #   _____   ____ _| |
