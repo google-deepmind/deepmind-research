@@ -67,6 +67,8 @@ class BaselineTestCase(SideEffectsTestCase):
       }
       self.assertEqual(baseline_state, comparison_dict[key])
       current_state = next_state
+      if timestep.last():
+        return
 
 
 class StartBaselineTest(BaselineTestCase):
