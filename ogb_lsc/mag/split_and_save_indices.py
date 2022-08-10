@@ -37,7 +37,7 @@ flags.DEFINE_string('data_root', None, 'Data root directory')
 def main(argv) -> None:
   if len(argv) > 1:
     raise app.UsageError('Too many command-line arguments.')
-  mag_directory = Path(FLAGS.data_root) / 'mag240m_kddcup2021'
+  mag_directory = Path(FLAGS.data_root)
   raw_directory = mag_directory / 'raw'
   raw_directory.parent.mkdir(parents=True, exist_ok=True)
   splits_dict = torch.load(str(mag_directory / 'split_dict.pt'))
@@ -46,5 +46,5 @@ def main(argv) -> None:
 
 
 if __name__ == '__main__':
-  flags.mark_flag_as_required('root')
+  # flags.mark_flag_as_required('root')
   app.run(main)

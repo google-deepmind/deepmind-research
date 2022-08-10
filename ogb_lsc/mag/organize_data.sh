@@ -46,10 +46,9 @@ if [[ -z "${TASK_ROOT}" ]]; then
   exit 1
 fi
 
-DATA_ROOT="${TASK_ROOT}"/data
-
+DATA_ROOT="${TASK_ROOT}/data/mag240m_kddcup2021"
 # Create raw directory to move all files to it.
-mkdir "${INPUT_DIR}"/mag240m_kddcup2021/raw
+mkdir -p "${DATA_ROOT}/raw"
 
 mv "${INPUT_DIR}"/mag240m_kddcup2021/processed/paper/node_feat.npy \
    "${INPUT_DIR}"/mag240m_kddcup2021/processed/paper/node_label.npy \
@@ -57,11 +56,13 @@ mv "${INPUT_DIR}"/mag240m_kddcup2021/processed/paper/node_feat.npy \
    "${DATA_ROOT}"/raw
 mv "${INPUT_DIR}"/mag240m_kddcup2021/processed/author___affiliated_with___institution/edge_index.npy \
    "${DATA_ROOT}"/raw/author_affiliated_with_institution_edges.npy
-mv "${ROOT}"/mag240m_kddcup2021/processed/author___writes___paper/edge_index.npy \
+mv "${INPUT_DIR}"/mag240m_kddcup2021/processed/author___writes___paper/edge_index.npy \
    "${DATA_ROOT}"/raw/author_writes_paper_edges.npy
-mv "${ROOT}"/mag240m_kddcup2021/processed/paper___cites___paper/edge_index.npy \
+mv "${INPUT_DIR}"/mag240m_kddcup2021/processed/paper___cites___paper/edge_index.npy \
    "${DATA_ROOT}"/raw/paper_cites_paper_edges.npy
+mv "${INPUT_DIR}"/mag240m_kddcup2021/split_dict.pt \
+   "${DATA_ROOT}"/split_dict.pt
 
 # Split and save the train/valid/test indices to the raw directory, with names
-"train_idx.npy", "valid_idx.npy", "test_idx.npy":
+#"train_idx.npy", "valid_idx.npy", "test_idx.npy".
 python3 "${SCRIPT_DIR}"/split_and_save_indices.py --data_root=${DATA_ROOT}
