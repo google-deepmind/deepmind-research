@@ -650,6 +650,7 @@ class NeuralNumInt(numint.NumInt):
       spin: int = 0,
       relativity: int = 0,
       deriv: int = 1,
+      omega: Optional[float] = None,
       verbose=None
   ) -> Tuple[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray],
              None, None]:
@@ -670,8 +671,9 @@ class NeuralNumInt(numint.NumInt):
         details.
       spin: 0 for a spin-unpolarized (restricted Kohn-Sham) calculation, and
         spin-polarized (unrestricted) otherwise.
-      relativity: unused.
+      relativity: Not supported.
       deriv: unused. The first functional derivatives are always computed.
+      omega: RSH parameter. Not supported.
       verbose: unused.
 
     Returns:
@@ -685,7 +687,14 @@ class NeuralNumInt(numint.NumInt):
         kxc is set to None. (The third-order functional derivatives are not
         computed.)
     """
-    del xc_code, verbose, relativity, deriv  # unused
+    del xc_code, verbose, deriv  # unused
+
+    if relativity != 0:
+      raise NotImplementedError('Relatistic calculations are not implemented '
+                                'for DM21 functionals.')
+    if omega is not None:
+      raise NotImplementedError('User-specifed range seperation parameters are '
+                                'not implemented for DM21 functionals.')
 
     # Retrieve cached state.
     ao = self._grid_state.ao
