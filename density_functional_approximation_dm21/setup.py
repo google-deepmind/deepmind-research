@@ -19,12 +19,13 @@ from setuptools import setup
 REQUIRED_PACKAGES = [
     'absl-py',
     'attrs',
-    # PySCF 1.7.6 and older do not support h5py 3.3.0:
+    # Note PySCF 1.7.6 and older do not support h5py 3.3.0:
     # https://github.com/pyscf/pyscf/issues/1016
-    # If using PySCF 2.0 or later, this restriction can be lifted.
-    'h5py<3.3.0',
+    'h5py',
     'numpy',
-    'pyscf',
+    # Note DM21 functionals are compatible with PySCF 1.7.6 if an older version
+    # of h5py is used.
+    'pyscf>=2.0',
     'tensorflow',
     'tensorflow_hub',
 ]
