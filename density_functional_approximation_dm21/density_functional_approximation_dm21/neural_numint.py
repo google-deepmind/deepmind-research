@@ -786,4 +786,7 @@ class NeuralNumInt(numint.NumInt):
 
     fxc = None  # Second derivative not implemented
     kxc = None  # Second derivative not implemented
-    return exc, (vxc_0, vxc_1, vxc_2, vxc_3), fxc, kxc
+    # PySCF C routines expect float64.
+    exc = exc.astype(np.float64)
+    vxc = tuple(v.astype(np.float64) for v in (vxc_0, vxc_1, vxc_2, vxc_3))
+    return exc, vxc, fxc, kxc
