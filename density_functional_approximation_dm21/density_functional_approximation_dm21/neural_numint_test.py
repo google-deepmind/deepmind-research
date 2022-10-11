@@ -62,6 +62,7 @@ class NeuralNumintTest(tf.test.TestCase, parameterized.TestCase):
     mol.build()
 
     mf = dft.RKS(mol)
+    mf.small_rho_cutoff = 1.e-20
     mf._numint = ni
     mf.run()
     self.assertAlmostEqual(mf.e_tot, expected_energy, delta=2.e-4)
@@ -94,6 +95,7 @@ class NeuralNumintTest(tf.test.TestCase, parameterized.TestCase):
     mol.build()
 
     mf = dft.UKS(mol)
+    mf.small_rho_cutoff = 1.e-20
     mf._numint = ni
     mf.run()
     self.assertAlmostEqual(mf.e_tot, expected_energy, delta=2.e-4)
@@ -108,6 +110,7 @@ class NeuralNumintTest(tf.test.TestCase, parameterized.TestCase):
 
     ni = neural_numint.NeuralNumInt(neural_numint.Functional.DM21)
     mf = dft.UKS(mol)
+    mf.small_rho_cutoff = 1.e-20
     mf._numint = ni
     mf.run()
 
