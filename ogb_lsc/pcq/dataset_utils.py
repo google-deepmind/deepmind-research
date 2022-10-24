@@ -289,6 +289,7 @@ def _load_smiles(
   elif split == "train":
     indices = datasets.load_all_except_kth_fold_indices(
         data_root, k_fold_split_id, num_k_fold_splits)
+    indices += datasets.load_splits()["train"]
   else:
     assert split == "valid"
     indices = datasets.load_kth_fold_indices(data_root, k_fold_split_id)
