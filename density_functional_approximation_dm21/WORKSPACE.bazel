@@ -37,8 +37,8 @@ http_archive(
     name = "org_tensorflow",
     patch_args = ["-p1"],
     patches = ["tf_bazel.patch"],
-    strip_prefix = "tensorflow-2.7.0",
-    urls = ["https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.7.0.tar.gz"],
+    strip_prefix = "tensorflow-2.10.0",
+    urls = ["https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.10.0.tar.gz"],
 )
 
 # The cascade of load() statements and tf_workspace?() calls works around the
