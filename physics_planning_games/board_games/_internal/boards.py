@@ -241,7 +241,7 @@ class CheckerBoard(composer.Entity):
 class GoBoard(CheckerBoard):
   """An entity representing a Goboard."""
 
-  def _build(self, boardsize=7, square_halfwidth=0.05):
+  def _build(self, boardsize=7, square_halfwidth=0.05):  # pytype: disable=signature-mismatch  # overriding-default-value-checks
     """Builds a `GoBoard` entity.
 
     Args:
