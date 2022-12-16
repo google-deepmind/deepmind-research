@@ -62,7 +62,7 @@ class TicTacToeGameLogic(logic_base.OpenSpielBasedLogic):
       unmarked squares, x's (player 0) and y's (player 1).
     """
     board_state = np.reshape(
-        np.array(self._open_spiel_state.observation_tensor(0), dtype=np.bool),
+        np.array(self._open_spiel_state.observation_tensor(0), dtype=bool),
         [3, 3, 3])
     board_state = np.transpose(board_state, [1, 2, 0])
     board_state = board_state[:, :, [0, 2, 1]]
