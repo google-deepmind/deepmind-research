@@ -28,7 +28,7 @@ class AbstractCombiner(targets.AbstractTarget):
   """Combines a set of rewards, possibly weighted."""
 
   @abc.abstractmethod
-  def __call__(self, values: List[float],
+  def __call__(self, values: List[float],  # pytype: disable=signature-mismatch  # overriding-return-type-checks
                weights: Optional[List[float]] = None) -> List[float]:
     """Combines a set of rewards, possibly weighted."""
 
