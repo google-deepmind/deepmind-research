@@ -6,23 +6,36 @@ Subject: [PATCH] Set dependencies for saved_model_compile_aot rule,
  tensorflow, and absl version.
 
 ---
- tensorflow/compiler/tf2xla/BUILD  | 2 +-
- tensorflow/python/tools/tools.bzl | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ tensorflow/compiler/tf2xla/BUILD              | 2 +-
+ tensorflow/compiler/xla/mlir/ir/runtime/BUILD | 1 +
+ tensorflow/python/tools/tools.bzl             | 4 ++--
+ 3 files changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/tensorflow/compiler/tf2xla/BUILD b/tensorflow/compiler/tf2xla/BUILD
 index cfe63b16675..cd273aaf29e 100644
 --- a/tensorflow/compiler/tf2xla/BUILD
 +++ b/tensorflow/compiler/tf2xla/BUILD
 @@ -235,7 +235,7 @@ cc_library(
-     copts = runtime_copts() + tf_openmp_copts(),
-     features = ["fully_static_link"],
+         "-parse_headers",
+     ],
      linkstatic = 1,
 -    visibility = [":friends"],
 +    visibility = ["//visibility:public"],
      # Note, we specifically removed MKL and multithreaded dependencies so the
      # standalone does not require the MKL binary blob or threading libraries.
      #
+diff --git a/tensorflow/compiler/xla/mlir/ir/runtime/BUILD b/tensorflow/compiler/xla/mlir/ir/runtime/BUILD
+index 8c693fa5d49..bf95a3de622 100644
+--- a/tensorflow/compiler/xla/mlir/ir/runtime/BUILD
++++ b/tensorflow/compiler/xla/mlir/ir/runtime/BUILD
+@@ -90,6 +90,7 @@ cc_library(
+         "rt_ops.h",
+     ],
+     compatible_with = get_compatible_with_cloud(),
++    visibility = ["//visibility:public"],
+     deps = [
+         ":rt_inc_gen",
+         "//tensorflow/compiler/xla/runtime:constraints",
 diff --git a/tensorflow/python/tools/tools.bzl b/tensorflow/python/tools/tools.bzl
 index db886746006..bc597e29de9 100644
 --- a/tensorflow/python/tools/tools.bzl

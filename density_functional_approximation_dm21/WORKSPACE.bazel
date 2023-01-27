@@ -20,25 +20,16 @@ pip_install(
 
 http_archive(
     name = "io_abseil_py",
-    strip_prefix = "abseil-py-pypi-v0.15.0",
-    urls = ["https://github.com/abseil/abseil-py/archive/pypi-v0.15.0.tar.gz"],
-)
-
-http_archive(
-    name = "six_archive",
-    build_file = "@io_abseil_py//third_party:six.BUILD",
-    strip_prefix = "six-1.12.0",
-    urls = [
-        "https://pypi.python.org/packages/source/s/six/six-1.12.0.tar.gz",
-    ],
+    strip_prefix = "abseil-py-1.4.0",
+    urls = ["https://github.com/abseil/abseil-py/archive/refs/tags/v1.4.0.tar.gz"],
 )
 
 http_archive(
     name = "org_tensorflow",
     patch_args = ["-p1"],
     patches = ["tf_bazel.patch"],
-    strip_prefix = "tensorflow-2.10.0",
-    urls = ["https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.10.0.tar.gz"],
+    strip_prefix = "tensorflow-2.11.0",
+    urls = ["https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.11.0.tar.gz"],
 )
 
 # The cascade of load() statements and tf_workspace?() calls works around the

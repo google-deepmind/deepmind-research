@@ -113,15 +113,14 @@ be found in the paper (reference below). Note that the results in our paper also
 include D3 corrections, which must be
 [included separately](https://pyscf.org/user/dft.html#dispersion-corrections).
 
-
 ### Best practices for using the neural functionals.
 
 In this section, we suggest some tips for using the neural functionals in a way
 similar to how they were used for benchmarking in the paper. The tensorflow
-network that we used is running at single precision, and as such it is very
-hard to converge calculations to the high convergence thresholds which are
-default in pyscf. For example, the following script should allow users to
-run an atomization energy calculation for methane.
+network that we used is running at single precision, and as such it is very hard
+to converge calculations to the high convergence thresholds which are default in
+pyscf. For example, the following script should allow users to run an
+atomization energy calculation for methane.
 
 ```python
 import density_functional_approximation_dm21 as dm21
@@ -178,17 +177,16 @@ print({'CH4': energies[0], 'C': energies[1], 'H': energies[2]})
 ```
 
 This script should produce three energies (in Hartrees) for the water molecule
-and the two atoms of
-`{'CH4': -40.51785372584538, 'C': -37.84542045526023, 'H': -0.5011533955627797}`
-, this leads to an atomization energy of 419.06 kcal/mol, which is then
-corrected with the D3(BJ) correction for methane (1.20 kcal/mol) to yield a
-predicted atomization energy of 420.26 kcal/mol. Comparing this to the
-literature value of 420.42, leads us to deduce an error of around 0.2 kcal/mol.
+and the two atoms of `{'CH4': -40.51785372584538, 'C': -37.84542045526023, 'H':
+-0.5011533955627797}` , this leads to an atomization energy of 419.06 kcal/mol,
+which is then corrected with the D3(BJ) correction for methane (1.20 kcal/mol)
+to yield a predicted atomization energy of 420.26 kcal/mol. Comparing this to
+the literature value of 420.42, leads us to deduce an error of around 0.2
+kcal/mol.
 
-It should also be noted that if a closed shell system is run unrestricted it
-can give a small difference between spin densities and eigenvalues with a
-negligible effect on the energy.
-
+It should also be noted that if a closed shell system is run unrestricted it can
+give a small difference between spin densities and eigenvalues with a negligible
+effect on the energy.
 
 ## Using DM21 from C++
 
@@ -210,10 +208,10 @@ library is provided in `cc/dm21_aot_compiled_example.cc`. This requires a
 link-time dependency on parts of the `xla_compiled_cpu_runtime_standalone`
 library, which are not included in the compiled functional library. The easiest
 way to build this is to use [Bazel](https://bazel.build). The first step is to
-[install Bazel](https://docs.bazel.build/versions/4.2.0/install.html).
+[install Bazel](https://docs.bazel.build/versions/5.3.0/install.html).
 [Bazelisk](https://docs.bazel.build/versions/main/install-bazelisk.html) is
 another way to install Bazel if a native installer is not available. The
-following has been tested with Bazel 4.2.0. It is best to continue working
+following has been tested with Bazel 5.3.0. It is best to continue working
 inside a virtual environment.
 
 Assuming the above installation steps using `git clone` have been followed, and
@@ -221,7 +219,7 @@ Assuming the above installation steps using `git clone` have been followed, and
 
 ```
 pip install -r requirements_aot_compilation.txt
-bazel run --experimental_repo_remote_exec :run_dm21_aot_compiled_example
+bazel run --experimental_cc_shared_library --experimental_repo_remote_exec :run_dm21_aot_compiled_example
 ```
 
 where the `pip install` command is only required if a fresh virtual environment
