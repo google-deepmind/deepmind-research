@@ -64,7 +64,6 @@ def construct_compute_losses_inputs(
     write = functools.partial(tgm.write_env, env)
 
     # Bind args and consts to environment
-    write(jax.core.unitvar, jax.core.unit)
     jax_util.safe_map(write, jaxpr.invars, flat_args)
     jax_util.safe_map(write, jaxpr.constvars, consts)
 
@@ -230,7 +229,6 @@ def trace_estimator_vjp(tagged_func: _Function) -> _Function:
       write = functools.partial(tgm.write_env, env)
 
       # Bind args and consts to environment
-      write(jax.core.unitvar, jax.core.unit)
       jax_util.safe_map(write, jaxpr.invars, jax.tree_flatten(own_func_args)[0])
       jax_util.safe_map(write, jaxpr.constvars, consts)
 
@@ -253,12 +251,11 @@ def trace_estimator_vjp(tagged_func: _Function) -> _Function:
       env = dict()
       read = functools.partial(tgm.read_env, env)
       def write(var, val):
-        if not isinstance(var, (jax.core.Literal, jax.core.UnitVar)):
+        if not isinstance(var, jax.core.Literal):
           val = val + aux[var] if var in aux else val
         env[var] = val
 
       # Bind args and consts to environment
-      write(jax.core.unitvar, jax.core.unit)
       jax_util.safe_map(write, jaxpr.invars, jax.tree_flatten(own_func_args)[0])
       jax_util.safe_map(write, jaxpr.constvars, consts)
 

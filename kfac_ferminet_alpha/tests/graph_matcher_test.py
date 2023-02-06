@@ -61,10 +61,8 @@ class TestGraphMatcher(unittest.TestCase):
     self.assertEqual(len(jaxpr.constvars), len(tagged_jaxpr.constvars))
     self.assertEqual(len(jaxpr.outvars), len(tagged_jaxpr.outvars))
     for eq, tagged_eq in zip(jaxpr.eqns, tagged_jaxpr.eqns):
-      eq_in_vars = [v for v in eq.invars if not isinstance(v, jax.core.UnitVar)]
-      tagged_in_vars = [
-          v for v in tagged_eq.invars if not isinstance(v, jax.core.UnitVar)
-      ]
+      eq_in_vars = [v for v in eq.invars]
+      tagged_in_vars = [v for v in tagged_eq.invars]
       self.assertEqual(len(eq_in_vars), len(tagged_in_vars))
       self.assertEqual(len(eq.outvars), len(tagged_eq.outvars))
       self.assertEqual(eq.primitive, tagged_eq.primitive)
