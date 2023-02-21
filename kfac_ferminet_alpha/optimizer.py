@@ -481,10 +481,10 @@ class Optimizer(utils.Stateful):
     self.step_counter = self.step_counter + 1
 
     if self.value_func_has_state:
-      return params, self.pop_state(), new_func_state, stats
+      return params, self.pop_state(), new_func_state, stats  # pytype: disable=bad-return-type  # jax-ndarray
     else:
       assert new_func_state is None
-      return params, self.pop_state(), stats
+      return params, self.pop_state(), stats  # pytype: disable=bad-return-type  # jax-ndarray
 
   def init(
       self,

@@ -180,11 +180,11 @@ class ByolExperiment:
       return outputs
 
     if is_training:
-      outputs_view1 = apply_once_fn(inputs['view1'], '_view1')
-      outputs_view2 = apply_once_fn(inputs['view2'], '_view2')
+      outputs_view1 = apply_once_fn(inputs['view1'], '_view1')  # pytype: disable=wrong-arg-types  # jax-ndarray
+      outputs_view2 = apply_once_fn(inputs['view2'], '_view2')  # pytype: disable=wrong-arg-types  # jax-ndarray
       return {**outputs_view1, **outputs_view2}
     else:
-      return apply_once_fn(inputs['images'], '')
+      return apply_once_fn(inputs['images'], '')  # pytype: disable=wrong-arg-types  # jax-ndarray
 
   def _optimizer(self, learning_rate: float) -> optax.GradientTransformation:
     """Build optimizer from config."""

@@ -728,7 +728,7 @@ class MultimodalPreprocessor(hk.Module):
 
     # Apply a predictable ordering to the modalities
     padded_ls = [padded[k] for k in sorted(padded.keys())]
-    return (jnp.concatenate(padded_ls, axis=1),
+    return (jnp.concatenate(padded_ls, axis=1),  # pytype: disable=bad-return-type  # jax-ndarray
             modality_sizes,
             inputs_without_pos)
 

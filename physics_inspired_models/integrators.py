@@ -677,7 +677,7 @@ def solve_hamiltonian_ivp_t_eval(
   if method == "adaptive":
     dy_dt = phase_space.transform_symplectic_tangent_function_using_array(dy_dt)
 
-  return solve_ivp_t_eval(
+  return solve_ivp_t_eval(  # pytype: disable=bad-return-type  # jax-ndarray
       fun=dy_dt,
       t_span=t_span,
       y0=y0,

@@ -291,7 +291,7 @@ class Experiment(experiment.AbstractExperiment):
   #  \__|_|  \__,_|_|_| |_|
   #
 
-  def step(self, global_step: int, rng: jnp.ndarray,
+  def step(self, global_step: int, rng: jnp.ndarray,  # pytype: disable=signature-mismatch  # jax-ndarray
            *unused_args, **unused_kwargs):
     """See base class."""
 

@@ -432,8 +432,8 @@ class EvalExperiment:
     logits = self.forward_classif.apply(classif_params, embeddings)
     labels = hk.one_hot(inputs['labels'], self._num_classes)
     loss = helpers.softmax_cross_entropy(logits, labels, reduction=None)
-    top1_correct = helpers.topk_accuracy(logits, inputs['labels'], topk=1)
-    top5_correct = helpers.topk_accuracy(logits, inputs['labels'], topk=5)
+    top1_correct = helpers.topk_accuracy(logits, inputs['labels'], topk=1)  # pytype: disable=wrong-arg-types  # jax-ndarray
+    top5_correct = helpers.topk_accuracy(logits, inputs['labels'], topk=5)  # pytype: disable=wrong-arg-types  # jax-ndarray
     # NOTE: Returned values will be summed and finally divided by num_samples.
     return {
         'eval_loss': loss,
