@@ -610,12 +610,12 @@ class PhysicsSimulationNetwork(hk.Module):
           y.q, y.p, **nets_kwargs)
       # Special Haiku magic to avoid tracer issues
       if hk.running_init():
-        return self.lagrangian(y0, **nets_kwargs)
+        return self.lagrangian(y0, **nets_kwargs)  # pytype: disable=bad-return-type  # jax-ndarray
     else:
       hamiltonian = lambda t_, y: self.hamiltonian(y, **nets_kwargs)
       dy_dt = phase_space.poisson_bracket_with_q_and_p(hamiltonian)
       if hk.running_init():
-        return self.hamiltonian(y0, **nets_kwargs)
+        return self.hamiltonian(y0, **nets_kwargs)  # pytype: disable=bad-return-type  # jax-ndarray
 
     # Optionally switch coordinate frame
     if self.input_space == "velocity" and self.simulation_space == "momentum":

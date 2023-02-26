@@ -341,7 +341,7 @@ class SequenceModel(abc.ABC, Generic[T]):
     params = hk.data_structures.to_immutable_dict(params)
     state = hk.data_structures.to_immutable_dict(state)
 
-    return params, state
+    return params, state  # pytype: disable=bad-return-type  # jax-ndarray
 
   def init(
       self,

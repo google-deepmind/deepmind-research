@@ -220,7 +220,7 @@ class TeacherForcingAutoregressiveModel(base.SequenceModel):
                               is_training=is_training)
     return p_x, z0, decoder_z
 
-  def training_objectives(
+  def training_objectives(  # pytype: disable=signature-mismatch  # jax-ndarray
       self,
       params: hk.Params,
       state: hk.State,
@@ -300,7 +300,7 @@ class TeacherForcingAutoregressiveModel(base.SequenceModel):
         include_z0=False,
     )[0]
 
-  def gt_state_and_latents(
+  def gt_state_and_latents(  # pytype: disable=signature-mismatch  # jax-ndarray
       self,
       params: hk.Params,
       rng: jnp.ndarray,
@@ -336,7 +336,7 @@ class TeacherForcingAutoregressiveModel(base.SequenceModel):
   ) -> Tuple[Dict[str, jnp.ndarray], Dict[str, jnp.ndarray]]:
     return dict(), dict()
 
-  def _init_latent_system(
+  def _init_latent_system(  # pytype: disable=signature-mismatch  # jax-ndarray
       self,
       rng: jnp.ndarray,
       z: jnp.ndarray,

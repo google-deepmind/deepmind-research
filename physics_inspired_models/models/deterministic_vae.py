@@ -155,8 +155,8 @@ class DeterministicLatentsGenerativeModel(base.SequenceModel[_ArrayOrPhase]):
 
   def process_latents_for_decoder(self, z: _ArrayOrPhase) -> jnp.ndarray:
     if self.latent_dynamics_type == "Physics":
-      return z.q if self.render_from_q_only else z.single_state
-    return z
+      return z.q if self.render_from_q_only else z.single_state  # pytype: disable=attribute-error  # jax-ndarray
+    return z  # pytype: disable=bad-return-type  # jax-ndarray
 
   @property
   def inferred_index(self) -> int:
@@ -327,7 +327,7 @@ class DeterministicLatentsGenerativeModel(base.SequenceModel[_ArrayOrPhase]):
     if num_steps_backward > 0 and not self.can_run_backwards:
       raise ValueError("This model can not be unrolled backward in time.")
 
-  def unroll_latent_dynamics(
+  def unroll_latent_dynamics(  # pytype: disable=signature-mismatch  # jax-ndarray
       self,
       z: phase_space.PhaseSpace,
       params: hk.Params,
@@ -393,7 +393,7 @@ class DeterministicLatentsGenerativeModel(base.SequenceModel[_ArrayOrPhase]):
     z = z.single_state if isinstance(z, phase_space.PhaseSpace) else z
     return p_x, q_z, self.prior(), z0, z, dyn_stats
 
-  def training_objectives(
+  def training_objectives(  # pytype: disable=signature-mismatch  # jax-ndarray
       self,
       params: utils.Params,
       state: hk.State,
@@ -532,7 +532,7 @@ class DeterministicLatentsGenerativeModel(base.SequenceModel[_ArrayOrPhase]):
         include_z0=True,
     )[0]
 
-  def gt_state_and_latents(
+  def gt_state_and_latents(  # pytype: disable=signature-mismatch  # jax-ndarray
       self,
       params: hk.Params,
       rng: jnp.ndarray,
