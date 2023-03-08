@@ -161,7 +161,7 @@ class SUnit3D(hk.Module):
         x = self._activation_fn(x)
     if self._self_gating_fn:
       x = self._self_gating_fn(x)
-    return x
+    return x  # pytype: disable=bad-return-type  # jax-devicearray
 
 
 class InceptionBlockV13D(hk.Module):

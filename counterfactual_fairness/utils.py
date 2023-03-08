@@ -62,7 +62,7 @@ def multinomial_mode(
     joint-highest.
   """
   if isinstance(distribution_or_probs, tfd.Distribution):
-    probs = distribution_or_probs.probs_parameter()
+    probs = distribution_or_probs.probs_parameter()  # pytype: disable=attribute-error  # jax-devicearray
   else:
     probs = distribution_or_probs
   max_prob = jnp.max(probs, axis=1, keepdims=True)
@@ -86,7 +86,7 @@ def multinomial_class(
     probability.
   """
   if isinstance(distribution_or_probs, tfd.Distribution):
-    return jnp.argmax(distribution_or_probs.logits_parameter(), axis=1)
+    return jnp.argmax(distribution_or_probs.logits_parameter(), axis=1)  # pytype: disable=attribute-error  # jax-devicearray
   return jnp.argmax(distribution_or_probs, axis=1)
 
 

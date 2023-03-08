@@ -211,7 +211,7 @@ class TSMResNetUnit(hk.Module):
           num_frames=self._num_frames,
           name=f'block_{idx_block}')(
               net, is_training=is_training)
-    return net
+    return net  # pytype: disable=bad-return-type  # jax-devicearray
 
 
 class TSMResNetV2(hk.Module):
