@@ -17,11 +17,11 @@
 
 from typing import Callable, Tuple, Union
 
-import jax.numpy as jnp
+import jax
 import numpy as np
 import optax
 
-TensorLike = Union[np.ndarray, jnp.DeviceArray]
+TensorLike = Union[np.ndarray, jax.Array]
 
 ActivationFn = Callable[[TensorLike], TensorLike]
 GatingFn = Callable[[TensorLike], TensorLike]

@@ -18,6 +18,7 @@ from typing import Tuple
 
 import chex
 import haiku as hk
+import jax
 import jax.numpy as jnp
 import numpy as np
 from scipy.ndimage import interpolation
@@ -72,7 +73,7 @@ def load_deskewed_mnist(*a, **k):
 class MeanStdEstimator(hk.Module):
   """Online mean and standard deviation estimator using Welford's algorithm."""
 
-  def __call__(self, sample: jnp.DeviceArray) -> Tuple[Array, Array]:
+  def __call__(self, sample: jax.Array) -> Tuple[Array, Array]:
     if len(sample.shape) > 1:
       raise ValueError("sample must be a rank 0 or 1 DeviceArray.")
 
