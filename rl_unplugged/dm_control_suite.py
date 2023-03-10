@@ -291,6 +291,7 @@ class NormilizeActionSpecWrapper(wrappers.EnvironmentWrapper):
     super().__init__(environment)
 
     action_spec = environment.action_spec()
+    # pytype: disable=attribute-error  # always-use-return-annotations
     self._scale = action_spec.maximum - action_spec.minimum
     self._offset = action_spec.minimum
 
@@ -302,6 +303,7 @@ class NormilizeActionSpecWrapper(wrappers.EnvironmentWrapper):
         minimum,
         maximum,
         name=action_spec.name)
+    # pytype: enable=attribute-error  # always-use-return-annotations
 
   def _from_normal_actions(self, actions):
     actions = 0.5 * (actions + 1.0)  # a_t is now in the range [0, 1]
