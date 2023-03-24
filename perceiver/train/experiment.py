@@ -444,9 +444,9 @@ class Experiment(experiment.AbstractExperiment):
     params = optax.apply_updates(params, updates)
 
     n_params = 0
-    for k in params.keys():
+    for k in params.keys():  # pytype: disable=attribute-error  # numpy-scalars
       for l in params[k]:
-        n_params = n_params + np.prod(params[k][l].shape)
+        n_params = n_params + np.prod(params[k][l].shape)  # pytype: disable=attribute-error  # numpy-scalars
 
     # Scalars to log (note: we log the mean across all hosts/devices).
     scalars = {'learning_rate': learning_rate,

@@ -103,7 +103,7 @@ def weight_decay(params: hk.Params,
           any(re.match(regex, name) for regex in regex_ignore)):
         continue
       l2_norm += jnp.sum(jnp.square(param))
-  return .5 * l2_norm
+  return .5 * l2_norm  # pytype: disable=bad-return-type  # numpy-scalars
 
 
 def ema_update(step: chex.Array,
@@ -113,7 +113,7 @@ def ema_update(step: chex.Array,
                warmup_steps: int = 0,
                dynamic_decay: bool = True) -> chex.ArrayTree:
   """Applies an exponential moving average."""
-  factor = (step >= warmup_steps).astype(jnp.float32)
+  factor = (step >= warmup_steps).astype(jnp.float32)  # pytype: disable=attribute-error  # numpy-scalars
   if dynamic_decay:
     # Uses TF-style EMA.
     delta = step - warmup_steps

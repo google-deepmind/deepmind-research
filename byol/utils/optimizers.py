@@ -135,7 +135,7 @@ def add_weight_decay(
     new_updates = _partial_update(updates, new_updates, params, filter_fn)
     return new_updates, state
 
-  return optax.GradientTransformation(init_fn, update_fn)
+  return optax.GradientTransformation(init_fn, update_fn)  # pytype: disable=wrong-arg-types  # numpy-scalars
 
 
 LarsState = List  # Type for the lars optimizer

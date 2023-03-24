@@ -271,7 +271,7 @@ class EvalExperiment:
     classif_params = self.forward_classif.init(rng, embeddings)
     classif_opt_state = self._optimizer(0.).init(classif_params)
 
-    return _EvalExperimentState(
+    return _EvalExperimentState(  # pytype: disable=wrong-arg-types  # numpy-scalars
         backbone_params=backbone_params,
         classif_params=classif_params,
         backbone_state=backbone_state,
@@ -389,7 +389,7 @@ class EvalExperiment:
       new_backbone_params = optax.apply_updates(
           experiment_state.backbone_params, backbone_updates)
 
-    experiment_state = _EvalExperimentState(
+    experiment_state = _EvalExperimentState(  # pytype: disable=wrong-arg-types  # numpy-scalars
         new_backbone_params,
         new_classif_params,
         new_backbone_state,

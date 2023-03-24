@@ -121,7 +121,7 @@ def training_statistics(
   # Note that "_over_time" stats are getting normalised by time here
   stats = jax.tree_map(lambda x: x / scale, stats)
   if p_x_learned_sigma:
-    stats["p_x_sigma"] = p_x.variance().reshape([-1])[0]
+    stats["p_x_sigma"] = p_x.variance().reshape([-1])[0]  # pytype: disable=attribute-error  # numpy-scalars
   if q_z is not None:
     stats["small_latents"] = calculate_small_latents(q_z)
   return stats
