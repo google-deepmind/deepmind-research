@@ -14,6 +14,7 @@
 
 """Dataset utilities."""
 
+import functools
 from typing import List, Optional
 
 import jax
@@ -31,6 +32,9 @@ import tree
 import batching_utils
 import conformer_utils
 import datasets
+
+
+curry = lambda f: functools.partial(functools.partial, f)
 
 
 def build_dataset_iterator(
@@ -196,7 +200,7 @@ def _sample_uniform_categorical(num: int, size: int) -> tf.Tensor:
   return tf.random.categorical(tf.math.log([[1 / size] * size]), num)[0]
 
 
-@jax.curry(jax.tree_map)
+@curry(jax.tree_map)
 def _downcast_ints(x):
   if x.dtype == tf.int64:
     return tf.cast(x, tf.int32)
