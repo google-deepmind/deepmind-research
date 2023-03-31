@@ -154,7 +154,7 @@ def write_env(env, var, val):
 
 def abstract_single_value(value):
   if isinstance(value, jnp.ndarray):
-    value = jax.ShapedArray(np.shape(value), np.result_type(value))
+    value = jax_core.ShapedArray(np.shape(value), np.result_type(value))
     return pe.PartialVal.unknown(value)
   else:
     return value
