@@ -682,7 +682,7 @@ class MultimodalDecoder(AbstractPerceiverDecoder):
         position_encoding_type='none',
         **decoder_kwargs)
 
-  def decoder_query(self, inputs, modality_sizes, inputs_without_pos=None,
+  def decoder_query(self, inputs, modality_sizes, inputs_without_pos=None,  # pytype: disable=signature-mismatch  # overriding-parameter-count-checks
                     subsampled_points=None):
     # Partition the flat inputs among the different modalities
     inputs = io_processors.restructure(modality_sizes, inputs)
