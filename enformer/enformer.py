@@ -26,7 +26,7 @@ Pushmeet Kohli1, David R. Kelley2*
 4 These authors contributed equally.
 * correspondence: avsec@google.com, pushmeet@google.com, drk@calicolabs.com
 """
-import inspect
+import _thread
 from typing import Any, Callable, Dict, Optional, Text, Union, Iterable
 
 import attention_module
@@ -334,5 +334,21 @@ def exponential_linspace_int(start, end, num, divisible_by=1):
   return [_round(start * base**i) for i in range(num)]
 
 
-def accepts_is_training(module):
-  return 'is_training' in list(inspect.signature(module.__call__).parameters)
+def accepts_is_training(module: Callable[..., Any]):
+  """This function returns True if module requires the argument 'is_training' otherwise it returns False."""
+  return 'is_training' in get_co_varnames(module.__call__)
+
+
+def get_co_varnames(call_method: Union[Callable[..., Any], list, _thread.RLock]) -> list[str]:
+  """This function returns a list of all local variables encountered in the stack of call_method. It does so by
+  recursing through all closure cells and getting the local variables from the code object."""
+  if not getattr(call_method, '__closure__', False):
+    return []
+  # We store all seen local variables in this list
+  seen_variables = []
+  # We loop over every closure cell to retrieve all local variables from the code object
+  for cell in call_method.__closure__:
+    seen_variables += get_co_varnames(cell.cell_contents)
+    if getattr(cell.cell_contents, '__code__', False):
+      seen_variables += list(cell.cell_contents.__code__.co_varnames)
+  return seen_variables
