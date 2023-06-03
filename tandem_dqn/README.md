@@ -19,7 +19,7 @@ For installation, run
 git clone git@github.com:deepmind/deepmind-research.git
 virtualenv --python=python3.6 "tandem"
 source tandem/bin/activate
-cd deepmind_research
+cd deepmind-research
 pip install -r tandem_dqn/requirements.txt
 ```
 
