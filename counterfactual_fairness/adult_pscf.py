@@ -38,6 +38,8 @@ from counterfactual_fairness import utils
 from counterfactual_fairness import variational
 
 FLAGS = flags.FLAGS
+flags.DEFINE_string ("dataset_dir","", "Sets the dataset directory")
+flags.DEFINE_string ("num_steps","10", "Sets the number of steps")
 config_flags.DEFINE_config_file(
     'config', 'adult_pscf_config.py', 'Training configuration.')
 
