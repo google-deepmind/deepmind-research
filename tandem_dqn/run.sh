@@ -25,7 +25,7 @@
 set -e
 set -x
 
-TMP_DIR=`mktemp -d`
+TMP_DIR=$(mktemp -d)
 
 # Set up environment.
 virtualenv --python=python3.6 "${TMP_DIR}/env"
@@ -42,5 +42,5 @@ python -m tandem_dqn.run_tandem \
   --jax_platform_name=cpu
 
 # Clean up.
-rm -r ${TMP_DIR}
+rm -r "${TMP_DIR}"
 echo "Test run finished."
