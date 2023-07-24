@@ -41,7 +41,7 @@ First, install dependencies following these instructions:
 2. Switch to the virtual env: `source ~/.venv/perceiver/bin/activate`
 3. Follow instructions for installing JAX on your platform:
    https://github.com/google/jax#installation
-4. Install other dependencies: `pip install -f requirements.txt`
+4. Install other dependencies: `pip install -r requirements.txt`
 
 After installing dependencies, you can open the notebooks in the `colabs` directory
 using Jupyter or Colab, and you can run our example training script.
