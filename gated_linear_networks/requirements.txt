@@ -4,7 +4,7 @@ astunparse==1.6.3
 async-timeout==3.0.1
 attrs==20.2.0
 cachetools==4.1.1
-certifi==2020.6.20
+certifi==2023.7.22
 chardet==3.0.4
 chex==0.0.2
 cloudpickle==1.6.0
