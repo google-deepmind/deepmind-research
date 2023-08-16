@@ -32,7 +32,7 @@ keyrings.alt==3.0
 opencv-python==4.2.0.34
 opt-einsum==3.2.1
 pycrypto==2.6.1
-pyxdg==0.25
+pyxdg==0.26
 SecretStorage==2.3.1
 six==1.15.0
 toolz==0.11.1
