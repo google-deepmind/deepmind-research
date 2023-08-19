@@ -33,7 +33,7 @@ function download_shards {
   local PREFIX="$1"
   local LIMIT="$(printf "%05d" "$2")"
   # Avoid leading zeros or this will be interpreted as an octal number.
-  local MAX="$(("$2"-1))"
+  local MAX="$(($2-1))"
 
   (
     for IDX in $(seq -f'%05.0f' 0 "$MAX"); do
