@@ -59,6 +59,6 @@ tensorflow-metadata==1.1.0
 termcolor==1.1.0
 toolz==0.11.1
 typing-extensions==3.7.4.3
-urllib3==1.26.6
+urllib3==1.26.18
 Werkzeug==2.0.1
 wrapt==1.12.1
