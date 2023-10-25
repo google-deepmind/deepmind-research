@@ -18,5 +18,5 @@ tensorflow==1.13.1
 tensorflow-estimator==1.13.0
 tensorflow-probability==0.6.0
 termcolor==1.1.0
-Werkzeug==0.15.4
+Werkzeug==3.0.1
 wrapt==1.11.1
