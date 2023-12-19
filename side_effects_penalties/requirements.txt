@@ -56,7 +56,7 @@ olefile==0.46
 onboard==1.4.1
 PAM==0.4.2
 pandas==1.1.3
-paramiko==2.6.0
+paramiko==3.4.0
 pbr==5.4.5
 pexpect==4.6.0
 Pillow==7.2.0
