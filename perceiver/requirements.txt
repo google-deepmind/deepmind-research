@@ -10,7 +10,7 @@ numpy~=1.19.2
 opencv-python==4.5.2.54
 opt-einsum==3.3.0
 optax==0.0.9
-Pillow==8.3.1
+Pillow==10.2.0
 scipy==1.7.0
 six~=1.15.0
 tabulate==0.8.9
