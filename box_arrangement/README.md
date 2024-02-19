@@ -1,7 +1,7 @@
 # Predicate tasks.
 
 This package contains tasks associated with "Behavior Priors for Efficient
-Reiforcement Learning" (https://arxiv.org/abs/2010.14274), "Exploiting Hierarchy
+Reinforcement Learning" (https://arxiv.org/abs/2010.14274), "Exploiting Hierarchy
 for Learning and Transfer in KL-Regularized RL" (https://arxiv.org/abs/2010.14274)
 and "Information asymmetry in KL-regularized RL"
 (https://arxiv.org/abs/1905.01240).
