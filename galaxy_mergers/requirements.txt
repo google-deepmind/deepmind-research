@@ -1,5 +1,5 @@
 absl-py==0.11.0
-astropy==4.2
+astropy==5.3.3
 astunparse==1.6.3
 cachetools==4.2.1
 certifi==2020.12.5
