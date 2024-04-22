@@ -11,7 +11,7 @@ opencv-python==4.5.2.54
 opt-einsum==3.3.0
 optax==0.0.9
 Pillow==8.3.1
-scipy==1.7.0
+scipy==1.11.1
 six~=1.15.0
 tabulate==0.8.9
 tensorflow==2.5.0
