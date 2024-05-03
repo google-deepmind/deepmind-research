@@ -49,4 +49,4 @@ tensorflow-metadata==0.24.0
 tensorflow-probability==0.11.1
 termcolor==1.1.0
 toolz==0.11.1
-tqdm==4.50.0
+tqdm==4.66.3
