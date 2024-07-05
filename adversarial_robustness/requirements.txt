@@ -18,7 +18,7 @@ tqdm==4.61.1
 astunparse==1.6.3
 attrs==21.2.0
 cachetools==4.2.2
-certifi==2021.5.30
+certifi==2024.7.4
 chardet==4.0.0
 contextlib2==21.6.0
 dill==0.3.4
