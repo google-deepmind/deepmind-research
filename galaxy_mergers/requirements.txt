@@ -43,7 +43,7 @@ six==1.15.0
 tabulate==0.8.9
 tensorboard==2.4.1
 tensorboard-plugin-wit==1.8.0
-tensorflow==2.4.1
+tensorflow==2.12.1
 tensorflow-estimator==2.4.0
 tensorflow-probability==0.12.1
 termcolor==1.1.0
