@@ -3,7 +3,7 @@ astor==0.7.1
 contextlib2==0.5.5
 dm-sonnet==1.32
 gast==0.2.2
-grpcio==1.20.1
+grpcio==1.53.2
 h5py==2.9.0
 Keras-Applications==1.0.7
 Keras-Preprocessing==1.0.9
