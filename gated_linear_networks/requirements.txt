@@ -42,7 +42,7 @@ scipy==1.5.2
 six==1.15.0
 tensorboard==2.3.0
 tensorboard-plugin-wit==1.7.0
-tensorflow==2.3.1
+tensorflow==2.12.1
 tensorflow-datasets==3.2.1
 tensorflow-estimator==2.3.0
 tensorflow-metadata==0.24.0
