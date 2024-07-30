@@ -5,5 +5,5 @@ numpy==1.24.1
 pyscf==2.1.1
 pytest==6.2.4
 scipy==1.9.3
-tensorflow==2.11.0
+tensorflow==2.12.1
 tensorflow-hub==0.12.0
