@@ -29,7 +29,7 @@ future==0.18.2
 idna==2.6
 keyring==10.6.0
 keyrings.alt==3.0
-opencv-python==4.2.0.34
+opencv-python==4.8.1.78
 opt-einsum==3.2.1
 pycrypto==2.6.1
 pyxdg==0.25
