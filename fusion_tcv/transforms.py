@@ -11,173 +11,112 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Transforms from actual/target to rewards."""
+
+"""Transforms errors into rewards for reinforcement learning."""
 
 import abc
 import math
-from typing import List, Optional
+from typing import List
 
-import dataclasses
+# Utility Functions
+def clip_value(value: float, min_val: float = 0, max_val: float = 1) -> float:
+    """Clips a value between min_val and max_val, preserving NaN."""
+    return value if math.isnan(value) else max(min_val, min(max_val, value))
 
+def scale_value(value: float, old_min: float, old_max: float, new_min: float, new_max: float) -> float:
+    """Linearly scales value from [old_min, old_max] to [new_min, new_max]."""
+    return new_min + (value - old_min) * (new_max - new_min) / (old_max - old_min)
 
-# Comparison of some of the transforms:
-# Order is NegExp, SoftPlus, Sigmoid.
-# Over range of good to bad:
-# https://www.wolframalpha.com/input/?i=plot+e%5E%28x*ln%280.1%29%29%2C2%2F%281%2Be%5E%28x*ln%2819%29%29%29%2C1%2F%281%2Be%5E%28-+%28-ln%2819%29+-+%28x-1%29*%282*ln%2819%29%29%29%29%29+from+x%3D0+to+2
-# When close to good:
-# https://www.wolframalpha.com/input/?i=plot+e%5E%28x*ln%280.1%29%29%2C2%2F%281%2Be%5E%28x*ln%2819%29%29%29%2C1%2F%281%2Be%5E%28-+%28-ln%2819%29+-+%28x-1%29*%282*ln%2819%29%29%29%29%29+from+x%3D0+to+0.2
+def logistic_value(value: float) -> float:
+    """Computes the logistic function, clipped for stability."""
+    clipped = clip_value(value, -50, 50)
+    return 1 / (1 + math.exp(-clipped))
 
+# Abstract Base Class
+class RewardTransform(abc.ABC):
+    """Base class for transforming errors into rewards."""
+    
+    @abc.abstractmethod
+    def __call__(self, errors: List[float]) -> List[float]:
+        """Converts a list of errors into a list of rewards."""
 
-class AbstractTransform(abc.ABC):
+# Transformation Classes
+class EqualReward(RewardTransform):
+    """Rewards 1 for zero error, else a specified value."""
+    def __init__(self, nonzero_value: float = 0):
+        self.nonzero_value = nonzero_value
+    
+    def __call__(self, errors: List[float]) -> List[float]:
+        return [error if math.isnan(error) else (1 if error == 0 else self.nonzero_value) 
+                for error in errors]
 
-  @abc.abstractmethod
-  def __call__(self, errors: List[float]) -> List[float]:
-    """Transforms target errors into rewards."""
+class AbsoluteReward(RewardTransform):
+    """Returns the absolute value of errors."""
+    def __call__(self, errors: List[float]) -> List[float]:
+        return [abs(error) for error in errors]
 
-  @property
-  def outputs(self) -> Optional[int]:
-    return None
+class NegatedReward(RewardTransform):
+    """Negates the errors."""
+    def __call__(self, errors: List[float]) -> List[float]:
+        return [-error for error in errors]
 
+class PowerReward(RewardTransform):
+    """Raises errors to a specified power."""
+    def __init__(self, exponent: float):
+        self.exponent = exponent
+    
+    def __call__(self, errors: List[float]) -> List[float]:
+        return [error ** self.exponent for error in errors]
 
-def clip(value: float, low: float, high: float) -> float:
-  """Clip a value to the range of low - high."""
-  if math.isnan(value):
-    return value
-  assert low <= high
-  return max(low, min(high, value))
+class LogReward(RewardTransform):
+    """Computes the natural log of errors plus a small offset."""
+    def __init__(self, offset: float = 1e-4):
+        self.offset = offset
+    
+    def __call__(self, errors: List[float]) -> List[float]:
+        return [math.log(error + self.offset) for error in errors]
 
+class LinearClippedReward(RewardTransform):
+    """Scales errors linearly from bad (0) to good (1), clipped to [0, 1]."""
+    def __init__(self, bad_value: float, good_value: float = 0):
+        self.bad_value = bad_value
+        self.good_value = good_value
+    
+    def __call__(self, errors: List[float]) -> List[float]:
+        return [clip_value(scale_value(error, self.bad_value, self.good_value, 0, 1)) 
+                for error in errors]
 
-def scale(v: float, a: float, b: float, c: float, d: float) -> float:
-  """Scale a value, v on a line with anchor points a,b to new anchors c,d."""
-  v01 = (v - a) / (b - a)
-  return c - v01 * (c - d)
+class SoftPlusReward(RewardTransform):
+    """Smoothly scales errors from bad (~0.1) to good (1), clipped to [0, 1]."""
+    def __init__(self, bad_value: float, good_value: float = 0, sharpness: float = -math.log(19)):
+        self.bad_value = bad_value
+        self.good_value = good_value
+        self.sharpness = sharpness
+    
+    def __call__(self, errors: List[float]) -> List[float]:
+        return [clip_value(2 * logistic_value(scale_value(error, self.bad_value, self.good_value, self.sharpness, 0))) 
+                for error in errors]
 
+class NegExpReward(RewardTransform):
+    """Exponentially scales errors from bad (~0.1) to good (1), clipped to [0, 1]."""
+    def __init__(self, bad_value: float, good_value: float = 0, sharpness: float = -math.log(0.1)):
+        self.bad_value = bad_value
+        self.good_value = good_value
+        self.sharpness = sharpness
+    
+    def __call__(self, errors: List[float]) -> List[float]:
+        return [clip_value(math.exp(-scale_value(error, self.bad_value, self.good_value, self.sharpness, 0))) 
+                for error in errors]
 
-def logistic(v: float) -> float:
-  """Standard logistic, asymptoting to 0 and 1."""
-  v = clip(v, -50, 50)  # Improve numerical stability.
-  return 1 / (1 + math.exp(-v))
-
-
-@dataclasses.dataclass(frozen=True)
-class Equal(AbstractTransform):
-  """Returns 1 if the error is 0 and not_equal_val otherwise."""
-  not_equal_val: float = 0
-
-  def __call__(self, errors: List[float]) -> List[float]:
-    out = []
-    for err in errors:
-      if math.isnan(err):
-        out.append(err)
-      elif err == 0:
-        out.append(1)
-      else:
-        out.append(self.not_equal_val)
-    return out
-
-
-class Abs(AbstractTransform):
-  """Take the absolue value of the error. Does not guarantee 0-1."""
-
-  @staticmethod
-  def __call__(errors: List[float]) -> List[float]:
-    return [abs(err) for err in errors]
-
-
-class Neg(AbstractTransform):
-  """Negate the error. Does not guarantee 0-1."""
-
-  @staticmethod
-  def __call__(errors: List[float]) -> List[float]:
-    return [-err for err in errors]
-
-
-@dataclasses.dataclass(frozen=True)
-class Pow(AbstractTransform):
-  """Return a power of the error. Does not guarantee 0-1."""
-  pow: float
-
-  def __call__(self, errors: List[float]) -> List[float]:
-    return [err**self.pow for err in errors]
-
-
-@dataclasses.dataclass(frozen=True)
-class Log(AbstractTransform):
-  """Return a log of the error. Does not guarantee 0-1."""
-  eps: float = 1e-4
-
-  def __call__(self, errors: List[float]) -> List[float]:
-    return [math.log(err + self.eps) for err in errors]
-
-
-@dataclasses.dataclass(frozen=True)
-class ClippedLinear(AbstractTransform):
-  """Scales and clips errors, bad to 0, good to 1. If good=0, this is a relu."""
-  bad: float
-  good: float = 0
-
-  def __call__(self, errors: List[float]) -> List[float]:
-    return [clip(scale(err, self.bad, self.good, 0, 1), 0, 1)
-            for err in errors]
-
-
-@dataclasses.dataclass(frozen=True)
-class SoftPlus(AbstractTransform):
-  """Scales and clips errors, bad to 0.1, good to 1, asymptoting to 0.
-
-  Based on the lower half of the logistic instead of the standard softplus as
-  we want it to be bounded from 0 to 1, with the good value being exactly 1.
-  Various constants can be chosen to get the softplus to give the desired
-  properties, but this is much simpler.
-  """
-  bad: float
-  good: float = 0
-
-  # Constant to set the sharpness/slope of the softplus.
-  # Default was chosen such that the good/bad have 1 and 0.1 reward:
-  # https://www.wolframalpha.com/input/?i=plot+2%2F%281%2Be%5E%28x*ln%2819%29%29%29+from+x%3D0+to+2
-  low: float = -math.log(19)  # -2.9444389791664403
-
-  def __call__(self, errors: List[float]) -> List[float]:
-    return [clip(2 * logistic(scale(e, self.bad, self.good, self.low, 0)), 0, 1)
-            for e in errors]
-
-
-@dataclasses.dataclass(frozen=True)
-class NegExp(AbstractTransform):
-  """Scales and clips errors, bad to 0.1, good to 1, asymptoting to 0.
-
-  This scales the reward in an exponential space. This means there is a sharp
-  gradient toward reaching the value of good, flattening out at the value of
-  bad. This can be useful for a reward that gives meaningful signal far away,
-  but still have a sharp gradient near the true target.
-  """
-  bad: float
-  good: float = 0
-
-  # Constant to set the sharpness/slope of the exponential.
-  # Default was chosen such that the good/bad have 1 and 0.1 reward:
-  # https://www.wolframalpha.com/input/?i=plot+e%5E%28x*ln%280.1%29%29+from+x%3D0+to+2
-  low: float = -math.log(0.1)
-
-  def __call__(self, errors: List[float]) -> List[float]:
-    return [clip(math.exp(-scale(e, self.bad, self.good, self.low, 0)), 0, 1)
-            for e in errors]
-
-
-@dataclasses.dataclass(frozen=True)
-class Sigmoid(AbstractTransform):
-  """Scales and clips errors, bad to 0.05, good to 0.95, asymptoting to 0-1."""
-  good: float
-  bad: float
-
-  # Constants to set the sharpness/slope of the sigmoid.
-  # Defaults were chosen such that the good/bad have 0.95 and 0.05 reward:
-  # https://www.wolframalpha.com/input/?i=plot+1%2F%281%2Be%5E%28-+%28-ln%2819%29+-+%28x-1%29*%282*ln%2819%29%29%29%29%29+from+x%3D0+to+2
-  high: float = math.log(19)  # +2.9444389791664403
-  low: float = -math.log(19)  # -2.9444389791664403
-
-  def __call__(self, errors: List[float]) -> List[float]:
-    return [logistic(scale(err, self.bad, self.good, self.low, self.high))
-            for err in errors]
-
+class SigmoidReward(RewardTransform):
+    """Scales errors sigmoidally from bad (~0.05) to good (~0.95)."""
+    def __init__(self, bad_value: float, good_value: float, 
+                 low_sharpness: float = -math.log(19), high_sharpness: float = math.log(19)):
+        self.bad_value = bad_value
+        self.good_value = good_value
+        self.low_sharpness = low_sharpness
+        self.high_sharpness = high_sharpness
+    
+    def __call__(self, errors: List[float]) -> List[float]:
+        return [logistic_value(scale_value(error, self.bad_value, self.good_value, self.low_sharpness, self.high_sharpness)) 
+                for error in errors]

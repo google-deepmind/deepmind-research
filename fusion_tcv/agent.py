@@ -14,28 +14,27 @@
 """An agent interface for interacting with the environment."""
 
 import abc
-
 import dm_env
 import numpy as np
-
 from fusion_tcv import tcv_common
-
 
 class AbstractAgent(abc.ABC):
   """Agent base class."""
-
+  
   def reset(self):
     """Reset to the initial state."""
-
+    pass
+  
   @abc.abstractmethod
   def step(self, timestep: dm_env.TimeStep) -> np.ndarray:
     """Return the action given the current observations."""
 
-
 class ZeroAgent(AbstractAgent):
-  """An agent that always returns "zero" actions."""
-
+  """An agent that always returns 'zero' actions."""
+  
+  def __init__(self):
+    self._action = np.zeros(tcv_common.action_spec().shape,
+                           tcv_common.action_spec().dtype)
+  
   def step(self, timestep: dm_env.TimeStep) -> np.ndarray:
-    del timestep
-    return np.zeros(tcv_common.action_spec().shape,
-                    tcv_common.action_spec().dtype)
+    return self._action
