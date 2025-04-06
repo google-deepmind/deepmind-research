@@ -1,12 +1,7 @@
 # DeepMind Research
 
 This repository contains implementations and illustrative code to accompany
-DeepMind publications. Along with publishing papers to accompany research
-conducted at DeepMind, we release open-source
-[environments](https://deepmind.com/research/open-source/open-source-environments/),
-[data sets](https://deepmind.com/research/open-source/open-source-datasets/),
-and [code](https://deepmind.com/research/open-source/open-source-code/) to
-enable the broader research community to engage with our work and build upon it,
+DeepMind publications. Along with publishing papers to accompany research conducted at DeepMind, we release open-source environments, datasets,and code to enable the broader research community to engage with our work and build upon it,
 with the ultimate goal of accelerating scientific progress to benefit society.
 For example, you can build on our implementations of the
 [Deep Q-Network](https://github.com/deepmind/dqn) or
@@ -14,6 +9,8 @@ For example, you can build on our implementations of the
 in the same environments we use for our research, such as
 [DeepMind Lab](https://github.com/deepmind/lab) or
 [StarCraft II](https://github.com/deepmind/pysc2).
+
+For a complete list of our open-source contributions, see [Open-Source Resources](open-source-resources.md).
 
 If you enjoy building tools, environments, software libraries, and other
 infrastructure of the kind listed below, you can view open positions to work in
