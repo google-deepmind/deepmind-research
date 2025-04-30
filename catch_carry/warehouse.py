@@ -573,13 +573,30 @@ class PhasedBoxCarry(composer.Task):
 
   def _move_arms_if_necessary(self, physics):
     if self._min_prop_gap is not None:
-      for entity in self._props + self._pedestals:
-        try:
-          arm_opener.open_arms_for_prop(
-              physics, self._walker.left_arm_root, self._walker.right_arm_root,
-              entity.mjcf_model, self._min_prop_gap)
-        except RuntimeError as e:
-          raise composer.EpisodeInitializationError(e)
+        for entity in self._props + self._pedestals:
+            try:
+                arm_opener.open_arms_for_prop(
+                    physics, self._walker.left_arm_root, self._walker.right_arm_root,
+                    entity.mjcf_model, self._min_prop_gap)
+            except RuntimeError as e:
+                logging.error(
+                    f"[Initialization Warning] Failed to open arms for entity {entity.mjcf_model.model}.\n"
+                    f"  Error: {e}\n"
+                    f"  Attempted gap: {self._min_prop_gap}\n"
+                    f"  Entity position: {mjcf.get_attachment_frame(entity.mjcf_model).pos}"
+                )
+                # Attempt to fix by nudging the entity slightly upward and retrying
+                try:
+                    mjcf.get_attachment_frame(entity.mjcf_model).pos[2] += 0.01  # raise by 1 cm
+                    arm_opener.open_arms_for_prop(
+                        physics, self._walker.left_arm_root, self._walker.right_arm_root,
+                        entity.mjcf_model, self._min_prop_gap)
+                    logging.info(f"Retry successful after lifting: {entity.mjcf_model.model}")
+                except RuntimeError as retry_e:
+                    logging.error(
+                        f"Retry failed for entity {entity.mjcf_model.model}. Skipping. Error: {retry_e}")
+                    continue  # skip this entity instead of crashing
+
 
   def after_step(self, physics, random_state):
     # First we check for failure termination.
