@@ -1,4 +1,4 @@
-setuptools==41.0.0
+setuptools==78.1.1
 absl-py==0.8.1
 numpy==1.16
 six==1.12
