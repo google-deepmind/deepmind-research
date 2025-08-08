@@ -53,7 +53,7 @@ def encode_sentence(token_map, sentence, pad_length):
   """Encode CLEVRER question/choice sentences as sequence of token ids."""
   ret = np.array(
       [token_map["question_vocab"][w] for w in _split_string(sentence)],
-      np.int32)
+      np.int64)
   return _pad(ret, pad_length)
 
 
@@ -80,20 +80,20 @@ def main(unused_argv):
 
   inputs_descriptive = {
       "monet_latents": tf.placeholder(
-          tf.float32,
+          tf.float64,
           [BATCH_SIZE, NUM_FRAMES, NUM_OBJECTS, modellib.EMBED_DIM]),
       "question": tf.placeholder(
-          tf.int32, [BATCH_SIZE, modellib.MAX_QUESTION_LENGTH]),
+          tf.int64, [BATCH_SIZE, modellib.MAX_QUESTION_LENGTH]),
   }
 
   inputs_mc = {
       "monet_latents": tf.placeholder(
-          tf.float32,
+          tf.float64,
           [BATCH_SIZE, NUM_FRAMES, NUM_OBJECTS, modellib.EMBED_DIM]),
-      "question": tf.placeholder(tf.int32,
+      "question": tf.placeholder(tf.int64,
                                  [BATCH_SIZE, modellib.MAX_QUESTION_LENGTH]),
       "choices": tf.placeholder(
-          tf.int32, [BATCH_SIZE, modellib.NUM_CHOICES,
+          tf.int64, [BATCH_SIZE, modellib.NUM_CHOICES,
                      modellib.MAX_CHOICE_LENGTH]),
   }
 
