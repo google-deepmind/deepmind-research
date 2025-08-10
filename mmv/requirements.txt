@@ -1,9 +1,9 @@
-dm-haiku
-dm-tree
-jax
-jaxlib
-numpy>=1.16
-optax
+dm-haiku>=0.0.9
+dm-tree>=0.1.6
+jax>=0.3.25
+jaxlib>=0.3.25
+numpy>=1.16,<1.24
+optax>=0.1.4
 sklearn
-tensorflow
-tensorflow_datasets
+tensorflow>=2.8.0
+tensorflow_datasets>=4.6.0

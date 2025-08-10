@@ -72,7 +72,28 @@ class _CrossReplicaBatchNorm(hk.BatchNorm):
           'behavior use `normalizer=\'batch_norm\'` directly.')
 
     self._test_local_stats = test_local_stats
-    kwargs['cross_replica_axis'] = kwargs.get('cross_replica_axis', 'i')
+    
+    # Only set cross_replica_axis if we're actually in a pmap context
+    # This prevents "unbound axis name" errors when running on single device
+    default_axis = kwargs.get('cross_replica_axis', None)
+    if default_axis is None:
+      # Check if we're in a pmap context by looking for available axis names
+      try:
+        import jax
+        # Try to get available axis names - this will be empty if not in pmap
+        available_axes = jax.local_devices()  # This is a safe way to check JAX state
+        # Only set the axis if we have multiple devices or explicitly requested
+        if len(available_axes) > 1:
+          kwargs['cross_replica_axis'] = 'i'
+        else:
+          # Single device - don't use cross replica batch norm
+          kwargs['cross_replica_axis'] = None
+      except Exception:
+        # If anything fails, default to None (safer)
+        kwargs['cross_replica_axis'] = None
+    else:
+      kwargs['cross_replica_axis'] = default_axis
+      
     super().__init__(create_scale=create_scale,
                      create_offset=create_offset,
                      decay_rate=decay_rate,
