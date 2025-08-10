@@ -21,10 +21,30 @@ Requirements:
 *   kipoiseq (0.5.2)
 *   numpy (1.19.5)
 *   pandas (1.2.3)
-*   tensoflow (2.4.1)
+*   tensorflow (2.5.0)
 *   tensorflow-hub (0.11.0)
 
 See `requirements.txt`.
+
+### NVIDIA H100 GPU Support
+
+For H100 GPU compatibility, use the updated requirements:
+
+```shell
+pip install -r requirements-h100.txt
+```
+
+**H100 Requirements:**
+*   TensorFlow 2.8+ (for optimal performance)
+*   CUDA 11.8+
+*   cuDNN 8.6+
+
+Test H100 compatibility:
+```shell
+python ../test_h100_compatibility.py
+```
+
+See [H100-COMPATIBILITY.md](../H100-COMPATIBILITY.md) for detailed setup instructions.
 
 To run the unit test:
 

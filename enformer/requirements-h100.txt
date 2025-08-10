@@ -1,0 +1,23 @@
+# H100-compatible requirements for Enformer
+# This file provides TensorFlow and dependency versions compatible with NVIDIA H100 GPUs
+
+# Core ML framework - H100 compatible version
+tensorflow==2.10.1
+tensorflow-hub==0.13.0
+
+# DeepMind Sonnet - compatible version
+dm-sonnet==2.0.1
+
+# Scientific computing
+numpy==1.21.6
+pandas==1.5.3
+
+# Bioinformatics
+kipoiseq==0.5.2
+
+# Performance optimization for H100
+# Enable mixed precision and memory optimization
+tensorflow-io-gcs-filesystem==0.29.0  # For efficient data loading
+
+# Optional: Enhanced GPU memory management
+gputil>=1.4.0  # For GPU monitoring
