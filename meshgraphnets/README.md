@@ -40,6 +40,19 @@ Download a dataset:
     mkdir -p ${DATA}
     bash meshgraphnets/download_dataset.sh flag_simple ${DATA}
 
+**Alternative download methods:**
+
+If you encounter 404 errors with the bash script (Issue #596), use the Python downloader:
+
+    # Download using Python script (recommended)
+    python meshgraphnets/download_meshgraphnet_datasets.py --dataset flag_simple --output_dir ${DATA}
+    
+    # List available datasets
+    python meshgraphnets/download_meshgraphnet_datasets.py --list-datasets
+    
+    # Verify downloaded dataset
+    python meshgraphnets/download_meshgraphnet_datasets.py --verify flag_simple
+
 ## Running the model
 
 Train a model:
@@ -66,21 +79,48 @@ Datasets can be downloaded using the script `download_dataset.sh`. They contain
 a metadata file describing the available fields and their shape, and tfrecord
 datasets for train, valid and test splits.
 Dataset names match the naming in the paper.
-The following datasets are available:
 
-    airfoil
-    cylinder_flow
-    deforming_plate
-    flag_minimal
-    flag_simple
-    flag_dynamic
-    flag_dynamic_sizing
-    sphere_simple
-    sphere_dynamic
-    sphere_dynamic_sizing
+### 📋 **Complete Dataset List**
 
-`flag_minimal` is a truncated version of flag_simple, and is only used for
-integration tests. `flag_dynamic_sizing` and `sphere_dynamic_sizing` can be
-used to learn the sizing field. These datasets have the same structure as
-the other datasets, but contain the meshes in their state before remeshing,
-and define a matching `sizing_field` target for each mesh.
+The following datasets are available for download:
+
+#### **Fluid Dynamics (CFD)**
+- **`airfoil`**: Airfoil steady-state simulations (CFD around airfoils) - *Addresses Issue #569*
+- **`cylinder_flow`**: Cylinder flow CFD dataset (time-dependent fluid dynamics)
+
+#### **Cloth/Structural Dynamics**  
+- **`flag_simple`**: Simple flag simulation dataset (cloth dynamics)
+- **`flag_minimal`**: Truncated version of flag_simple (for integration tests)
+- **`flag_dynamic`**: Advanced flag dynamics with varying conditions
+- **`flag_dynamic_sizing`**: Flag simulation with adaptive mesh sizing
+
+#### **Structural Mechanics**
+- **`deforming_plate`**: Deforming plate simulation dataset
+- **`sphere_simple`**: Simple sphere simulation dataset  
+- **`sphere_dynamic`**: Complex sphere dynamics
+- **`sphere_dynamic_sizing`**: Sphere simulation with adaptive mesh sizing
+
+### 💾 **Download Methods**
+
+**Using Python script (recommended for Issue #569):**
+```bash
+# Download airfoil dataset (addresses Issue #569)
+python meshgraphnets/download_meshgraphnet_datasets.py --dataset airfoil --output_dir ${DATA}
+
+# List all available datasets
+python meshgraphnets/download_meshgraphnet_datasets.py --list-datasets
+
+# Download any specific dataset
+python meshgraphnets/download_meshgraphnet_datasets.py --dataset DATASET_NAME --output_dir ${DATA}
+```
+
+**Using shell script:**
+```bash
+bash meshgraphnets/download_dataset.sh DATASET_NAME ${DATA}
+```
+
+### 📖 **Detailed Dataset Information**
+
+For comprehensive information about each dataset, including research applications and usage examples, see [DATASETS.md](DATASETS.md).
+
+**Special Note for Issue #569**: The `airfoil` dataset mentioned in the MeshGraphNets paper is available for download using the methods above. This dataset contains steady-state CFD simulations around airfoils, suitable for aerodynamics research and comparison studies.
