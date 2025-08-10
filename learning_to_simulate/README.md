@@ -35,6 +35,16 @@ Download dataset (e.g. WaterRamps):
     mkdir -p /tmp/datasets
     bash ./learning_to_simulate/download_dataset.sh WaterRamps /tmp/datasets
 
+**Cross-platform alternatives:**
+
+For Python (recommended):
+
+    python ./learning_to_simulate/download_dataset.py WaterRamps /tmp/datasets
+
+For Windows PowerShell:
+
+    .\learning_to_simulate\download_dataset.ps1 -DatasetName "WaterRamps" -OutputDir "/tmp/datasets"
+
 Train a model:
 
     mkdir -p /tmp/models
@@ -94,6 +104,12 @@ Where:
   * `Goop-3D`
 
 The provided script `./download_dataset.sh` may be used to download all files from each dataset into a folder given its name.
+
+**Additional download tools:**
+* `download_dataset.py`: Cross-platform Python script with progress bars, resume capability, and better error handling
+* `download_dataset.ps1`: Windows PowerShell script for Windows users who prefer native PowerShell
+
+These tools address common issues with dataset downloading across different operating systems and provide improved user experience.
 
 An additional smaller dataset `WaterDropSample`, which includes only the first two trajectories of `WaterDrop` for each split, is provided for debugging purposes.
 
