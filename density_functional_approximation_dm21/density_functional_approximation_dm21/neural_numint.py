@@ -193,16 +193,39 @@ class NeuralNumInt(numint.NumInt):
     # Note an omega of 0.0 is interpreted by PySCF and libcint to indicate no
     # range-separation.
     self._omega_values = [0.0, 0.4]
+    
+    # Create a unique graph for this functional to avoid interference
+    # between different DM21 functional instances
     self._graph = tf.Graph()
     with self._graph.as_default():
       self._build_graph()
-      self._session = tf.Session()
+      # Create session with explicit graph to ensure isolation
+      self._session = tf.Session(graph=self._graph)
       self._session.run(tf.global_variables_initializer())
 
     self._grid_state = None
     self._system_state = None
     self._vmat_hf = None
     super().__init__()
+
+  def __del__(self):
+    """Cleanup method to properly close TensorFlow session and prevent resource leaks."""
+    try:
+      if hasattr(self, '_session') and self._session is not None:
+        self._session.close()
+    except Exception:
+      # Suppress exceptions during cleanup to avoid issues during interpreter shutdown
+      pass
+
+  def close(self):
+    """Explicitly close the TensorFlow session to free resources.
+    
+    This method should be called when the NeuralNumInt instance is no longer needed,
+    especially when switching between different DM21 functionals.
+    """
+    if hasattr(self, '_session') and self._session is not None:
+      self._session.close()
+      self._session = None
 
   def _build_graph(self, batch_dim: Optional[int] = None):
     """Builds the TensorFlow graph for evaluating the functional.
@@ -214,7 +237,18 @@ class NeuralNumInt(numint.NumInt):
         library.
     """
 
-    self._functional = hub.Module(spec=self._model_path)
+    # Ensure we're in the correct graph context to avoid cross-functional interference
+    assert tf.get_default_graph() == self._graph, (
+        "Graph context mismatch - this should not happen if sessions are properly isolated")
+    
+    # Load the TensorFlow Hub module with explicit path to ensure correct functional
+    try:
+      self._functional = hub.Module(spec=self._model_path)
+    except Exception as e:
+      raise RuntimeError(
+          f"Failed to load DM21 functional '{self._functional_name}' from path "
+          f"'{self._model_path}'. Please ensure the checkpoint files exist and are "
+          f"accessible. Original error: {e}")
 
     grid_coords = tf.placeholder(
         tf.float32, shape=[batch_dim, 3], name='grid_coords')
