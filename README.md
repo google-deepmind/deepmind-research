@@ -22,6 +22,23 @@ related areas on our [careers page](https://deepmind.com/careers/).
 For a full list of our publications, please see
 https://deepmind.com/research/publications/
 
+## 📊 Datasets and Resources
+
+**📋 [Complete Resource Index](open-source-resources.md)** - Comprehensive list of all datasets, code, and external resources
+
+### Quick Access to Major Datasets:
+- **[MeshGraphNets](meshgraphnets/)** - CFD and cloth simulation datasets
+- **[RL Unplugged](rl_unplugged/)** - Offline reinforcement learning benchmarks  
+- **[WikiGraphs](wikigraphs/)** - Wikipedia-Knowledge Graph paired dataset
+- **[Learning to Simulate](learning_to_simulate/)** - Physics simulation datasets
+- **[Nowcasting](nowcasting/)** - UK precipitation radar data
+
+**🔗 External Repositories:**
+- [DeepMind Lab](https://github.com/deepmind/lab) - 3D learning environments
+- [OpenSpiel](https://github.com/deepmind/open_spiel) - Multi-agent RL
+- [dm-haiku](https://github.com/deepmind/dm-haiku) - JAX neural networks
+- [Acme](https://github.com/deepmind/acme) - RL research framework
+
 ## Projects
 
 *   [Magnetic control of tokamak plasmas through deep reinforcement learning](fusion_tcv), Nature 2022
