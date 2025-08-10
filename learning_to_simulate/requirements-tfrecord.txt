@@ -1,0 +1,4 @@
+# TFRecord Generation Requirements
+tensorflow>=2.0.0
+numpy>=1.19.0
+pathlib2  # For Python < 3.4 compatibility

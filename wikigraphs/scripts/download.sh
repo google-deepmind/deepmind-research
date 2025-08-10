@@ -33,7 +33,7 @@ BASE_DIR=/tmp/data
 # wikitext-103
 TARGET_DIR=${BASE_DIR}/wikitext-103
 mkdir -p ${TARGET_DIR}
-wget https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-v1.zip -P ${TARGET_DIR}
+wget https://wikitext.smerity.com/wikitext-103-v1.zip -P ${TARGET_DIR}
 unzip ${TARGET_DIR}/wikitext-103-v1.zip -d ${TARGET_DIR}
 mv ${TARGET_DIR}/wikitext-103/* ${TARGET_DIR}
 rm -rf ${TARGET_DIR}/wikitext-103 ${TARGET_DIR}/wikitext-103-v1.zip
@@ -41,7 +41,7 @@ rm -rf ${TARGET_DIR}/wikitext-103 ${TARGET_DIR}/wikitext-103-v1.zip
 # wikitext-103-raw
 TARGET_DIR=${BASE_DIR}/wikitext-103-raw
 mkdir -p ${TARGET_DIR}
-wget https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-raw-v1.zip -P ${TARGET_DIR}
+wget https://wikitext.smerity.com/wikitext-103-raw-v1.zip -P ${TARGET_DIR}
 unzip ${TARGET_DIR}/wikitext-103-raw-v1.zip -d ${TARGET_DIR}
 mv ${TARGET_DIR}/wikitext-103-raw/* ${TARGET_DIR}
 rm -rf ${TARGET_DIR}/wikitext-103-raw ${TARGET_DIR}/wikitext-103-raw-v1.zip

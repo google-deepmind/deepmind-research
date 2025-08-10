@@ -1,0 +1,13 @@
+# Requirements for MeshGraphNet dataset download tools
+# This file contains minimal dependencies for the download functionality only
+
+# No additional dependencies required - using only Python standard library:
+# - urllib.request for HTTP downloads
+# - argparse for command line interface  
+# - pathlib for path handling
+# - typing for type hints
+
+# The download script is designed to work with Python 3.6+ standard library only
+# to minimize dependency requirements and avoid conflicts with the main project.
+
+# Main MeshGraphNet requirements are in the primary requirements.txt file
