@@ -35,6 +35,7 @@ class MeshGraphNetDownloader:
     BASE_URL = "https://storage.googleapis.com/dm-meshgraphnets"
     
     AVAILABLE_DATASETS = {
+        "airfoil": "Airfoil simulation dataset (CFD around airfoils)",
         "flag_simple": "Simple flag simulation dataset (cloth dynamics)",
         "cylinder_flow": "Cylinder flow CFD dataset (fluid dynamics)", 
         "deforming_plate": "Deforming plate simulation dataset",
