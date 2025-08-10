@@ -45,6 +45,31 @@ You can download and unzip the data by running the following command:
 bash scripts/download.sh
 ```
 
+**Alternative download methods:**
+
+If you encounter file not found errors (Issue #575), use the Python downloader:
+
+```bash
+# Download all datasets (recommended)
+python scripts/download_wikigraphs_datasets.py --all --output_dir /tmp/data
+
+# Download only WikiText-103
+python scripts/download_wikigraphs_datasets.py --wikitext --output_dir /tmp/data
+
+# Download only Freebase graphs  
+python scripts/download_wikigraphs_datasets.py --freebase --output_dir /tmp/data
+
+# Verify downloaded datasets
+python scripts/download_wikigraphs_datasets.py --verify /tmp/data
+```
+
+**Troubleshooting:**
+
+If you see `FileNotFoundError: [Errno 2] No such file or directory: '/tmp/data/wikitext-103/wiki.train.tokens'`:
+1. The original S3 download links are broken
+2. Use the Python download script above which uses working URLs
+3. Ensure you have sufficient disk space (~2GB for WikiText-103, ~10GB for Freebase)
+
 This will put the downloaded WikiText-103 data in a temporary directory
 `/tmp/data` with the tokenized WikiText-103 data in `/tmp/data/wikitext-103` and
 the raw data in `/tmp/data/wikitext-103-raw`.

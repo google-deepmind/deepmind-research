@@ -1,0 +1,16 @@
+# Requirements for WikiGraphs dataset download tools
+# This file contains minimal dependencies for the download functionality only
+
+# No additional dependencies required - using only Python standard library:
+# - urllib.request for HTTP downloads
+# - zipfile for ZIP extraction
+# - tarfile for TAR extraction
+# - argparse for command line interface  
+# - pathlib for path handling
+# - typing for type hints
+# - tempfile for temporary file handling
+
+# The download script is designed to work with Python 3.6+ standard library only
+# to minimize dependency requirements and avoid conflicts with the main project.
+
+# Main WikiGraphs requirements are in the primary requirements.txt file
