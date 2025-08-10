@@ -40,6 +40,19 @@ Download a dataset:
     mkdir -p ${DATA}
     bash meshgraphnets/download_dataset.sh flag_simple ${DATA}
 
+**Alternative download methods:**
+
+If you encounter 404 errors with the bash script (Issue #596), use the Python downloader:
+
+    # Download using Python script (recommended)
+    python meshgraphnets/download_meshgraphnet_datasets.py --dataset flag_simple --output_dir ${DATA}
+    
+    # List available datasets
+    python meshgraphnets/download_meshgraphnet_datasets.py --list-datasets
+    
+    # Verify downloaded dataset
+    python meshgraphnets/download_meshgraphnet_datasets.py --verify flag_simple
+
 ## Running the model
 
 Train a model:
