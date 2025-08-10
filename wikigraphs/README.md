@@ -7,6 +7,21 @@ This package provides tools to download the [WikiGraphs dataset](https://arxiv.o
 this can spur more interest in developing models that can generate long text
 conditioned on graph and generate graphs given text.
 
+## 🚀 Quick Start: Processed WikiText-103 Dataset (Issue #40 Solution)
+
+**New**: For convenient access to processed WikiText-103 data, use our one-command setup:
+
+```bash
+# Complete setup - downloads, processes, validates everything
+python scripts/setup_wikitext103_dataset.py
+
+# Advanced setup with full WikiGraphs integration  
+python scripts/create_processed_wikitext103_dataset.py --create_all
+```
+
+This creates a fully processed dataset with tokenized data, vocabulary, validation, and examples. 
+See [WIKITEXT103_SETUP_GUIDE.md](WIKITEXT103_SETUP_GUIDE.md) for detailed instructions.
+
 ## Setup Jax environment
 
 [Jax](https://github.com/google/jax#installation),
