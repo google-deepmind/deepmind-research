@@ -1,216 +1,333 @@
 #lang racket/base
 
-;***************************************************************************************;
-;****                             Operations on clauses                             ****;
-;***************************************************************************************;
+;**************************************************************************************;
+;****            Clause: Clauses With Additional Properties In A Struct            ****;
+;**************************************************************************************;
 
-(require bazaar/cond-else
-         bazaar/list
-         bazaar/loop
-         bazaar/mutation
-         (except-in bazaar/order atom<=>)
-         define2
-         global
-         racket/file
+(require define2
+         define2/define-wrapper
+         racket/format
          racket/list
+         racket/string
+         satore/clause
+         satore/clause-format
          satore/misc
-         satore/trie
          satore/unification
-         syntax/parse/define)
+         text-table)
 
 (provide (all-defined-out))
 
-(define-global *subsumes-iter-limit* 0
-  '("Number of iterations in the θ-subsumption loop before failing."
-    "May help in cases where subsumption take far too long."
-    "0 = no limit.")
-  exact-nonnegative-integer?
-  string->number)
+;==============;
+;=== Clause ===;
+;==============;
 
-(define-counter n-tautologies 0)
+;; TODO: A lot of space is wasted in Clause (boolean flags?)
+;; TODO: What's the best way to gain space without losing time or readability?
 
-;; Returns a new clause where the literals have been sorted according to `literal<?`.
+;; idx : exact-nonnegative-integer? ; unique id of the Clause.
+;; parents : (listof Clause?) ; The first parent is the 'mother'.
+;; clause : clause? ; the list of literals.
+;; type : symbol? ; How the Clause was generated (loaded from file, input clause, rewrite, resolution,
+;;   factor, etc.)
+;; binary-rewrite-rule? : boolean? ; Initially #false, set to #true if the clause has been added
+;;   (at some point) to the binary rewrite rules (but may not be in the set anymore if subsumed).
+;; candidate? : boolean? ; Whether the clause is currently a candidate (see `saturation` in
+;;   saturation.rkt).
+;; discarded? : boolean? ; whether the Clause has been discarded (see `saturation` in saturation.rkt).
+;; n-literals : exact-nonnegative-integer? ; number of literals in the clause.
+;; size : number? ; tree-size of the clause.
+;; depth : exact-nonnegative-integer? : Number of parents up to the input clauses, when following
+;;   resolutions and factorings.
+;; cost : number? ; Used to sort Clauses in `saturation` (in saturation.rkt).
+(struct Clause (idx
+                parents
+                clause
+                type
+                [binary-rewrite-rule? #:mutable]
+                [candidate? #:mutable]
+                [discarded? #:mutable]
+                n-literals
+                size
+                depth
+                [cost #:mutable])
+  #:prefab)
+
+;; Unique clause index. No two Clauses should have the same index.
+(define-counter clause-index 0)
+
+;; Clause constructor. See the struct Clause for more information.
 ;;
-;; (listof literal?) -> (listof literal?)
-(define (sort-clause cl)
-  (sort cl literal<?))
+;; parents : (listof Clause?)
+;; candidate? : boolean?
+;; n-literals : exact-nonnegative-integer?
+;; size : number?
+;; depth : exact-nonnegative-integer?
+(define (make-Clause cl
+                     [parents '()]
+                     #:? [type '?]
+                     #:? [candidate? #false]
+                     #:? [n-literals (length cl)]
+                     #:? [size (clause-size cl)]
+                     #:? [depth (if (empty? parents) 1 (+ 1 (Clause-depth (first parents))))])
+  (++clause-index)
+  (when-debug>= steps
+                (define cl2 (clause-normalize cl))  ; costly, hence done only in debug mode
+                (unless (= (tree-size cl) (tree-size cl2))
+                  (displayln "Assertion failed: clause is in normal form")
+                  (printf "Clause (type: ~a):\n~a\n" type (clause->string cl))
+                  (displayln "Parents:")
+                  (print-Clauses parents)
+                  (error (format "Assertion failed: (= (tree-size cl) (tree-size cl2)): ~a ~a"
+                                 (tree-size cl) (tree-size cl2)))))
+  ; Notice: Variables are ASSUMED freshed. Freshing is not performed here.
+  (Clause clause-index
+          parents
+          cl
+          type
+          #false ; binary-rewrite-rule
+          candidate?
+          #false ; discarded?
+          n-literals
+          size
+          depth ; depth (C0 is of depth 0, axioms are of depth 1)
+          0. ; cost
+          ))
 
-;; 'Normalizes' a clause by sorting the literals, safely factoring it (removes duplicate literals),
-;; and 'freshing' the variables.
-;; cl is assumed to be already Varified, but possibly not freshed.
+;; Sets the Clause as discarded. Used in `saturation`.
 ;;
-;; (listof literal?) -> (listof literal?)
-(define (clause-normalize cl)
-   ; fresh the variables just to make sure
-  (fresh (safe-factoring (sort-clause cl))))
+;; Clause? -> void?
+(define (discard-Clause! C) (set-Clause-discarded?! C #true))
 
-;; Takes a tree of symbols and returns a clause, after turning symbol variables into `Var`s.
-;; Used to turn human-readable clauses into computer-friendly clauses.
+;; A tautological clause used for as parent of the converse of a unit Clause.
+(define true-Clause (make-Clause (list ltrue)))
+
+;; Returns a  converse Clause of a unit or binary Clause.
+;; These are meant to be temporary.
 ;;
-;; tree? -> clause?
-(define (clausify l)
-  (clause-normalize (Varify l)))
+;; C : Clause?
+;; candidate? : boolean?
+;; -> Clause?
+(define (make-converse-Clause C #:? [candidate? #false])
+  (if (unit-Clause? C)
+      true-Clause ; If C has 1 literal A, then C = A | false, and converse is ~A | true = true
+      (make-Clause (fresh (clause-converse (Clause-clause C)))
+                   (list C)
+                   #:type 'converse
+                   #:candidate? candidate?)))
 
-;; clause? -> boolean?
-(define (empty-clause? cl)
-  (empty? cl))
+;; List of possible fields for output formatting.
+(define Clause->string-all-fields '(idx parents clause type binary-rw? depth size cost))
 
-;; Returns whether the clause `cl` is a tautologie.
-;; cl is a tautology if it contains the literals `l` and `(not l)`.
-;; Assumes that the clause cl is sorted according to `sort-clause`.
+;; Returns a tree representation of the Clause, for human reading.
+;; If what is a list, each element is printed (possibly multiple times).
+;; If what is 'all, all fields are printed.
 ;;
-;; clause? -> boolean?
-(define (clause-tautology? cl)
-  (define-values (neg pos) (partition lnot? cl))
-  (define pneg (map lnot neg))
-  (and
-   (or
-    (memq ltrue pos)
-    (memq lfalse pneg)
-    (let loop ([pos pos] [pneg pneg])
-      (cond/else
-       [(or (empty? pos) (empty? pneg)) #false]
-       #:else
-       (define p (first pos))
-       (define n (first pneg))
-       (define c (literal<=> p n))
-       #:cond
-       [(order<? c) (loop (rest pos) pneg)]
-       [(order>? c) (loop pos (rest pneg))]
-       [(literal==? p n)]
-       #:else (error "uh?"))))
-   (begin (++n-tautologies) #true)))
+;; Clause? (or/c 'all (listof symbol?)) -> list?
+(define (Clause->list C [what '(idx parents clause)])
+  (when (eq? what 'all)
+    (set! what Clause->string-all-fields))
+  (for/list ([w (in-list what)])
+    (case w
+      [(idx)            (~a (Clause-idx C))]
+      [(parents)        (~a (map Clause-idx (Clause-parents C)))]
+      [(clause)         (clause->string (Clause-clause C))]
+      [(clause-pretty)  (clause->string/pretty (Clause-clause C))]
+      [(type)           (~a (Clause-type C))]
+      [(binary-rw?)     (~a (Clause-binary-rewrite-rule? C))]
+      [(depth)          (~r (Clause-depth C))]
+      [(size)           (~r (Clause-size C))]
+      [(cost)           (~r2 (Clause-cost C))])))
 
-;; Returns the converse clause of `cl`.
-;; Notice: This does *not* rename the variables.
+;; Returns a string representation of a Clause.
 ;;
-;; clause? -> clause?
-(define (clause-converse cl)
-  (sort-clause (map lnot cl)))
+;; Clause? (or/c 'all (listof symbol?)) -> string?
+(define (Clause->string C [what '(idx parents clause)])
+  (string-join (Clause->list C what) " "))
 
-;; Returns the pair of (predicate-symbol . arity) of the literal.
+;; Returns a string representation of a Clause, for displaying a single Clause.
 ;;
-;; literal? -> (cons/c symbol? exact-nonnegative-integer?)
-(define (predicate.arity lit)
-  (let ([lit (depolarize lit)])
-    (cond [(list? lit) (cons (first lit) (length lit))]
-          [else (cons lit 0)])))
+;; Clause? (listof symbol?) -> string?
+(define (Clause->string/alone C [what '(idx parents clause)])
+  (when (eq? what 'all)
+    (set! what Clause->string-all-fields))
+  (string-join (map (λ (f w) (format "~a: ~a " w f))
+                    (Clause->list C what)
+                    what)
+               " "))
 
-;; Several counters to keep track of statistics.
-(define-counter n-subsumes-checks 0)
-(define-counter n-subsumes-steps 0)
-(define-counter n-subsumes-breaks 0)
-(define (reset-subsumes-stats!)
-  (reset-n-subsumes-checks!)
-  (reset-n-subsumes-steps!)
-  (reset-n-subsumes-breaks!))
-
-
-;; θ-subsumption. Returns a (unreduced) most-general unifier θ such that caθ ⊆ cb, in the sense
-;; of set inclusion.
-;; Assumes vars(ca) ∩ vars(cb) = ∅.
-;; Note that this function does not check for multiset inclusion. A length check is performed in
-;; Clause-subsumes?.
+;; Outputs the Clauses `Cs` in a table for human reading.
 ;;
-;; clause? clause? -> subst?
-(define (clause-subsumes ca cb)
-  (++n-subsumes-checks)
-  ; For every each la of ca  with current substitution β, we need to find a literal lb of cb
-  ; such that we can extend β to β' so that la β' = lb.
+;; (listof Clause?) (or/c 'all (listof symbol?)) -> void?
+(define (print-Clauses Cs [what '(idx parents clause)])
+  (when (eq? what 'all)
+    (set! what Clause->string-all-fields))
+  (print-simple-table
+   (cons what
+         (map (λ (C) (Clause->list C what)) Cs))))
 
-  (define cbtrie (make-trie #:variable? Var?))
-  (for ([litb (in-list cb)])
-    ; the key must be a list, but a literal may be just a constant, so we need to `list` it.
-    (trie-insert! cbtrie (list litb) litb))
-
-  ;; Each literal lita of ca is paired with a list of potential literals in cb that lita matches,
-  ;; for subsequent left-unification.
-  ;; We sort the groups by smallest size first, to fail fast.
-  (define groups
-    (sort
-     (for/list ([lita (in-list ca)])
-       ; lita must match litb, hence inverse-ref
-       (cons lita (append* (trie-inverse-ref cbtrie (list lita)))))
-     < #:key length #:cache-keys? #true))
-
-  ;; Depth-first search while trying to find a substitution that works for all literals of ca.
-  (define n-iter-max (*subsumes-iter-limit*))
-  (define n-iter 0)
-
-  (let/ec return
-    (let loop ([groups groups] [subst '()])
-      (++ n-iter)
-      ; Abort when we have reached the step limit
-      (when (= n-iter n-iter-max) ; if n-iter-max = 0 then no limit
-        (++n-subsumes-breaks)
-        (return #false))
-      (++n-subsumes-steps)
-      (cond
-        [(empty? groups) subst]
-        [else
-         (define gp (first groups))
-         (define lita (car gp))
-         (define litbs (cdr gp))
-         (for/or ([litb (in-list litbs)])
-           ; We use a immutable substitution to let racket handle copies when needed.
-           (define new-subst (left-unify/assoc lita litb subst))
-           (and new-subst (loop (rest groups) new-subst)))]))))
-
-;; Returns the shortest clause `cl2` such that `cl2` subsumes `cl`.
-;; Since `cl` subsumes each of its factors (safe or unsafe, and in the sense of
-;; non-multiset subsumption above), this means that `cl2` is equivalent to `cl`
-;; (hence no information is lost in `cl2`, it's a 'safe' factor).
-;; Assumes that the clause cl is sorted according to `sort-clause`.
-;; - The return value is eq? to the argument cl if no safe-factoring is possible.
-;; - Applies safe-factoring as much as possible.
+;; Returns a substitution if C1 subsumes C2 and the number of literals of C1 is no larger
+;; than that of C2, #false otherwise.
+;; Indeed, even when the clauses are safely factored, there can still be issues, for example,
+;; this prevents cases infinite chains such as:
+;; p(A, A) subsumed by p(A, B) | p(B, A) subsumed by p(A, B) | p(B, C) | p(C, A) subsumed by…
+;; Notice: This is an approximation of the correct subsumption based on multisets.
 ;;
-;; clause? -> clause?
-(define (safe-factoring cl)
-  (let/ec return
-    (zip-loop ([(l x r) cl])
-      (define pax (predicate.arity x))
-      (zip-loop ([(l2 y r2) r] #:break (not (equal? pax (predicate.arity y))))
-        ; To avoid code duplication:
-        (define-simple-macro (attempt a b)
-          (begin
-            (define s (left-unify a b))
-            (when s
-              (define new-cl
-                (sort-clause
-                 (fresh ; required for clause-subsumes below
-                  (left-substitute (rev-append l (rev-append l2 (cons a r2))) ; remove b
-                                   s))))
-              (when (clause-subsumes new-cl cl)
-                ; Try one more time with new-cl.
-                (return (safe-factoring new-cl))))))
+;; Clause? Clause? -> (or/c #false subst?)
+(define (Clause-subsumes C1 C2)
+  (and (<= (Clause-n-literals C1) (Clause-n-literals C2))
+       (clause-subsumes (Clause-clause C1) (Clause-clause C2))))
 
-        (attempt x y)
-        (attempt y x)))
-    cl))
-
-;; Returns whether the two clauses subsume each other,
-;; in the sense of (non-multiset) subsumption above.
+;; Like Clause-subsumes but first takes the converse of C1.
+;; Useful for rewrite rules.
 ;;
-;; clause? clause? -> boolean?
-(define (clause-equivalence? cl1 cl2)
-  (and (clause-subsumes cl1 cl2)
-       (clause-subsumes cl2 cl1)))
+;; Clause? Clause? -> (or/c #false subst?)
+(define (Clause-converse-subsumes C1 C2)
+  (and (<= (Clause-n-literals C1) (Clause-n-literals C2))
+       (clause-subsumes (clause-converse (Clause-clause C1))
+                        (Clause-clause C2))))
+
+;; Clause? -> boolean?
+(define (unit-Clause? C)
+  (= 1 (Clause-n-literals C)))
+
+;; Clause? -> boolean?
+(define (binary-Clause? C)
+  (= 2 (Clause-n-literals C)))
+
+;; Clause? -> boolean?
+(define (Clause-tautology? C)
+  (clause-tautology? (Clause-clause C)))
+
+;; Returns whether C1 and C2 are α-equivalences, that is,
+;; if there exists a renaming substitution α such that C1α = C2
+;; and C2α⁻¹ = C1.
+;;
+;; Clause? Clause? -> boolean?
+(define (Clause-equivalence? C1 C2)
+  (and (Clause-subsumes C1 C2)
+       (Clause-subsumes C2 C1)))
+
+;================;
+;=== Printing ===;
+;================;
+
+;; Returns the tree of ancestor Clauses of C up to init Clauses,
+;; but each Clause appears only once in the tree.
+;; (The full tree can be further retrieved from the Clause-parents.)
+;; Used for proofs.
+;;
+;; C : Clause?
+;; dmax : number?
+;; -> (treeof Clause?)
+(define (Clause-ancestor-graph C #:depth [dmax +inf.0])
+  (define h (make-hasheq))
+  (let loop ([C C] [depth 0])
+    (cond
+      [(or (> depth dmax)
+           (hash-has-key? h C))
+       #false]
+      [else
+       (hash-set! h C #true)
+       (cons C (filter-map (λ (C2) (loop C2 (+ depth 1)))
+                           (Clause-parents C)))])))
+
+;; Like `Clause-ancestor-graph` but represented as a string for printing.
+;;
+;; C : Clause?
+;; prefix : string? ; a prefix before each line
+;; tab : string? ; tabulation string to show the tree-like structure
+;; what : (or/c 'all (listof symbol?)) ; see `Clause->string`
+;; -> string?
+(define (Clause-ancestor-graph-string C
+                                      #:? [depth +inf.0]
+                                      #:? [prefix ""]
+                                      #:? [tab " "]
+                                      #:? [what '(idx parents type clause)])
+  (define h (make-hasheq))
+  (define str-out "")
+  (let loop ([C C] [d 0])
+    (unless (or (> d depth)
+                (hash-has-key? h C))
+      (set! str-out (string-append str-out
+                                   prefix
+                                   (string-append* (make-list d tab))
+                                   (Clause->string C what)
+                                   "\n"))
+      (hash-set! h C #true)
+      (for ([P (in-list (Clause-parents C))])
+        (loop P (+ d 1)))))
+  str-out)
+
+;; Like `Clause-ancestor-graph-string` but directly outputs it.
+(define-wrapper (display-Clause-ancestor-graph
+                 (Clause-ancestor-graph-string C #:? depth #:? prefix #:? tab #:? what))
+  #:call-wrapped call
+  (display (call)))
+
+;; Returns #true if C1 was generated before C2
+;;
+;; Clause? Clause? -> boolean?
+(define (Clause-age>= C1 C2)
+  (<= (Clause-idx C1) (Clause-idx C2)))
+
 
 ;=================;
 ;=== Save/load ===;
 ;=================;
 
-;; Save the clauses `cls` to the file `f`.
+;; Saves the Clauses `Cs` to the file `f`.
 ;;
-;; cls : (listof clause?)
+;; Cs : (listof Clause?)
 ;; f : file?
-;; exists : symbol? ; See `with-output-to-file`.
-(define (save-clauses! cls f #:? [exists 'replace])
-  (with-output-to-file f #:exists exists
-    (λ () (for-each writeln cls))))
+;; exists : symbol? ; see `with-output-to-file`
+;; -> void?
+(define (save-Clauses! Cs f #:? exists)
+  (save-clauses! (map Clause-clause Cs) f #:exists exists))
 
-;; Returns the list of clauses loaded from the file `f`.
+;; Loads Clauses from a file. If `sort?` is not #false, Clauses are sorted by Clause-size.
+;; The type defaults to `'load` and can be changed with `type`.
 ;;
-;; file? -> (listof clause?)
-(define (load-clauses f)
-  (map clausify (file->list f)))
+;; f : file?
+;; sort? : boolean?
+;; type : symbol?
+;; -> (listof Clause?)
+(define (load-Clauses f #:? [sort? #true] #:? [type 'load])
+  (define Cs (map (λ (c) (make-Clause c #:type type))
+                  (load-clauses f)))
+  (if sort?
+      (sort Cs <= #:key Clause-size)
+      Cs))
+
+;======================;
+;=== Test utilities ===;
+;======================;
+
+;; Provides testing utilities. Use with `(require (submod satore/Clause test))`.
+(module+ test
+  (require rackunit)
+  (provide Clausify
+           check-Clause-set-equivalent?)
+
+  ;; Takes a symbol tree, turns symbol variables into actual `Var`s, freshes them,
+  ;; sorts the literals and makes a new Clause.
+  ;;
+  ;; tree? -> Clause?
+  (define Clausify (compose make-Clause clausify))
+
+  ;; Returns whether for every clause of Cs1 there is an α-equivalent clause in Cs2.
+  ;;
+  ;; (listof Clause?)  (listof Clause?) -> any/c
+  (define-check (check-Clause-set-equivalent? Cs1 Cs2)
+    (unless (= (length Cs1) (length Cs2))
+      (fail-check "not ="))
+    (for/fold ([Cs2 Cs2])
+              ([C1 (in-list Cs1)])
+      (define C1b
+        (for/first ([C2 (in-list Cs2)] #:when (Clause-equivalence? C1 C2))
+          C2))
+      (unless C1b
+        (printf "Cannot find equivalence Clause for ~a\n" (Clause->string C1))
+        (print-Clauses Cs1)
+        (print-Clauses Cs2)
+        (fail-check))
+      (remq C1b Cs2))))
