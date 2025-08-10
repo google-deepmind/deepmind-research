@@ -27,8 +27,34 @@ To set up a Python virtual environment with the required dependencies, run:
 python3 -m venv mmv_env
 source mmv_env/bin/activate
 pip install --upgrade pip setuptools wheel
-pip install -r mmv/requirements.txt --use-feature=2020-resolver
+pip install -r mmv/requirements.txt
 ```
+
+### Troubleshooting: Axis Name Error
+
+If you encounter the error `NameError: unbound axis name: i`, this is due to the model expecting multi-device pmap setup but running on a single device. 
+
+**Quick Fix:**
+```shell
+# Use the provided runner script (recommended)
+python mmv/run_mmv_eval.py \
+  --checkpoint_path=/path/to/checkpoint \
+  --dataset_folder=/path/to/dataset \
+  --force_single_device
+
+# Or check your environment first
+python mmv/run_mmv_eval.py --check_only
+```
+
+**Manual Fix:**
+If you prefer to use the original script, set single-device mode:
+```python
+import os
+os.environ['JAX_PLATFORM_NAME'] = 'cpu'  # Force CPU mode
+# Then run your code
+```
+
+**Root Cause:** The error occurs because the model uses cross-replica batch normalization with axis name 'i', but this axis is only available in multi-device pmap contexts. The fix automatically detects the device setup and adjusts accordingly.
 
 
 ### Linear evaluation
@@ -36,10 +62,18 @@ pip install -r mmv/requirements.txt --use-feature=2020-resolver
 The linear evaluation on UCF101 can be run using:
 
 ```shell
+# Using the improved runner (recommended)
+python mmv/run_mmv_eval.py \
+  --checkpoint_path=/path/to/checkpoint \
+  --dataset_folder=/path/to/dataset
+
+# Original method (may require environment configuration)
 python -m mmv.eval_ucf101 \
   --checkpoint_path=</path/to/the/checkpointing/folder> \
   --dataset_folder=</path/to/dataset/folder>
 ```
+
+**Note:** If you encounter axis name errors with the original script, use the `run_mmv_eval.py` wrapper which handles device configuration automatically.
 
 ## Checkpoints
 
