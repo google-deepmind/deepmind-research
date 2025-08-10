@@ -3,9 +3,9 @@
 This repository contains implementations and illustrative code to accompany
 DeepMind publications. Along with publishing papers to accompany research
 conducted at DeepMind, we release open-source
-[environments](https://deepmind.com/research/open-source/open-source-environments/),
-[data sets](https://deepmind.com/research/open-source/open-source-datasets/),
-and [code](https://deepmind.com/research/open-source/open-source-code/) to
+[environments](https://github.com/deepmind),
+[data sets](https://github.com/deepmind/deepmind-research),
+and [code](https://github.com/deepmind) to
 enable the broader research community to engage with our work and build upon it,
 with the ultimate goal of accelerating scientific progress to benefit society.
 For example, you can build on our implementations of the
@@ -17,10 +17,38 @@ in the same environments we use for our research, such as
 
 If you enjoy building tools, environments, software libraries, and other
 infrastructure of the kind listed below, you can view open positions to work in
-related areas on our [careers page](https://deepmind.com/careers/).
+related areas on our [careers page](https://deepmind.google/about/careers/).
 
 For a full list of our publications, please see
-https://deepmind.com/research/publications/
+https://deepmind.google/research/publications/
+
+## Datasets
+
+Several projects in this repository provide access to datasets used in DeepMind research:
+
+### Computer Vision & Graphics
+*   [Learning to Simulate Complex Physics](learning_to_simulate) - Physics simulation datasets (WaterDrop, Sand, etc.)
+*   [PolyGen](polygen) - 3D mesh generation datasets
+*   [Multi-Object Representation Learning (IODINE)](iodine) - Multi-object scene datasets
+
+### Natural Language Processing  
+*   [WikiGraphs](wikigraphs) - Wikipedia-Knowledge Graph paired dataset
+*   [Language Modeling](curl) - Various text corpora for unsupervised learning
+
+### Reinforcement Learning
+*   [RL Unplugged](rl_unplugged) - Offline reinforcement learning benchmarks
+*   [DeepMind Lab](https://github.com/deepmind/lab) - 3D learning environments
+*   [OpenSpiel](https://github.com/deepmind/open_spiel) - Game theory and multi-agent environments
+
+### Genomics & Biology
+*   [Enformer](enformer) - Gene expression prediction datasets
+*   [AlphaFold](alphafold_casp13) - Protein structure prediction data
+
+### Physics & Simulation
+*   [MeshGraphNets](meshgraphnets) - Mesh-based simulation datasets
+*   [Density Functional Theory](density_functional_approximation_dm21) - Quantum chemistry datasets
+
+For specific dataset download instructions, refer to individual project READMEs.
 
 ## Projects
 
