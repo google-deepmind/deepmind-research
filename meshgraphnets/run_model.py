@@ -25,6 +25,8 @@ from meshgraphnets import cfd_eval
 from meshgraphnets import cfd_model
 from meshgraphnets import cloth_eval
 from meshgraphnets import cloth_model
+from meshgraphnets import sphere_eval
+from meshgraphnets import sphere_model
 from meshgraphnets import core_model
 from meshgraphnets import dataset
 
@@ -32,7 +34,7 @@ from meshgraphnets import dataset
 FLAGS = flags.FLAGS
 flags.DEFINE_enum('mode', 'train', ['train', 'eval'],
                   'Train model, or run evaluation.')
-flags.DEFINE_enum('model', None, ['cfd', 'cloth'],
+flags.DEFINE_enum('model', None, ['cfd', 'cloth', 'sphere'],
                   'Select model to run.')
 flags.DEFINE_string('checkpoint_dir', None, 'Directory to save checkpoint')
 flags.DEFINE_string('dataset_dir', None, 'Directory to load dataset from.')
@@ -47,7 +49,9 @@ PARAMETERS = {
     'cfd': dict(noise=0.02, gamma=1.0, field='velocity', history=False,
                 size=2, batch=2, model=cfd_model, evaluator=cfd_eval),
     'cloth': dict(noise=0.003, gamma=0.1, field='world_pos', history=True,
-                  size=3, batch=1, model=cloth_model, evaluator=cloth_eval)
+                  size=3, batch=1, model=cloth_model, evaluator=cloth_eval),
+    'sphere': dict(noise=0.003, gamma=0.1, field='world_pos', history=True,
+                   size=3, batch=1, model=sphere_model, evaluator=sphere_eval)
 }
 
 
