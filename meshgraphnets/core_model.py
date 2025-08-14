@@ -52,23 +52,22 @@ class GraphNetBlock(snt.AbstractModule):
       return self._model_fn()(tf.concat(features, axis=-1))
 
   def _build(self, graph):
-    """Applies GraphNetBlock and returns updated MultiGraph."""
+    """Applies GraphNetBlock and returns updated MultiGraph per MeshGraphNets paper."""
 
-    # apply edge functions
+    # Apply edge functions with immediate residual connections
     new_edge_sets = []
     for edge_set in graph.edge_sets:
-      updated_features = self._update_edge_features(graph.node_features,
-                                                    edge_set)
+      # Compute edge update
+      edge_update = self._update_edge_features(graph.node_features, edge_set)
+      # Apply residual connection immediately
+      updated_features = edge_set.features + edge_update
       new_edge_sets.append(edge_set._replace(features=updated_features))
 
-    # apply node function
-    new_node_features = self._update_node_features(graph.node_features,
-                                                   new_edge_sets)
+    # Apply node function with residual connection
+    node_update = self._update_node_features(graph.node_features, new_edge_sets)
+    # Apply residual connection to node features
+    new_node_features = graph.node_features + node_update
 
-    # add residual connections
-    new_node_features += graph.node_features
-    new_edge_sets = [es._replace(features=es.features + old_es.features)
-                     for es, old_es in zip(new_edge_sets, graph.edge_sets)]
     return MultiGraph(new_node_features, new_edge_sets)
 
 
