@@ -28,7 +28,7 @@ If you use the code here please cite this paper:
 After downloading the repo, and from the parent directory. Install dependencies:
 
     pip install -r learning_to_simulate/requirements.txt
-    mkdir -p /tmp/rollous
+    mkdir -p /tmp/rollouts
 
 Download dataset (e.g. WaterRamps):
 
