@@ -18,7 +18,7 @@
          define2
          global
          racket/list
-         satore/Clause
+         satore/clause-struct
          satore/clause
          satore/misc
          satore/trie

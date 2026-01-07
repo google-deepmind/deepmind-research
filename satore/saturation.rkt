@@ -20,7 +20,7 @@
          racket/math
          racket/pretty
          racket/string
-         satore/Clause
+         satore/clause-struct
          satore/clause-format
          satore/clause
          satore/interact

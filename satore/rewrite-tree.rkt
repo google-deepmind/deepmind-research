@@ -13,7 +13,7 @@
          racket/file
          racket/list
          racket/string
-         satore/Clause
+         satore/clause-struct
          satore/clause-format
          satore/clause
          satore/misc
@@ -521,7 +521,7 @@
           ; We set the bit to #true, *even if* no rule has been added,
           ; because the purpose of this bit is to avoid considering
           ; C later again to save time.
-          ; TODO: We could set Conv as a rewrite-rule too but ONLY if C also subsumes the converse
+          ; TODO: We could set Conv as a rewrite-rule too but ONLY if C also subsumes the converse
           ; TODO: of conv.
           (set-Clause-binary-rewrite-rule?! C #true)
           rls]))]))
