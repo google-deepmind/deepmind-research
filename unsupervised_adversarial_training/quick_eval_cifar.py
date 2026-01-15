@@ -17,6 +17,8 @@
 This script is called by run.sh.
 Usage:
   user@host:/path/to/deepmind_research$ unsupervised_adversarial_training/run.sh
+
+Updated to fix Issue #46: TensorFlow GraphKeys compatibility
 """
 
 from __future__ import absolute_import
@@ -26,6 +28,19 @@ from __future__ import print_function
 import collections
 from absl import app
 from absl import flags
+
+# Fix for Issue #46: TensorFlow GraphKeys compatibility
+try:
+    from unsupervised_adversarial_training.tensorflow_compatibility import setup_tensorflow_compatibility
+    setup_tensorflow_compatibility()
+except ImportError:
+    # Fallback for when running from different directories
+    import sys
+    import os
+    sys.path.append(os.path.dirname(__file__))
+    from tensorflow_compatibility import setup_tensorflow_compatibility
+    setup_tensorflow_compatibility()
+
 import cleverhans
 from cleverhans import attacks
 import numpy as np

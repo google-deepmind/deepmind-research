@@ -13,7 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""Utility functions for reading the datasets."""
+"""Dataset utilities for MeshGraphNets."""
+
+import json
+import os
+import re
+
+import tensorflow.compat.v1 as tf
 
 import functools
 import json
@@ -31,7 +37,23 @@ def _parse(proto, meta):
   features = tf.io.parse_single_example(proto, feature_lists)
   out = {}
   for key, field in meta['features'].items():
-    data = tf.io.decode_raw(features[key].values, getattr(tf, field['dtype']))
+    # Handle malformed dtype strings like "<dtype: 'float32'>"
+    dtype_str = field['dtype']
+    if dtype_str.startswith('<') and dtype_str.endswith('>'):
+      # Extract the actual dtype from malformed strings
+      match = re.search(r"'([^']+)'", dtype_str)
+      if match:
+        dtype_str = match.group(1)
+        # Handle numpy.float32 -> float32
+        if dtype_str.startswith('numpy.'):
+          dtype_str = dtype_str.replace('numpy.', '')
+      else:
+        # Alternative pattern for numpy dtypes like "<class 'numpy.float32'>"
+        match = re.search(r'\.([^.>]+)>', dtype_str)
+        if match:
+          dtype_str = match.group(1)
+    
+    data = tf.io.decode_raw(features[key].values, getattr(tf, dtype_str))
     data = tf.reshape(data, field['shape'])
     if field['type'] == 'static':
       data = tf.tile(data, [meta['trajectory_length'], 1, 1])
