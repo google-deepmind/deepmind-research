@@ -278,7 +278,7 @@ Each project directory is self contained with its own README, code, and dependen
 
 ## Feedback
 
-Found this guide helpful. Have suggestions for improvement. Please open an issue or contribute via a pull request.
+Found this guide helpful? Have suggestions for improvement? Please open an issue or contribute via a pull request.
 
 This is not an official Google product.
 
