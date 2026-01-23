@@ -77,7 +77,7 @@ Check the project README for the exact command to run.
 
 ## Recommended projects for beginners
 
-Start with these well documented, beginner friendly projects.
+Start with these well-documented, beginner-friendly projects.
 
 ### Easiest to get started
 
