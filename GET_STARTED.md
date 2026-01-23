@@ -5,7 +5,7 @@ Welcome. This repository contains implementations and example code that accompan
 
 ## What is in this repository
 
-This repository hosts 70 plus research projects from DeepMind publications. These projects cover areas such as:
+This repository hosts more than 70 research projects from DeepMind publications. These projects cover areas such as:
 
 - Machine Learning: graph networks, transformers, generative models
 - Reinforcement Learning: Deep Q Networks, offline reinforcement learning, multi agent systems
