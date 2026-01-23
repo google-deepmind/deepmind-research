@@ -90,7 +90,7 @@ Start with these well-documented, beginner-friendly projects.
 2. Bootstrap Your Own Latent (BYOL) (byol folder)
 
    * Why: clear documentation and visual results
-   * Topics: self supervised learning, computer vision
+   * Topics: self-supervised learning, computer vision
    * Prerequisites: JAX and Haiku
 
 3. Graph Matching Networks (graph_matching_networks folder)
