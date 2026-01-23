@@ -111,7 +111,7 @@ Start with these well-documented, beginner-friendly projects.
 
    * Why: real-world applications in engineering
    * Topics: graph networks, physics simulation
-   * Prerequisites: JAX, and understanding of mesh based methods
+   * Prerequisites: JAX, and understanding of mesh-based methods
 
 6. Adversarial Robustness (adversarial_robustness folder)
 
