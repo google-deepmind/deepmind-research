@@ -14,7 +14,7 @@ This repository hosts 70 plus research projects from DeepMind publications. Thes
 - Physics Simulation: graph neural networks for physics, mesh based simulation
 - Scientific Computing: quantum chemistry, climate modeling, fusion control
 
-Each directory in this repository represents a self contained project. Every project includes its own README, code, and sometimes datasets.
+Each directory in this repository represents a self-contained project. Every project includes its own README, code, and sometimes datasets.
 
 ## Prerequisites
 
