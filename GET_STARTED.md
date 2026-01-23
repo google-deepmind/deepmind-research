@@ -39,7 +39,6 @@ Recommended tools:
 ```bash
 git clone https://github.com/google-deepmind/deepmind-research.git
 cd deepmind-research
-````
 
 ### Step 2. Choose a project
 
