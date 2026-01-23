@@ -129,7 +129,7 @@ Start with these well-documented, beginner-friendly projects.
 
 8. Enformer (enformer folder)
 
-   * Why: state of the art genomics model
+   * Why: state-of-the-art genomics model
    * Topics: genomics, transformers
    * Prerequisites: TensorFlow, genomics background helps
 
