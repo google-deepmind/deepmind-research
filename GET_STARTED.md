@@ -11,7 +11,7 @@ This repository hosts more than 70 research projects from DeepMind publications.
 - Reinforcement Learning: Deep Q Networks, offline reinforcement learning, multi agent systems
 - Computer Vision: object detection, image generation, video prediction
 - Computational Biology: AlphaFold, protein structure prediction, genomics
-- Physics Simulation: graph neural networks for physics, mesh based simulation
+- Physics Simulation: graph neural networks for physics, mesh-based simulation
 - Scientific Computing: quantum chemistry, climate modeling, fusion control
 
 Each directory in this repository represents a self-contained project. Every project includes its own README, code, and sometimes datasets.
