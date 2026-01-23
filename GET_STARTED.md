@@ -231,7 +231,7 @@ Getting help:
 
 ## Contributing
 
-Interested in contributing. Check CONTRIBUTING.md.
+Interested in contributing? Check CONTRIBUTING.md.
 
 Ways to contribute:
 
