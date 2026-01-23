@@ -109,7 +109,7 @@ Start with these well-documented, beginner-friendly projects.
 
 5. MeshGraphNets (meshgraphnets folder)
 
-   * Why: real world applications in engineering
+   * Why: real-world applications in engineering
    * Topics: graph networks, physics simulation
    * Prerequisites: JAX, and understanding of mesh based methods
 
