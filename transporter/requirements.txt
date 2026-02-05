@@ -10,7 +10,7 @@ Keras-Preprocessing==1.0.9
 Markdown==3.1
 mock==3.0.5
 numpy==1.16.3
-protobuf==3.7.1
+protobuf==5.29.6
 semantic-version==2.6.0
 six==1.12.0
 tensorboard==1.13.1
