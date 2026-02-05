@@ -19,7 +19,7 @@ matplotlib==3.1.2
 numpy==1.18.1
 oauthlib==3.1.0
 opt-einsum==3.1.0
-protobuf==3.11.2
+protobuf==5.29.6
 pyasn1==0.4.8
 pyasn1-modules==0.2.7
 pyparsing==2.4.6
