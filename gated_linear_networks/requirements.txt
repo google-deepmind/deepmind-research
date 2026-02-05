@@ -31,7 +31,7 @@ numpy==1.18.5
 oauthlib==3.1.0
 opt-einsum==3.3.0
 promise==2.3
-protobuf==3.13.0
+protobuf==5.29.6
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 requests==2.24.0
