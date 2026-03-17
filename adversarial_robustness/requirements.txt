@@ -42,7 +42,7 @@ Pillow==8.2.0
 pkg-resources==0.0.0
 promise==2.3
 protobuf==3.17.3
-pyasn1==0.4.8
+pyasn1==0.6.3
 pyasn1-modules==0.2.8
 PyYAML==5.4.1
 requests==2.25.1
