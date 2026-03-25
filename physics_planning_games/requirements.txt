@@ -3,4 +3,4 @@ dm-control == 0.0.403778684
 dm-env
 labmaze
 numpy == 1.19.1
-requests == 2.24.0
+requests == 2.33.0
