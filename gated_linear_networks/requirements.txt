@@ -34,7 +34,7 @@ promise==2.3
 protobuf==3.13.0
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
-requests==2.24.0
+requests==2.33.0
 requests-oauthlib==1.3.0
 rlax==0.0.2
 rsa==4.6
