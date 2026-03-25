@@ -35,7 +35,7 @@ pyerfa==1.7.2
 pyparsing==2.4.7
 python-dateutil==2.8.1
 PyYAML==5.4.1
-requests==2.25.1
+requests==2.33.0
 requests-oauthlib==1.3.0
 rsa==4.7.2
 scipy==1.6.1
