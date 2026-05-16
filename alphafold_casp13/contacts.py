@@ -42,7 +42,6 @@ flags.DEFINE_string('stats_file', None,
 
 FLAGS = flags.FLAGS
 
-
 # A named tuple to store the outputs of a single prediction run.
 Prediction = collections.namedtuple(
     'Prediction', [
@@ -68,12 +67,10 @@ def evaluate(crop_size_x, crop_size_y, feature_normalization, checkpoint_path,
       crop_size_y=crop_size_y,
       feature_normalization=feature_normalization,
       normalization_exclusion=normalization_exclusion)
-
-  checkpoint = snt.get_saver(experiment.model, collections=[
+checkpoint = snt.get_saver(experiment.model, collections=[
       tf.GraphKeys.GLOBAL_VARIABLES,
       tf.GraphKeys.MOVING_AVERAGE_VARIABLES])
-
-  with tf.train.SingularMonitoredSession(hooks=[]) as sess:
+with tf.train.SingularMonitoredSession(hooks=[]) as sess:
     logging.info('Restoring from checkpoint %s', checkpoint_path)
     checkpoint.restore(sess, checkpoint_path)
 
@@ -88,8 +85,6 @@ def evaluate(crop_size_x, crop_size_y, feature_normalization, checkpoint_path,
                     num_bins=network_config.num_bins,
                     torsion_bins=network_config.torsion_bins)
     logging.info('Finished eval %.1fs', (time.time() - eval_begin_time))
-
-
 def _run_evaluation(
     sess, experiment, eval_config, output_dir, min_range, max_range, num_bins,
     torsion_bins):

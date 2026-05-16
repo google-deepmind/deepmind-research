@@ -56,10 +56,11 @@ class Checkpointer:
     """
     if jax.host_id() != 0:
       return
+      
 
     checkpoint_data = dict(
-        experiment_state=jax.tree_map(jax.device_get, experiment_state),
-        opt_state=jax.tree_map(jax.device_get, opt_state),
+    experiment_state=jax.tree_map(jax.device_get, experiment_state),
+    opt_state=jax.tree_map(jax.device_get, opt_state),
         step=step)
     if extra_checkpoint_info is not None:
       for key in extra_checkpoint_info:
