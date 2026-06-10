@@ -11,7 +11,7 @@ numpy==1.19.5
 optax==0.0.8
 tensorflow==2.5.0
 tensorflow-datasets==4.3.0
-torch==1.9.0
+torch==2.12.0
 torchvision==0.10.0
 tqdm==4.61.1
 # Transitive dependencies.
