@@ -23,7 +23,7 @@ python-snappy==0.6
 # Transitive dependencies.
 asn1crypto==0.24.0
 cloudpickle==1.2.2
-cryptography==2.1.4
+cryptography==48.0.1
 dataclasses==0.7
 future==0.18.2
 idna==2.6
