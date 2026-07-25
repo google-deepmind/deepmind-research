@@ -788,8 +788,11 @@
     (define pairs (find-critical-pairs rwtree rl #:bounded? bounded?))
     (for/fold ([any-change? any-change?])
               ([C (in-list pairs)])
-      (define change? (force-add-binary-Clause! rwtree C))
-      (or any-change? (and change? #true)))))
+      ; `force-add-binary-Clause!` returns the (possibly empty) list of rules that
+      ; were added; a rule was added iff that list is non-empty. Note that in Racket
+      ; the empty list is truthy, so we must test emptiness rather than truthiness.
+      (define added-rules (force-add-binary-Clause! rwtree C))
+      (or any-change? (pair? added-rules)))))
 
 ;; Performs several steps of confluence until no more change happens.
 ;; Returns whether any change has been made.
