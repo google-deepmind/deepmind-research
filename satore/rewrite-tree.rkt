@@ -756,8 +756,12 @@
                                                 (literal-size from-lit2)))
                           (unless (or (Clause-tautology? C)
                                       (and bounded?
-                                           (> (max (literal-size (first cl))
-                                                   (literal-size (second cl)))
+                                           ; `cl` is the normalized resolvent of the two `to`
+                                           ; literals; safe-factoring can collapse them into a
+                                           ; single literal, so take the max over all literals
+                                           ; rather than hard-coding (first cl)/(second cl),
+                                           ; which raises an index error on a one-literal clause.
+                                           (> (apply max 0 (map literal-size cl))
                                               max-size)))
                             (cons! C new-Clauses)))))))
   new-Clauses)
@@ -808,7 +812,9 @@
     (define changed? (rewrite-tree-confluence-step! rwtree #:bounded? bounded?))
     (cond [(or (>= step max-steps)
                (not changed?))
-           any-change?]
+           ; Include this iteration's change: when we stop because of max-steps
+           ; (e.g. max-steps = 1), a change made on the final step must still count.
+           (or any-change? changed?)]
           [else (loop (+ step 1) #true)])))
 
 ;================;
