@@ -148,7 +148,7 @@ File formats:
                       "("
                       (string-join (map literal->tptp-string (rest lit)) ", ")
                       ")")]
-      [(Var? lit) (symbol->string (Var-name->symbol lit))]
+      [(Var? lit) (symbol->string (Var-name->symbol (Var-name lit)))]
       [else (format "~a" lit)]))
 
 ;; Returns a string representing the clause cl.
