@@ -519,9 +519,6 @@
                      (when binary-rewritten?
                        (displayln "Binary rewritten:")
                        (display-Clause-ancestor-graph selected-Clause-brw #:depth 1))
-                     (unless (eq? selected-Clause-brw selected-Clause-brw)
-                       (displayln "Unit rewritten:")
-                       (display-Clause-ancestor-graph selected-Clause-brw #:depth 1))
                      (when-debug>= interact
                                    (interact-saturation
                                     (priority utree rwtree selected-Clause make-return-dict)
@@ -832,6 +829,10 @@
           (set-problem-time-used! prob (+ (problem-time-used prob) last-time))
           (set! res (dict-set res 'cumulative-time (exact-ceiling (* 1000 (problem-time-used prob)))))
 
+          ; Running total *including* the current problem, so it matches the
+          ; denominator `n-attempted-iter` (already incremented for this problem).
+          (define cumu-time* (+ cumu-time last-time))
+
           (define remove-problem?
             (or solved?
                 (check-status res 'memory) ; more time won't help if status=memory
@@ -848,8 +849,12 @@
                      n-solved n-attempted
                      n-solved-iter n-attempted-iter n-unsolved
                      (~r (* 100 (/ n-solved-iter n-attempted-iter)) #:precision '(= 1))
-                     (~r (/ cumu-time n-attempted-iter 1000.) #:precision '(= 3))
-                     (~r (* (/ cumu-time n-attempted-iter 1000.)
+                     ; `cumu-time*` accumulates `last-time`, which is in seconds, so the
+                     ; per-problem average and ETA are already in seconds (matching the `~as`
+                     ; label). Dividing by an extra 1000 made them 1000x too small; using the
+                     ; pre-update `cumu-time` also excluded the current problem from the mean.
+                     (~r (/ cumu-time* n-attempted-iter) #:precision '(= 3))
+                     (~r (* (/ cumu-time* n-attempted-iter)
                             (- n-unsolved n-attempted-iter)) #:precision '(= 2)))])
           (flush-output)
 
@@ -857,7 +862,7 @@
             (if remove-problem?
                 unsolved
                 (cons prob unsolved))
-            (+ cumu-time last-time))))
+            cumu-time*)))
       (unless (or (empty? new-unsolved)
                   (= cpu-limit-factor 0))
         (loop new-unsolved (+ iter 1))))))
