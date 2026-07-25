@@ -118,9 +118,9 @@
 ;;
 ;; unification-tree? literal? -> (listof Clause?)
 (define (unification-tree-ref utree lit)
-  ; Node values are lists of rules, and trie-ref returns a list of node-values,
-  ; hence the append*.
-  (remove-duplicates (append* (map utree-leaf-Clause (trie-ref utree lit))) eq?))
+  ; Node values are lists of `utree-leaf`, and trie-ref returns a list of node-values,
+  ; so append* first to flatten into a list of `utree-leaf` before mapping the accessor.
+  (remove-duplicates (map utree-leaf-Clause (append* (trie-ref utree lit))) eq?))
 
 ;; Helper for the resolve/factors functions below.
 ;; Defines a new set of Clauses, and a helper function that creates new Clauses,
