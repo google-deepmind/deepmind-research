@@ -15,8 +15,8 @@
 # ============================================================================
 """Online data normalization."""
 
-import sonnet as snt
 import tensorflow.compat.v1 as tf
+from meshgraphnets import snt_compat as snt
 
 
 class Normalizer(snt.AbstractModule):

@@ -15,8 +15,8 @@
 # ============================================================================
 """Model for FlagSimple."""
 
-import sonnet as snt
 import tensorflow.compat.v1 as tf
+from meshgraphnets import snt_compat as snt
 
 from meshgraphnets import common
 from meshgraphnets import core_model

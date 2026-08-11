@@ -21,6 +21,9 @@ from absl import flags
 from absl import logging
 import numpy as np
 import tensorflow.compat.v1 as tf
+tf.disable_eager_execution()
+tf.disable_v2_tensorshape()
+tf.disable_control_flow_v2()
 from meshgraphnets import cfd_eval
 from meshgraphnets import cfd_model
 from meshgraphnets import cloth_eval
