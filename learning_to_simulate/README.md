@@ -56,6 +56,13 @@ Plot a trajectory:
     python -m learning_to_simulate.render_rollout \
         --rollout_path=/tmp/rollouts/WaterRamps/rollout_test_0.pkl
 
+In a headless environment, save the animation to a GIF instead of opening an
+interactive window:
+
+    python -m learning_to_simulate.render_rollout \
+        --rollout_path=/tmp/rollouts/WaterRamps/rollout_test_0.pkl \
+        --output_path=/tmp/rollouts/WaterRamps/rollout_test_0.gif
+
 
 ## Datasets
 

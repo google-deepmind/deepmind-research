@@ -23,6 +23,8 @@ Where {OUTPUT_PATH} is the output path passed to `train.py` in "eval_rollout"
 mode.
 
 It may require installing Tkinter with `sudo apt-get install python3.7-tk`.
+For headless environments, pass `--output_path=/path/to/rollout.gif` to save the
+animation instead of displaying an interactive window.
 
 """  # pylint: disable=line-too-long
 
@@ -36,6 +38,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 flags.DEFINE_string("rollout_path", None, help="Path to rollout pickle file")
+flags.DEFINE_string("output_path", None,
+                    help="Optional GIF path for saving the animation.")
 flags.DEFINE_integer("step_stride", 3, help="Stride of steps to skip.")
 flags.DEFINE_boolean("block_on_show", True, help="For test purposes.")
 
@@ -54,6 +58,8 @@ def main(unused_argv):
 
   if not FLAGS.rollout_path:
     raise ValueError("A `rollout_path` must be passed.")
+  if FLAGS.output_path and not FLAGS.output_path.lower().endswith(".gif"):
+    raise ValueError("`output_path` must use the .gif extension.")
   with open(FLAGS.rollout_path, "rb") as file:
     rollout_data = pickle.load(file)
 
@@ -92,10 +98,14 @@ def main(unused_argv):
         outputs.append(line)
     return outputs
 
-  unused_animation = animation.FuncAnimation(
+  rollout_animation = animation.FuncAnimation(
       fig, update,
       frames=np.arange(0, num_steps, FLAGS.step_stride), interval=10)
-  plt.show(block=FLAGS.block_on_show)
+  if FLAGS.output_path:
+    rollout_animation.save(FLAGS.output_path, writer="pillow")
+    plt.close(fig)
+  else:
+    plt.show(block=FLAGS.block_on_show)
 
 
 if __name__ == "__main__":
