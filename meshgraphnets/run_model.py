@@ -41,6 +41,9 @@ flags.DEFINE_string('rollout_path', None,
 flags.DEFINE_enum('rollout_split', 'valid', ['train', 'test', 'valid'],
                   'Dataset split to use for rollouts.')
 flags.DEFINE_integer('num_rollouts', 10, 'No. of rollout trajectories')
+flags.DEFINE_integer(
+    'rollout_steps', 0,
+    'No. of rollout steps. Zero uses the dataset trajectory length.')
 flags.DEFINE_integer('num_training_steps', int(10e6), 'No. of training steps')
 
 PARAMETERS = {
@@ -87,10 +90,14 @@ def learner(model, params):
 
 def evaluator(model, params):
   """Run a model rollout trajectory."""
+  if FLAGS.rollout_steps < 0:
+    raise ValueError('rollout_steps must be non-negative.')
   ds = dataset.load_dataset(FLAGS.dataset_dir, FLAGS.rollout_split)
   ds = dataset.add_targets(ds, [params['field']], add_history=params['history'])
   inputs = tf.data.make_one_shot_iterator(ds).get_next()
-  scalar_op, traj_ops = params['evaluator'].evaluate(model, inputs)
+  rollout_steps = FLAGS.rollout_steps or None
+  scalar_op, traj_ops = params['evaluator'].evaluate(
+      model, inputs, num_steps=rollout_steps)
   tf.train.create_global_step()
 
   with tf.train.MonitoredTrainingSession(

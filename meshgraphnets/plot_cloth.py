@@ -34,7 +34,7 @@ def main(unused_argv):
   fig = plt.figure(figsize=(8, 8))
   ax = fig.add_subplot(111, projection='3d')
   skip = 10
-  num_steps = rollout_data[0]['gt_pos'].shape[0]
+  num_steps = rollout_data[0]['pred_pos'].shape[0]
   num_frames = len(rollout_data) * num_steps // skip
 
   # compute bounds

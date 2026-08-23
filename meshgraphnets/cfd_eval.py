@@ -43,19 +43,37 @@ def _rollout(model, initial_state, num_steps):
   return output.stack()
 
 
-def evaluate(model, inputs):
+def _resize_static_trajectory_field(field, num_steps):
+  """Trims or extends a static mesh field to match a rollout length."""
+  field_steps = field.shape.as_list()[0]
+  if num_steps <= field_steps:
+    return field[:num_steps]
+  extra_steps = num_steps - field_steps
+  return tf.concat(
+      [field, tf.tile(field[-1:], [extra_steps, 1, 1])], axis=0)
+
+
+def evaluate(model, inputs, num_steps=None):
   """Performs model rollouts and create stats."""
   initial_state = {k: v[0] for k, v in inputs.items()}
-  num_steps = inputs['cells'].shape[0]
+  ground_truth_steps = inputs['cells'].shape.as_list()[0]
+  if num_steps is None:
+    num_steps = ground_truth_steps
+  if num_steps <= 0:
+    raise ValueError('num_steps must be positive.')
   prediction = _rollout(model, initial_state, num_steps)
 
-  error = tf.reduce_mean((prediction - inputs['velocity'])**2, axis=-1)
+  comparison_steps = min(num_steps, ground_truth_steps)
+  error = tf.reduce_mean(
+      (prediction[:comparison_steps] -
+       inputs['velocity'][:comparison_steps])**2,
+      axis=-1)
   scalars = {'mse_%d_steps' % horizon: tf.reduce_mean(error[1:horizon+1])
              for horizon in [1, 10, 20, 50, 100, 200]}
   traj_ops = {
-      'faces': inputs['cells'],
-      'mesh_pos': inputs['mesh_pos'],
-      'gt_velocity': inputs['velocity'],
+      'faces': _resize_static_trajectory_field(inputs['cells'], num_steps),
+      'mesh_pos': _resize_static_trajectory_field(inputs['mesh_pos'], num_steps),
+      'gt_velocity': inputs['velocity'][:comparison_steps],
       'pred_velocity': prediction
   }
   return scalars, traj_ops
