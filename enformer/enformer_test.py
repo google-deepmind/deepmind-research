@@ -34,6 +34,21 @@ class TestEnformer(unittest.TestCase):
     self.assertEqual(outputs['human'].shape, (1, enformer.TARGET_LENGTH, 5313))
     self.assertEqual(outputs['mouse'].shape, (1, enformer.TARGET_LENGTH, 1643))
 
+  def test_custom_heads(self):
+    model = enformer.Enformer(
+        channels=1536,
+        num_transformer_layers=11,
+        name='enformer_pig',
+        heads_channels={'pig': 17})
+    self.assertEqual(set(model.heads), {'pig'})
+    head_inputs = np.zeros((1, 2, 3072), dtype=np.float32)
+    outputs = model.heads['pig'](head_inputs, is_training=False)
+    self.assertEqual(outputs.shape, (1, 2, 17))
+
+  def test_empty_heads_rejected(self):
+    with self.assertRaises(ValueError):
+      enformer.Enformer(heads_channels={})
+
 
 def _get_random_input():
   seq = ''.join(

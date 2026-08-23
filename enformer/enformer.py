@@ -27,7 +27,7 @@ Pushmeet Kohli1, David R. Kelley2*
 * correspondence: avsec@google.com, pushmeet@google.com, drk@calicolabs.com
 """
 import inspect
-from typing import Any, Callable, Dict, Optional, Text, Union, Iterable
+from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Text, Union
 
 import attention_module
 import numpy as np
@@ -47,7 +47,8 @@ class Enformer(snt.Module):
                num_transformer_layers: int = 11,
                num_heads: int = 8,
                pooling_type: str = 'attention',
-               name: str = 'enformer'):
+               name: str = 'enformer',
+               heads_channels: Optional[Mapping[str, int]] = None):
     """Enformer model.
 
     Args:
@@ -57,10 +58,17 @@ class Enformer(snt.Module):
       num_heads: Number of attention heads.
       pooling_type: Which pooling function to use. Options: 'attention' or max'.
       name: Name of sonnet module.
+      heads_channels: Mapping from output head names to numbers of target tracks.
+        Defaults to the published human and mouse heads.
     """
     super().__init__(name=name)
     # pylint: disable=g-complex-comprehension,g-long-lambda,cell-var-from-loop
-    heads_channels = {'human': 5313, 'mouse': 1643}
+    if heads_channels is None:
+      heads_channels = {'human': 5313, 'mouse': 1643}
+    elif not heads_channels:
+      raise ValueError('heads_channels must contain at least one output head.')
+    else:
+      heads_channels = dict(heads_channels)
     dropout_rate = 0.4
     assert channels % num_heads == 0, ('channels needs to be divisible '
                                        f'by {num_heads}')

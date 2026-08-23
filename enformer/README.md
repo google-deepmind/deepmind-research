@@ -124,6 +124,18 @@ full sonnet module is defined in `enformer.py` called Enformer. See
 on how to train the model on Basenji2 data and how to load the pre-trained
 weights into the Enformer module for fine-tuning.
 
+The source model defaults to the published human and mouse output heads. To
+train Enformer with a different set of target tracks, pass a mapping from output
+head name to the number of tracks, for example:
+
+```python
+model = Enformer(heads_channels={'pig': num_pig_tracks})
+```
+
+This changes the output-head configuration only. A new head does not have
+weights in the published human/mouse checkpoint and therefore needs to be
+trained for the corresponding targets.
+
 ## Colab
 
 Further usage and training examples are given in the following colab notebooks:
