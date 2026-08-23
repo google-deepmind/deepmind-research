@@ -23,7 +23,8 @@ from setuptools import setup
 
 
 REQUIRED_PACKAGES = ['numpy', 'dm-sonnet==1.36', 'tensorflow==1.14',
-                     'tensor2tensor==1.15', 'networkx', 'matplotlib', 'six']
+                     'tensorflow-probability==0.7.0', 'tensor2tensor==1.15',
+                     'networkx', 'matplotlib', 'six']
 
 setup(
     name='polygen',
