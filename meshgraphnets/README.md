@@ -66,6 +66,30 @@ Datasets can be downloaded using the script `download_dataset.sh`. They contain
 a metadata file describing the available fields and their shape, and tfrecord
 datasets for train, valid and test splits.
 Dataset names match the naming in the paper.
+
+### Dataset field layout
+
+For mesh-based CFD datasets such as `cylinder_flow` and `airfoil`, the main
+trajectory fields are organized around mesh nodes and cells:
+
+* `cells`: triangle connectivity with shape `[num_steps, num_cells, 3]`. Each
+  entry contains three node indices defining one triangular cell.
+* `mesh_pos`: mesh-node coordinates with shape `[num_steps, num_nodes, 2]` for
+  the 2D CFD domains.
+* `node_type`: one integer type per mesh node, with shape
+  `[num_steps, num_nodes, 1]`. The values are defined by `NodeType` in
+  `common.py`, including `NORMAL`, `OBSTACLE`, `AIRFOIL`, `HANDLE`, `INFLOW`,
+  `OUTFLOW`, and `WALL_BOUNDARY`.
+* `velocity`: the velocity sampled at each mesh-node position, with shape
+  `[num_steps, num_nodes, 2]` in the 2D CFD domains.
+* `pressure`: the pressure sampled at each mesh-node position, with shape
+  `[num_steps, num_nodes, 1]` when present.
+
+The provided `cfd_model.py` constructs node features from velocity and the
+one-hot encoded node type, while `mesh_pos` is used to construct edge features.
+Pressure is part of the CFD dataset but is not an input to the provided
+`cylinder_flow` demonstration model.
+
 The following datasets are available:
 
     airfoil
