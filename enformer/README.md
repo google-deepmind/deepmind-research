@@ -83,6 +83,21 @@ one hot encoded using the order of indices being 'ACGT' with N values being all
 zeros. Note that only the central 196,608 bp of the input sequence will be used
 by the Enformer model. The rest will be cropped within the model.
 
+### Sequence length
+
+Two sequence lengths appear in the released examples. The TensorFlow Hub wrapper
+accepts 393,216 bp and crops to the central 196,608 bp used by the Enformer
+network. In the source implementation, `SEQUENCE_LENGTH = 196_608` is also part
+of the `predict_on_batch` SavedModel input signature. After the stem and six
+convolutional pooling stages, the trunk is cropped to `TARGET_LENGTH = 896`
+prediction bins.
+
+For the published pre-trained model, pad or crop inputs to the expected length
+rather than changing `SEQUENCE_LENGTH`. Changing that constant alone changes the
+SavedModel signature but does not retrain the model or redefine the published
+input/output geometry. Experiments with a different context length should be
+trained and validated as a modified model configuration.
+
 ```python
 import tensorflow as tf
 import tensorflow_hub as hub
