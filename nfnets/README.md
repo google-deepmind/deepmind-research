@@ -19,6 +19,32 @@ virtualenv.
 Note that you will need a local copy of ImageNet compatible with the TFDS format
 used in dataset.py in order to train on ImageNet.
 
+`NFNet` is a Haiku module, so it must be constructed inside an `hk.transform`
+(or another Haiku transform) rather than instantiated directly at module scope.
+For example:
+
+```python
+import haiku as hk
+import jax
+import jax.numpy as jnp
+
+from nfnets import nfnet
+
+
+def forward(images, is_training):
+  model = nfnet.NFNet(num_classes=5, variant='F0')
+  return model(images, is_training=is_training)['logits']
+
+
+network = hk.transform(forward)
+images = jnp.zeros((1, 224, 224, 3))
+params = network.init(jax.random.PRNGKey(0), images, False)
+logits = network.apply(params, None, images, False)
+```
+
+When applying the model with `is_training=True`, pass a PRNG key to
+`network.apply` so stochastic layers such as dropout can draw randomness.
+
 
 ## Pre-Trained Weights
 
