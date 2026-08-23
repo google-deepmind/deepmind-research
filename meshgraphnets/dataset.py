@@ -18,10 +18,23 @@
 import functools
 import json
 import os
+import re
 
 import tensorflow.compat.v1 as tf
 
 from meshgraphnets.common import NodeType
+
+
+_DTYPE_RE = re.compile(r"^<dtype: '([^']+)'>$", re.ASCII)
+
+
+def _as_dtype(dtype):
+  """Converts metadata dtype values to TensorFlow dtypes."""
+  if isinstance(dtype, str):
+    match = _DTYPE_RE.fullmatch(dtype)
+    if match:
+      dtype = match.group(1)
+  return tf.as_dtype(dtype)
 
 
 def _parse(proto, meta):
@@ -31,16 +44,30 @@ def _parse(proto, meta):
   features = tf.io.parse_single_example(proto, feature_lists)
   out = {}
   for key, field in meta['features'].items():
-    data = tf.io.decode_raw(features[key].values, getattr(tf, field['dtype']))
-    data = tf.reshape(data, field['shape'])
-    if field['type'] == 'static':
-      data = tf.tile(data, [meta['trajectory_length'], 1, 1])
-    elif field['type'] == 'dynamic_varlen':
+    data = tf.io.decode_raw(features[key].values, _as_dtype(field['dtype']))
+    if field['type'] == 'dynamic_varlen':
       length = tf.io.decode_raw(features['length_'+key].values, tf.int32)
       length = tf.reshape(length, [-1])
+      # The number of variable-length rows is encoded independently, so for
+      # two-dimensional fields the trailing width can be inferred from the
+      # serialized data instead of relying on a potentially stale value in
+      # metadata.
+      if len(field['shape']) == 2 and field['shape'][0] == -1:
+        row_count = tf.reduce_sum(length)
+        feature_width = tf.cond(
+            tf.equal(row_count, 0),
+            lambda: tf.constant(field['shape'][1], dtype=tf.int32),
+            lambda: tf.math.floordiv(tf.size(data), row_count))
+        data = tf.reshape(data, tf.stack([row_count, feature_width]))
+      else:
+        data = tf.reshape(data, field['shape'])
       data = tf.RaggedTensor.from_row_lengths(data, row_lengths=length)
-    elif field['type'] != 'dynamic':
-      raise ValueError('invalid data format')
+    else:
+      data = tf.reshape(data, field['shape'])
+      if field['type'] == 'static':
+        data = tf.tile(data, [meta['trajectory_length'], 1, 1])
+      elif field['type'] != 'dynamic':
+        raise ValueError('invalid data format')
     out[key] = data
   return out
 
