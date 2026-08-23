@@ -69,6 +69,13 @@ Datasets are available to download via:
 
   `https://storage.googleapis.com/learning-to-simulate-complex-physics/Datasets/{DATASET_NAME}/{DATASET_SPLIT}.tfrecord`
 
+The metadata `sequence_length` is the number of simulation transitions used by
+the dataset. Each serialized position trajectory contains
+`sequence_length + 1` frames because an additional initial frame is needed to
+compute the first position change. For example, `sequence_length: 600`
+corresponds to 601 position frames. `reading_utils.py` accounts for this extra
+frame when reshaping positions and per-step context.
+
 Where:
 
 * `{DATASET_SPLIT}` is one of:
