@@ -83,6 +83,13 @@ one hot encoded using the order of indices being 'ACGT' with N values being all
 zeros. Note that only the central 196,608 bp of the input sequence will be used
 by the Enformer model. The rest will be cropped within the model.
 
+`one_hot_encode` assigns non-zero vectors only to the uppercase canonical bases
+`A`, `C`, `G`, and `T`. `N` is encoded as all zeros, and characters that are not
+in the canonical alphabet also remain all zeros. This includes IUPAC ambiguity
+codes such as `R`, `Y`, and `M`, and lowercase soft-masked bases such as `a`,
+`c`, `g`, and `t`. Convert lowercase sequence to uppercase before encoding if
+soft masking should not change the canonical base identity.
+
 ```python
 import tensorflow as tf
 import tensorflow_hub as hub
