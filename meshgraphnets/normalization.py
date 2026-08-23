@@ -68,5 +68,10 @@ class Normalizer(snt.AbstractModule):
 
   def _std_with_epsilon(self):
     safe_count = tf.maximum(self._acc_count, 1.)
-    std = tf.sqrt(self._acc_sum_squared / safe_count - self._mean()**2)
+    variance = self._acc_sum_squared / safe_count - self._mean()**2
+    # Roundoff in E[x^2] - E[x]^2 can make a mathematically non-negative
+    # variance slightly negative. Clamp before sqrt so that this does not
+    # propagate a NaN through normalization.
+    variance = tf.maximum(variance, 0.)
+    std = tf.sqrt(variance)
     return tf.math.maximum(std, self._std_epsilon)
