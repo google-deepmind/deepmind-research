@@ -58,6 +58,7 @@ def learner(model, params):
   ds = dataset.split_and_preprocess(ds, noise_field=params['field'],
                                     noise_scale=params['noise'],
                                     noise_gamma=params['gamma'])
+  ds = dataset.batch_dataset(ds, params['batch'])
   inputs = tf.data.make_one_shot_iterator(ds).get_next()
 
   loss_op = model.loss(inputs)
