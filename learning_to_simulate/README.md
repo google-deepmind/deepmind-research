@@ -25,10 +25,18 @@ If you use the code here please cite this paper:
 
 ![WaterRamps rollout](images/water_ramps_rollout.gif)
 
-After downloading the repo, and from the parent directory. Install dependencies:
+After downloading the repo, and from the parent directory. This reference
+implementation depends on TensorFlow 1.15, whose published Python wheels support
+Python 3.6 and 3.7. Use one of those Python versions when creating the
+environment; newer Python versions cannot install the pinned TensorFlow 1.x
+runtime from PyPI.
 
+For example, with Python 3.7 available as `python3.7`:
+
+    python3.7 -m venv /tmp/learning_to_simulate_venv
+    source /tmp/learning_to_simulate_venv/bin/activate
     pip install -r learning_to_simulate/requirements.txt
-    mkdir -p /tmp/rollous
+    mkdir -p /tmp/rollouts
 
 Download dataset (e.g. WaterRamps):
 
