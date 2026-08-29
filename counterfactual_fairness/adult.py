@@ -37,7 +37,7 @@ _CATEGORICAL_COLUMNS = ('workclass', 'education', 'marital-status',
 def _read_data(
     name,
     data_path=''):
-  with os.path.join(data_path, name) as data_file:
+  with open(os.path.join(data_path, name)) as data_file:
     data = pd.read_csv(data_file, header=None, index_col=False,
                        names=_COLUMNS, skipinitialspace=True, na_values='?')
     for categorical in _CATEGORICAL_COLUMNS:
