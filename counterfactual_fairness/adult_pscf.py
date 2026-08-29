@@ -40,6 +40,11 @@ from counterfactual_fairness import variational
 FLAGS = flags.FLAGS
 config_flags.DEFINE_config_file(
     'config', 'adult_pscf_config.py', 'Training configuration.')
+flags.DEFINE_string(
+    'dataset_dir', '', 'Directory containing the Adult dataset files.')
+flags.DEFINE_integer(
+    'num_steps', 0, 'Number of training steps; 0 uses the value from the '
+    'config file.')
 
 LOG_EVERY = 100
 
@@ -501,11 +506,11 @@ class Updater:
 
 def main(_):
   flags_config = FLAGS.config
+  num_steps = FLAGS.num_steps or flags_config.num_steps
   # Create the dataset.
   train_data, test_data = adult.read_all_data(FLAGS.dataset_dir)
   column_names = list(train_data.columns)
-  train_input = build_input(train_data, flags_config.batch_size,
-                            flags_config.num_steps)
+  train_input = build_input(train_data, flags_config.batch_size, num_steps)
 
   # Set up the model, loss, and updater.
   forward_fn, fair_inference_fn = build_forward_fn(
@@ -533,7 +538,7 @@ def main(_):
   # Training loop.
   logging.info('Starting train loop...')
   prev_time = time.time()
-  for step in range(flags_config.num_steps):
+  for step in range(num_steps):
     train_data = next(train_input)
     state, stats = updater.update(state, train_data)
     if step % LOG_EVERY == 0:
