@@ -30,7 +30,7 @@ pip install --upgrade -r counterfactual_fairness/requirements.txt
 
 # Download minimal dataset
 DATA_DIR="${TMP_DIR}/adult"
-bash counterfactual_fairness/download_dataset.sh ${TMP_DIR}
+bash counterfactual_fairness/download_dataset.sh ${DATA_DIR}
 
 # Train for a few steps.
 python -m counterfactual_fairness.adult_pscf --config="counterfactual_fairness/adult_pscf_config.py" --dataset_dir=${DATA_DIR} --num_steps=10
