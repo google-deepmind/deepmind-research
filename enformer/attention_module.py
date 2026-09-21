@@ -453,7 +453,8 @@ def positional_features_gamma(positions: tf.Tensor,
       tf.abs(tf.cast(positions, dtype=tf.float32))[..., tf.newaxis],
       concentration, rate)
   probabilities += 1e-8  # To ensure numerical stability.
-  outputs = probabilities / tf.reduce_max(probabilities)
+  outputs = probabilities / tf.reduce_max(probabilities,
+                                          axis=1, keepdims=True)
   tf.TensorShape(outputs.shape).assert_is_compatible_with(
       positions.shape + [feature_size])
   return outputs

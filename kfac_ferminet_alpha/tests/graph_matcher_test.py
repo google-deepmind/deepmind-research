@@ -12,11 +12,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import unittest
+
 from absl.testing import absltest
 import jax
 import jax.numpy as jnp
 import jax.random as jnr
-import jax.test_util as jtu
 
 from kfac_ferminet_alpha import layers_and_loss_tags
 from kfac_ferminet_alpha import loss_functions
@@ -44,7 +45,7 @@ def tagged_autoencoder(all_params, x_in):
   return [[h1, t2], [h2, t2]]
 
 
-class TestGraphMatcher(jtu.JaxTestCase):
+class TestGraphMatcher(unittest.TestCase):
   """Class for running all of the tests for integrating the systems."""
 
   def _test_jaxpr(self, init_func, model_func, tagged_model, data_shape):
@@ -60,10 +61,8 @@ class TestGraphMatcher(jtu.JaxTestCase):
     self.assertEqual(len(jaxpr.constvars), len(tagged_jaxpr.constvars))
     self.assertEqual(len(jaxpr.outvars), len(tagged_jaxpr.outvars))
     for eq, tagged_eq in zip(jaxpr.eqns, tagged_jaxpr.eqns):
-      eq_in_vars = [v for v in eq.invars if not isinstance(v, jax.core.UnitVar)]
-      tagged_in_vars = [
-          v for v in tagged_eq.invars if not isinstance(v, jax.core.UnitVar)
-      ]
+      eq_in_vars = [v for v in eq.invars]
+      tagged_in_vars = [v for v in tagged_eq.invars]
       self.assertEqual(len(eq_in_vars), len(tagged_in_vars))
       self.assertEqual(len(eq.outvars), len(tagged_eq.outvars))
       self.assertEqual(eq.primitive, tagged_eq.primitive)

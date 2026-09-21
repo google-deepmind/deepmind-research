@@ -81,7 +81,7 @@ class NF_ResNet(hk.Module):
                                    )]
         ch = block_width
         index += 1
-         # Reset expected std but still give it 1 block of growth
+        # Reset expected std but still give it 1 block of growth
         if block_index == 0:
           expected_std = 1.0
         expected_std = (expected_std **2 + alpha**2)**0.5
@@ -124,11 +124,8 @@ class NF_ResNet(hk.Module):
       flops += [block.count_flops(h, w)]
       if block.stride > 1:
         h, w = h / block.stride, w / block.stride
-    # Head module FLOPs
-    out_ch = self.blocks[-1].out_ch
-    flops += [base.count_conv_flops(out_ch, self.final_conv, h, w)]
     # Count flops for classifier
-    flops += [self.final_conv.output_channels * self.fc.output_size]
+    flops += [self.blocks[-1].out_ch * self.fc.output_size]
     return flops, sum(flops)
 
 
@@ -213,4 +210,3 @@ class NFResBlock(hk.Module):
     se_flops += self.se.fc0.output_size * self.se.fc1.output_size
     contract_flops = base.count_conv_flops(self.width, self.conv2, h, w)
     return sum([expand_flops, dw_flops, se_flops, contract_flops, sc_flops])
-

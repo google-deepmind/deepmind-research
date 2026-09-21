@@ -291,7 +291,7 @@ class Experiment(experiment.AbstractExperiment):
   #  \__|_|  \__,_|_|_| |_|
   #
 
-  def step(self, global_step: int, rng: jnp.ndarray,
+  def step(self, global_step: int, rng: jnp.ndarray,  # pytype: disable=signature-mismatch  # jax-ndarray
            *unused_args, **unused_kwargs):
     """See base class."""
 
@@ -444,9 +444,9 @@ class Experiment(experiment.AbstractExperiment):
     params = optax.apply_updates(params, updates)
 
     n_params = 0
-    for k in params.keys():
+    for k in params.keys():  # pytype: disable=attribute-error  # numpy-scalars
       for l in params[k]:
-        n_params = n_params + np.prod(params[k][l].shape)
+        n_params = n_params + np.prod(params[k][l].shape)  # pytype: disable=attribute-error  # numpy-scalars
 
     # Scalars to log (note: we log the mean across all hosts/devices).
     scalars = {'learning_rate': learning_rate,
@@ -527,7 +527,7 @@ class Experiment(experiment.AbstractExperiment):
       if summed_scalars is None:
         summed_scalars = scalars
       else:
-        summed_scalars = jax.tree_multimap(jnp.add, summed_scalars, scalars)
+        summed_scalars = jax.tree_map(jnp.add, summed_scalars, scalars)
 
     mean_scalars = jax.tree_map(lambda x: x / num_samples, summed_scalars)
     return mean_scalars

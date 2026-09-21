@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 import collections
+from collections import abc
 import numpy as np
 from six.moves import range
 
@@ -36,7 +37,7 @@ class EpsilonGreedyPolicy(object):
     Raises:
       ValueError: if `actions` agument is not an iterable.
     """
-    if not isinstance(actions, collections.Iterable):
+    if not isinstance(actions, abc.Iterable):
       raise ValueError('`actions` argument must be an iterable.')
 
     self._value_function = value_function

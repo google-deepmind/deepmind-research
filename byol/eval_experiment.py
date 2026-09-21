@@ -271,7 +271,7 @@ class EvalExperiment:
     classif_params = self.forward_classif.init(rng, embeddings)
     classif_opt_state = self._optimizer(0.).init(classif_params)
 
-    return _EvalExperimentState(
+    return _EvalExperimentState(  # pytype: disable=wrong-arg-types  # numpy-scalars
         backbone_params=backbone_params,
         classif_params=classif_params,
         backbone_state=backbone_state,
@@ -389,7 +389,7 @@ class EvalExperiment:
       new_backbone_params = optax.apply_updates(
           experiment_state.backbone_params, backbone_updates)
 
-    experiment_state = _EvalExperimentState(
+    experiment_state = _EvalExperimentState(  # pytype: disable=wrong-arg-types  # numpy-scalars
         new_backbone_params,
         new_classif_params,
         new_backbone_state,
@@ -432,8 +432,8 @@ class EvalExperiment:
     logits = self.forward_classif.apply(classif_params, embeddings)
     labels = hk.one_hot(inputs['labels'], self._num_classes)
     loss = helpers.softmax_cross_entropy(logits, labels, reduction=None)
-    top1_correct = helpers.topk_accuracy(logits, inputs['labels'], topk=1)
-    top5_correct = helpers.topk_accuracy(logits, inputs['labels'], topk=5)
+    top1_correct = helpers.topk_accuracy(logits, inputs['labels'], topk=1)  # pytype: disable=wrong-arg-types  # jax-ndarray
+    top5_correct = helpers.topk_accuracy(logits, inputs['labels'], topk=5)  # pytype: disable=wrong-arg-types  # jax-ndarray
     # NOTE: Returned values will be summed and finally divided by num_samples.
     return {
         'eval_loss': loss,
@@ -471,7 +471,7 @@ class EvalExperiment:
       if summed_scalars is None:
         summed_scalars = scalars
       else:
-        summed_scalars = jax.tree_multimap(jnp.add, summed_scalars, scalars)
+        summed_scalars = jax.tree_map(jnp.add, summed_scalars, scalars)
 
     mean_scalars = jax.tree_map(lambda x: x / num_samples, summed_scalars)
     return mean_scalars

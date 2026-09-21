@@ -87,10 +87,12 @@ class Enformer(snt.Module):
     # lambda is used in Sequential to construct the module under tf.name_scope.
     def conv_block(filters, width=1, w_init=None, name='conv_block', **kwargs):
       return Sequential(lambda: [
-          snt.BatchNorm(create_scale=True,
-                        create_offset=True,
-                        decay_rate=0.9,
-                        scale_init=snt.initializers.Ones()),
+          snt.distribute.CrossReplicaBatchNorm(
+              create_scale=True,
+              create_offset=True,
+              scale_init=snt.initializers.Ones(),
+              moving_mean=snt.ExponentialMovingAverage(0.9),
+              moving_variance=snt.ExponentialMovingAverage(0.9)),
           gelu,
           snt.Conv1D(filters, width, w_init=w_init, **kwargs)
       ], name=name)
@@ -184,16 +186,22 @@ class Enformer(snt.Module):
 class TargetLengthCrop1D(snt.Module):
   """Crop sequence to match the desired target length."""
 
-  def __init__(self, target_length: int, name='target_length_crop'):
+  def __init__(self,
+               target_length: Optional[int],
+               name: str = 'target_length_crop'):
     super().__init__(name=name)
     self._target_length = target_length
 
   def __call__(self, inputs):
+    if self._target_length is None:
+      return inputs
     trim = (inputs.shape[-2] - self._target_length) // 2
     if trim < 0:
       raise ValueError('inputs longer than target length')
-
-    return inputs[..., trim:-trim, :]
+    elif trim == 0:
+      return inputs
+    else:
+      return inputs[..., trim:-trim, :]
 
 
 class Sequential(snt.Module):
@@ -209,8 +217,7 @@ class Sequential(snt.Module):
     else:
       # layers wrapped in a lambda function to have a common namespace.
       if hasattr(layers, '__call__'):
-        with tf.name_scope(name):
-          layers = layers()
+        layers = layers()
       self._layers = [layer for layer in layers if layer is not None]
 
   def __call__(self, inputs: tf.Tensor, is_training: bool, **kwargs):

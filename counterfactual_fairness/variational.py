@@ -17,6 +17,7 @@
 from typing import Callable, Iterable, Optional
 
 import haiku as hk
+import jax
 import jax.numpy as jnp
 from tensorflow_probability.substrates import jax as tfp
 
@@ -31,8 +32,7 @@ class Variational(hk.Module):
 
   def __init__(self,
                common_layer_sizes: Iterable[int],
-               activation: Callable[[jnp.DeviceArray],
-                                    jnp.DeviceArray] = jnp.tanh,
+               activation: Callable[[jax.Array], jax.Array] = jnp.tanh,
                output_dim: int = 1,
                name: Optional[str] = None):
     """Initialises a `Variational` instance.

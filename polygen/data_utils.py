@@ -14,7 +14,6 @@
 
 """Mesh data utilities."""
 import matplotlib.pyplot as plt
-import modules
 from mpl_toolkits import mplot3d  # pylint: disable=unused-import
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import networkx as nx
@@ -88,8 +87,16 @@ def make_face_model_dataset(
       example['faces'] = tf.cast(
           tf.gather(face_permutation, example['faces']), tf.int64)
 
+    def _dequantize_verts(verts, n_bits):
+      min_range = -0.5
+      max_range = 0.5
+      range_quantize = 2**n_bits - 1
+      verts = tf.cast(verts, tf.float32)
+      verts = verts * (max_range - min_range) / range_quantize + min_range
+      return verts
+
     # Vertices are quantized. So convert to floats for input to face model
-    example['vertices'] = modules.dequantize_verts(vertices, quantization_bits)
+    example['vertices'] = _dequantize_verts(vertices, quantization_bits)
     example['vertices_mask'] = tf.ones_like(
         example['vertices'][..., 0], dtype=tf.float32)
     example['faces_mask'] = tf.ones_like(example['faces'], dtype=tf.float32)
@@ -97,42 +104,48 @@ def make_face_model_dataset(
   return ds.map(_face_model_map_fn)
 
 
-def read_obj(obj_path):
-  """Read vertices and faces from .obj file."""
+def read_obj_file(obj_file):
+  """Read vertices and faces from already opened file."""
   vertex_list = []
   flat_vertices_list = []
   flat_vertices_indices = {}
   flat_triangles = []
 
-  with open(obj_path) as obj_file:
-    for line in obj_file:
-      tokens = line.split()
-      if not tokens:
-        continue
-      line_type = tokens[0]
-      # We skip lines not starting with v or f.
-      if line_type == 'v':
-        vertex_list.append([float(x) for x in tokens[1:]])
-      elif line_type == 'f':
-        triangle = []
-        for i in range(len(tokens) - 1):
-          vertex_name = tokens[i + 1]
-          if vertex_name in flat_vertices_indices:
-            triangle.append(flat_vertices_indices[vertex_name])
+  for line in obj_file:
+    tokens = line.split()
+    if not tokens:
+      continue
+    line_type = tokens[0]
+    # We skip lines not starting with v or f.
+    if line_type == 'v':
+      vertex_list.append([float(x) for x in tokens[1:]])
+    elif line_type == 'f':
+      triangle = []
+      for i in range(len(tokens) - 1):
+        vertex_name = tokens[i + 1]
+        if vertex_name in flat_vertices_indices:
+          triangle.append(flat_vertices_indices[vertex_name])
+          continue
+        flat_vertex = []
+        for index in six.ensure_str(vertex_name).split('/'):
+          if not index:
             continue
-          flat_vertex = []
-          for index in six.ensure_str(vertex_name).split('/'):
-            if not index:
-              continue
-            # obj triangle indices are 1 indexed, so subtract 1 here.
-            flat_vertex += vertex_list[int(index) - 1]
-          flat_vertex_index = len(flat_vertices_list)
-          flat_vertices_list.append(flat_vertex)
-          flat_vertices_indices[vertex_name] = flat_vertex_index
-          triangle.append(flat_vertex_index)
-        flat_triangles.append(triangle)
+          # obj triangle indices are 1 indexed, so subtract 1 here.
+          flat_vertex += vertex_list[int(index) - 1]
+        flat_vertex_index = len(flat_vertices_list)
+        flat_vertices_list.append(flat_vertex)
+        flat_vertices_indices[vertex_name] = flat_vertex_index
+        triangle.append(flat_vertex_index)
+      flat_triangles.append(triangle)
 
   return np.array(flat_vertices_list, dtype=np.float32), flat_triangles
+
+
+def read_obj(obj_path):
+  """Open .obj file from the path provided and read vertices and faces."""
+
+  with open(obj_path) as obj_file:
+    return read_obj_file(obj_file)
 
 
 def write_obj(vertices, faces, file_path, transpose=True, scale=1.):
@@ -286,10 +299,8 @@ def quantize_process_mesh(vertices, faces, tris=None, quantization_bits=8):
   return vertices, faces, tris
 
 
-def load_process_mesh(mesh_obj_path, quantization_bits=8):
-  """Load obj file and process."""
-  # Load mesh
-  vertices, faces = read_obj(mesh_obj_path)
+def process_mesh(vertices, faces, quantization_bits=8):
+  """Process mesh vertices and faces."""
 
   # Transpose so that z-axis is vertical.
   vertices = vertices[:, [2, 0, 1]]
@@ -314,6 +325,13 @@ def load_process_mesh(mesh_obj_path, quantization_bits=8):
       'vertices': vertices,
       'faces': faces,
   }
+
+
+def load_process_mesh(mesh_obj_path, quantization_bits=8):
+  """Load obj file and process."""
+  # Load mesh
+  vertices, faces = read_obj(mesh_obj_path)
+  return process_mesh(vertices, faces, quantization_bits)
 
 
 def plot_meshes(mesh_list,

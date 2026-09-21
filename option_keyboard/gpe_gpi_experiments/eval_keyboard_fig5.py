@@ -1,4 +1,3 @@
-# Lint as: python3
 # pylint: disable=g-bad-file-header
 # pylint: disable=line-too-long
 # Copyright 2020 DeepMind Technologies Limited. All Rights Reserved.

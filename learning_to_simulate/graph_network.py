@@ -1,4 +1,3 @@
-# Lint as: python3
 # pylint: disable=g-bad-file-header
 # Copyright 2020 DeepMind Technologies Limited. All Rights Reserved.
 #
@@ -45,7 +44,7 @@ def build_mlp(
     hidden_size: int, num_hidden_layers: int, output_size: int) -> snt.Module:
   """Builds an MLP."""
   return snt.nets.MLP(
-      output_sizes=[hidden_size] * num_hidden_layers + [output_size])
+      output_sizes=[hidden_size] * num_hidden_layers + [output_size])  # pytype: disable=bad-return-type  # gen-stub-imports
 
 
 class EncodeProcessDecode(snt.AbstractModule):

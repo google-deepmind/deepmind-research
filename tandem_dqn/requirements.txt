@@ -1,0 +1,38 @@
+# DeepMind libraries.
+chex==0.0.2
+dm-env==1.2
+dm-haiku @ git+git://github.com/deepmind/dm-haiku.git@db991d56563221d5a06be5e7228155e53d01aba9
+dm-tree==0.1.5
+optax==0.0.1
+rlax @ git+git://github.com/deepmind/rlax.git@870cba1ea8ad36725f4f3a790846298657b6fd4b
+
+# JAX libraries with GPU support.
+jax==0.1.72
+jaxlib==0.1.50
+
+# ALE and Gym libraries.
+atari-py==0.2.6
+gym==0.13.1
+
+# Base dependencies.
+absl-py==0.9.0
+numpy==1.18.0
+Pillow==7.1.2
+python-snappy==0.6
+
+# Transitive dependencies.
+asn1crypto==0.24.0
+cloudpickle==1.2.2
+cryptography==2.1.4
+dataclasses==0.7
+future==0.18.2
+idna==2.6
+keyring==10.6.0
+keyrings.alt==3.0
+opencv-python==4.2.0.34
+opt-einsum==3.2.1
+pycrypto==2.6.1
+pyxdg==0.25
+SecretStorage==2.3.1
+six==1.15.0
+toolz==0.11.1

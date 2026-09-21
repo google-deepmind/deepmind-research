@@ -1,7 +1,7 @@
-# Pitfalls of Static Language Modelling
+# Mind the Gap: Assessing Temporal Generalization in Neural Language Models
 
 This repository contains the dataset splits used in
-[Pitfalls of Static Language Modelling](https://arxiv.org/abs/2102.01951)
+[Mind the Gap: Assessing Temporal Generalization in Neural Language Models](https://arxiv.org/abs/2102.01951)
 (Lazaridou, Kuncoro, Gribovskaya et al., 2021).
 
 ## Datasets

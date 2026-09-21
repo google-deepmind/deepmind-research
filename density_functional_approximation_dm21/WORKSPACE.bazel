@@ -1,0 +1,53 @@
+workspace(name = "org_density_functional_approximation_dm21")
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "rules_python",
+    sha256 = "934c9ceb552e84577b0faf1e5a2f0450314985b4d8712b2b70717dc679fdc01b",
+    url = "https://github.com/bazelbuild/rules_python/releases/download/0.3.0/rules_python-0.3.0.tar.gz",
+)
+
+load("@rules_python//python:pip.bzl", "pip_install")
+
+# Create a central external repo, @external_py_deps, that contains Bazel
+# targets for all the third-party packages specified in the requirements.txt
+# file.
+pip_install(
+    name = "external_py_deps",
+    requirements = "//:requirements.txt",
+)
+
+http_archive(
+    name = "io_abseil_py",
+    strip_prefix = "abseil-py-1.4.0",
+    urls = ["https://github.com/abseil/abseil-py/archive/refs/tags/v1.4.0.tar.gz"],
+)
+
+http_archive(
+    name = "org_tensorflow",
+    patch_args = ["-p1"],
+    patches = ["tf_bazel.patch"],
+    strip_prefix = "tensorflow-2.11.0",
+    urls = ["https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.11.0.tar.gz"],
+)
+
+# The cascade of load() statements and tf_workspace?() calls works around the
+# restriction that load() statements need to be at the top of .bzl files.
+# E.g. we can not retrieve a new repository with http_archive and then load()
+# a macro from that repository in the same file.
+load("@org_tensorflow//tensorflow:workspace3.bzl", "tf_workspace3")
+
+tf_workspace3()
+
+load("@org_tensorflow//tensorflow:workspace2.bzl", "tf_workspace2")
+
+tf_workspace2()
+
+load("@org_tensorflow//tensorflow:workspace1.bzl", "tf_workspace1")
+
+tf_workspace1()
+
+load("@org_tensorflow//tensorflow:workspace0.bzl", "tf_workspace0")
+
+tf_workspace0()

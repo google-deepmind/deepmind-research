@@ -1,0 +1,10 @@
+git+https://github.com/deepmind/dm_hamiltonian_dynamics_suite@main#egg=dm_hamiltonian_dynamics_suite
+absl-py==0.12.0
+numpy>=1.16.4
+scikit-learn>=1.0
+typing>=3.7.4.3
+jax==0.2.20
+jaxline==0.0.3
+distrax==0.0.2
+optax==0.0.6
+dm-haiku==0.0.3

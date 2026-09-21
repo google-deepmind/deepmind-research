@@ -24,6 +24,10 @@ https://deepmind.com/research/publications/
 
 ## Projects
 
+*   [Magnetic control of tokamak plasmas through deep reinforcement learning](fusion_tcv), Nature 2022
+*   [Pushing the Frontiers of Density Functionals by Solving the Fractional Electron Problem](density_functional_approximation_dm21), Science 2021
+*   [Mind the Gap: Assessing Temporal Generalization in Neural Language Models](pitfalls_static_language_models), NeurIPS 2021
+*   [The Difficulty of Passive Learning in Deep Reinforcement Learning](tandem_dqn), NeurIPS 2021
 *   [Skilful precipitation nowcasting using deep generative models of radar](nowcasting), Nature 2021
 *   [Compute-Aided Design as Language](cadl)
 *   [Encoders and ensembles for continual learning](continual_learning)
@@ -46,6 +50,7 @@ https://deepmind.com/research/publications/
 *   [Uncovering the Limits of Adversarial Training against Norm-Bounded Adversarial Examples](adversarial_robustness)
 *   [Learning rich touch representations through cross-modal self-supervision](cmtouch), CoRL 2020
 *   [Functional Regularisation for Continual Learning](functional_regularisation_for_continual_learning), ICLR 2020
+*   [The Autoencoding Variational Autoencoder](avae), NeurIPS 2020
 *   [Self-Supervised MultiModal Versatile Networks](mmv), NeurIPS 2020
 *   [ODE-GAN: Training GANs by Solving Ordinary Differential Equations](ode_gan), NeurIPS 2020
 *   [Algorithms for Causal Reasoning in Probability Trees](causal_reasoning)
@@ -84,6 +89,7 @@ https://deepmind.com/research/publications/
 *   [REGAL: Transfer Learning for Fast Optimization of Computation Graphs](regal)
 *   [Deep Ensembles: A Loss Landscape Perspective](ensemble_loss_landscape)
 *   [Powerpropagation](powerpropagation)
+*   [Physics Inspired Models](physics_inspired_models)
 
 
 

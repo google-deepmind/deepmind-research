@@ -52,8 +52,8 @@ class MujobanPad(composer.Entity):
         pos=[0, 0, (height / 2 or -0.001)],
         size=[size / 2, size / 2, (height / 2 or 0.001)], rgba=rgba)
     self._activated = False
-    self._rgba = np.array(rgba, dtype=np.float)
-    self._pressed_rgba = np.array(pressed_rgba, dtype=np.float)
+    self._rgba = np.array(rgba, dtype=float)
+    self._pressed_rgba = np.array(pressed_rgba, dtype=float)
     self._activator = None
     self._detection_tolerance = detection_tolerance
     self._boxes = []

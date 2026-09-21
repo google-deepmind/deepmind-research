@@ -99,7 +99,7 @@ class _LayerNorm(hk.LayerNorm):
                      create_offset=create_offset,
                      **kwargs)
 
-  def __call__(self,
+  def __call__(self,  # pytype: disable=signature-mismatch  # overriding-parameter-count-checks
                x: types.TensorLike,
                is_training: bool) -> jnp.ndarray:
     del is_training  # Unused.

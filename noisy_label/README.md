@@ -1,12 +1,13 @@
 <img src="paradigm.png" width="50%">
 
-# A Realistic Simulation Framework for Learning with Label Noise
+# An Instance-Dependent Simulation Framework for Learning with Label Noise
 
-We propose a simulation framework for generating realistic instance-dependent
+We propose a simulation framework for generating instance-dependent
 noisy labels via a pseudo-labeling paradigm. We show that this framework
-generates synthetic noisy labels that exhibit important characteristics of the
-label noise in practical settings. Equipped with controllable label noise, we
-study the negative impact of noisy labels across a few realistic settings to
+generates synthetic noisy labels whose distribution is closer to human labels
+compared to independent and class-conditional random flipping.
+Equipped with controllable label noise, we study the negative impact of
+noisy labels across a few practical settings to
 understand when label noise is more problematic. Additionally, with the
 availability of annotator information from our simulation framework, we propose
 a new technique, Label Quality Model (LQM), that leverages annotator features to
@@ -14,7 +15,7 @@ predict and correct against noisy labels. We show that by adding LQM as a label
 correction step before applying existing noisy label techniques, we can further
 improve the models' performance.
 
-[A Realistic Simulation Framework for Learning with Label Noise](https://arxiv.org/pdf/2107.11413.pdf).
+[An Instance-Dependent Simulation Framework for Learning with Label Noise](https://arxiv.org/pdf/2107.11413.pdf).
 
 In this repository, we provide the link to the datasets that we used in Sections
 4 and 5 of the above paper, along with a colab that demonstrates how to load the
@@ -68,8 +69,8 @@ The colab example is provided under the Apache License, Version 2.0.
 Please use the following bibtex for citations to our paper:
 
 ```
-@article{gu2021realistic,
-  title={A Realistic Simulation Framework for Learning with Label Noise},
+@article{gu2021instance,
+  title={An Instance-Dependent Simulation Framework for Learning with Label Noise},
   author={Gu, Keren and Masotto, Xander and Bachani, Vandana and Lakshminarayanan, Balaji and Nikodem, Jack and Yin, Dong},
   year={2021}
 }
@@ -101,7 +102,7 @@ engines such as <a href="https://g.co/datasetsearch">Google Dataset Search</a>.
     <td>description</td>
     <td><code itemprop="description">
       Data accompanying
-[A Realistic Simulation Framework for Learning with Label Noise]().
+[An Instance-Dependent Simulation Framework for Learning with Label Noise]().
       </code></td>
   </tr>
   <tr>

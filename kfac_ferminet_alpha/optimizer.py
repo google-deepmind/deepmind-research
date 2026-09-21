@@ -449,7 +449,7 @@ class Optimizer(utils.Stateful):
     # The learning rate is defined as the negative of the coefficient by which
     # we multiply the gradients, while the momentum is the coefficient by
     # which we multiply the velocities.
-    neg_learning_rate = -learning_rate
+    neg_learning_rate = -learning_rate  # pytype: disable=unsupported-operands  # trace-all-classes
     # Compute the coefficients of the update vectors
     assert neg_learning_rate is not None and momentum is not None
     coefficients = (neg_learning_rate, momentum)
@@ -462,7 +462,7 @@ class Optimizer(utils.Stateful):
     )
 
     # Update parameters: params = params + delta
-    params = jax.tree_multimap(jnp.add, params, delta)
+    params = jax.tree_map(jnp.add, params, delta)
 
     # Optionally compute the reduction ratio and update the damping
     self.estimator.damping = None
@@ -481,10 +481,10 @@ class Optimizer(utils.Stateful):
     self.step_counter = self.step_counter + 1
 
     if self.value_func_has_state:
-      return params, self.pop_state(), new_func_state, stats
+      return params, self.pop_state(), new_func_state, stats  # pytype: disable=bad-return-type  # jax-ndarray
     else:
       assert new_func_state is None
-      return params, self.pop_state(), stats
+      return params, self.pop_state(), stats  # pytype: disable=bad-return-type  # jax-ndarray
 
   def init(
       self,
@@ -607,5 +607,5 @@ class Optimizer(utils.Stateful):
     assert len(vectors) == len(coefficients)
     delta = utils.scalar_mul(vectors[0], coefficients[0])
     for vi, wi in zip(vectors[1:], coefficients[1:]):
-      delta = jax.tree_multimap(jnp.add, delta, utils.scalar_mul(vi, wi))
+      delta = jax.tree_map(jnp.add, delta, utils.scalar_mul(vi, wi))
     return delta, delta

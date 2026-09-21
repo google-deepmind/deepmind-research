@@ -1,0 +1,4 @@
+absl-py>=0.13.0
+dm-env>=1.5
+numpy>=1.21.0
+scipy>=1.7.0

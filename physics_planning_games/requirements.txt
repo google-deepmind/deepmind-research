@@ -1,5 +1,5 @@
 absl-py == 0.9.0
-dm-control
+dm-control == 0.0.403778684
 dm-env
 labmaze
 numpy == 1.19.1

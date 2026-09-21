@@ -1,0 +1,64 @@
+From 76edcc2da8a754cb2b283d7de9a7b37f51f7f380 Mon Sep 17 00:00:00 2001
+From: James Spencer <jamessspencer@google.com>
+Date: Thu, 26 Aug 2021 10:00:53 +0100
+Subject: [PATCH] Set dependencies for saved_model_compile_aot rule,
+ visibility for xla_compiled_cpu_runtime_standalone to work outside of
+ tensorflow, and absl version.
+
+---
+ tensorflow/compiler/tf2xla/BUILD              | 2 +-
+ tensorflow/compiler/xla/mlir/ir/runtime/BUILD | 1 +
+ tensorflow/python/tools/tools.bzl             | 4 ++--
+ 3 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/tensorflow/compiler/tf2xla/BUILD b/tensorflow/compiler/tf2xla/BUILD
+index cfe63b16675..cd273aaf29e 100644
+--- a/tensorflow/compiler/tf2xla/BUILD
++++ b/tensorflow/compiler/tf2xla/BUILD
+@@ -235,7 +235,7 @@ cc_library(
+         "-parse_headers",
+     ],
+     linkstatic = 1,
+-    visibility = [":friends"],
++    visibility = ["//visibility:public"],
+     # Note, we specifically removed MKL and multithreaded dependencies so the
+     # standalone does not require the MKL binary blob or threading libraries.
+     #
+diff --git a/tensorflow/compiler/xla/mlir/ir/runtime/BUILD b/tensorflow/compiler/xla/mlir/ir/runtime/BUILD
+index 8c693fa5d49..bf95a3de622 100644
+--- a/tensorflow/compiler/xla/mlir/ir/runtime/BUILD
++++ b/tensorflow/compiler/xla/mlir/ir/runtime/BUILD
+@@ -90,6 +90,7 @@ cc_library(
+         "rt_ops.h",
+     ],
+     compatible_with = get_compatible_with_cloud(),
++    visibility = ["//visibility:public"],
+     deps = [
+         ":rt_inc_gen",
+         "//tensorflow/compiler/xla/runtime:constraints",
+diff --git a/tensorflow/python/tools/tools.bzl b/tensorflow/python/tools/tools.bzl
+index db886746006..bc597e29de9 100644
+--- a/tensorflow/python/tools/tools.bzl
++++ b/tensorflow/python/tools/tools.bzl
+@@ -148,7 +148,7 @@ def saved_model_compile_aot(
+         ),
+         tags = tags,
+         tools = [
+-            "//tensorflow/python/tools:saved_model_cli",
++            "@org_tensorflow//tensorflow/python/tools:saved_model_cli",
+         ],
+     )
+ 
+@@ -170,7 +170,7 @@ def saved_model_compile_aot(
+         tags = tags,
+         deps = _maybe_force_compile(
+             [
+-                "//tensorflow/compiler/tf2xla:xla_compiled_cpu_runtime_standalone",
++                "@org_tensorflow//tensorflow/compiler/tf2xla:xla_compiled_cpu_runtime_standalone",
+             ],
+             force_compile = force_without_xla_support_flag,
+         ),
+ 
+-- 
+2.33.0.259.gc128427fd7-goog
+

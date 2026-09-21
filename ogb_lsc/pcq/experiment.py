@@ -229,8 +229,8 @@ class Experiment(experiment.AbstractExperiment):
     params = optax.apply_updates(params, updates)
     if ema_params is not None:
       ema = lambda x, y: tf1_ema(x, y, self.config.ema_decay, global_step)
-      ema_params = jax.tree_multimap(ema, ema_params, params)
-      ema_network_state = jax.tree_multimap(ema, ema_network_state,
+      ema_params = jax.tree_map(ema, ema_params, params)
+      ema_network_state = jax.tree_map(ema, ema_network_state,
                                             network_state)
     return params, ema_params, network_state, ema_network_state, opt_state, scalars
 

@@ -37,7 +37,6 @@ idna==2.9
 iniparse==0.4
 IPy==1.0
 jeepney==0.4.3
-kernel-pruner==56
 keyring==18.0.1
 keyrings.alt==3.4.0
 LibAppArmor==2.13.4

@@ -62,7 +62,7 @@ class TicTacToeGameLogic(logic_base.OpenSpielBasedLogic):
       unmarked squares, x's (player 0) and y's (player 1).
     """
     board_state = np.reshape(
-        np.array(self._open_spiel_state.observation_tensor(0), dtype=np.bool),
+        np.array(self._open_spiel_state.observation_tensor(0), dtype=bool),
         [3, 3, 3])
     board_state = np.transpose(board_state, [1, 2, 0])
     board_state = board_state[:, :, [0, 2, 1]]
@@ -117,7 +117,7 @@ class TicTacToeRandomOpponent(logic_base.Opponent):
     valid_moves = game_logic.open_spiel_state.legal_actions()
     assert valid_moves
     move = random_state.choice(valid_moves)
-    row, col = np.unravel_index(move, dims=(3, 3))
+    row, col = np.unravel_index(move, shape=(3, 3))
     return SingleMarkerAction(row=row, col=col)
 
 
@@ -196,7 +196,7 @@ def numpy_array_to_open_spiel_state(board_state):
 
 
 def open_spiel_move_to_single_marker_action(action):
-  row, col = np.unravel_index(action, dims=(3, 3))
+  row, col = np.unravel_index(action, shape=(3, 3))
   return SingleMarkerAction(row=row, col=col)
 
 

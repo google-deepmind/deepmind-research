@@ -125,7 +125,8 @@ def _generate_test_prediction_file(test_predictions: np.ndarray,
   # It is not possible to write directlt on CNS.
   evaluator = lsc.PCQM4MEvaluator()
 
-  evaluator.save_test_submission(dict(y_pred=test_predictions), output_path)
+  evaluator.save_test_submission(
+      dict(y_pred=test_predictions), str(output_path))
   return output_path
 
 

@@ -380,7 +380,7 @@ def generate_fused_paper_adjacency_matrix(neighbor_indices, neighbor_distances,
   new_rows = np.concatenate(new_rows)
   new_cols = np.concatenate(new_cols)
   return sp.coo_matrix(
-      (np.ones_like(new_rows, dtype=np.bool), (new_rows, new_cols)),
+      (np.ones_like(new_rows, dtype=bool), (new_rows, new_cols)),
       shape=paper_paper_coo_shape).tocsr()
 
 

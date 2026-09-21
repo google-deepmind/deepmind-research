@@ -154,7 +154,7 @@ def write_env(env, var, val):
 
 def abstract_single_value(value):
   if isinstance(value, jnp.ndarray):
-    value = jax.ShapedArray(np.shape(value), np.result_type(value))
+    value = jax_core.ShapedArray(np.shape(value), np.result_type(value))
     return pe.PartialVal.unknown(value)
   else:
     return value
@@ -164,11 +164,19 @@ def abstract_args(args):
   return jax.tree_map(abstract_single_value, args)
 
 
+def _extract_call_jaxpr(primitive, params):
+  if not (primitive.call_primitive or primitive.map_primitive):
+    return None, params
+  else:
+    params = dict(params)
+    return params.pop("call_jaxpr"), params
+
+
 def evaluate_eqn(eqn, in_values, write_func):
   """Evaluate a single Jax equation and writes the outputs."""
   in_values = list(in_values)
   # This is logic specifically to handle `xla_call`
-  call_jaxpr, params = jax.core.extract_call_jaxpr(eqn.primitive, eqn.params)
+  call_jaxpr, params = _extract_call_jaxpr(eqn.primitive, eqn.params)
   if call_jaxpr:
     subfuns = [
         jax.core.lu.wrap_init(
@@ -224,12 +232,10 @@ def broadcast_merger(f):
 
     # Bind args and consts to environment
     flat_args = jax.tree_flatten(func_args)[0]
-    write(jax.core.unitvar, jax.core.unit)
     jax_util.safe_map(write, jaxpr.invars, flat_args)
     jax_util.safe_map(write, jaxpr.constvars, consts)
 
     # Bind args and consts to environment
-    write(jax.core.unitvar, jax.core.unit)
     jax_util.safe_map(write, jaxpr.invars, flat_args)
     jax_util.safe_map(write, jaxpr.constvars, consts)
 
@@ -354,8 +360,6 @@ def var_to_str(var):
   """Returns a string representation of the variable of a Jax expression."""
   if isinstance(var, jax.core.Literal):
     return str(var)
-  elif isinstance(var, jax.core.UnitVar):
-    return "*"
   elif not isinstance(var, jax.core.Var):
     raise ValueError(f"Idk what to do with this {type(var)}?")
   c = int(var.count)
@@ -388,7 +392,7 @@ def fill_jaxpr_to_graph(graph, jaxpr, in_vars=None, out_vars=None):
   for eqn in jaxpr.eqns:
     in_vars = []
     for v in eqn.invars:
-      if isinstance(v, (jax.core.Literal, jax.core.UnitVar)):
+      if isinstance(v, jax.core.Literal):
         in_vars.append(var_to_str(v))
       else:
         in_vars.append(in_map.get(v, var_to_str(v)))
@@ -406,8 +410,7 @@ def fill_jaxpr_to_graph(graph, jaxpr, in_vars=None, out_vars=None):
 
     # Create incoming edges
     for v, name in zip(eqn.invars, in_vars):
-      if (not isinstance(v, jax.core.Literal) and
-          not isinstance(v, jax.core.UnitVar)):
+      if not isinstance(v, jax.core.Literal):
         graph.add_edge(name, node_c)
 
     # Create output nodes and edges
@@ -573,7 +576,6 @@ def auto_register_tags(func,
         env[var] = val
 
     # Bind args and consts to environment
-    write(jax.core.unitvar, jax.core.unit)
     jax_util.safe_map(write, graph.jaxpr.invars, flat_args)
     jax_util.safe_map(write, graph.jaxpr.constvars, graph.consts)
 

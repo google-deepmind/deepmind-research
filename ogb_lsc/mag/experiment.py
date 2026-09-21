@@ -487,8 +487,8 @@ class Experiment(experiment.AbstractExperiment):
         ))
     ema_fn = (lambda x, y:  # pylint:disable=g-long-lambda
               schedules.apply_ema_decay(x, y, ema_rate))
-    ema_params = jax.tree_multimap(ema_fn, ema_params, params)
-    ema_network_state = jax.tree_multimap(
+    ema_params = jax.tree_map(ema_fn, ema_params, params)
+    ema_network_state = jax.tree_map(
         ema_fn,
         ema_network_state,
         network_state,

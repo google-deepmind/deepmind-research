@@ -388,7 +388,7 @@ class GoGameLogic(logic_base.OpenSpielBasedLogic):
       always all the same value indicating whether white is to play).
     """
     board_state = np.reshape(
-        np.array(self._open_spiel_state.observation_tensor(0), dtype=np.bool),
+        np.array(self._open_spiel_state.observation_tensor(0), dtype=bool),
         [4, self._board_size, self._board_size])
     board_state = np.transpose(board_state, [1, 2, 0])
     board_state = board_state[:, :, [2, 0, 1, 3]]
