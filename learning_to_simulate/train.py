@@ -366,11 +366,15 @@ def get_one_step_estimator_fn(data_path,
 
     predictions = {'predicted_next_position': predicted_next_position}
 
+    # Broadcast particle weights over coordinates; streaming metrics count only
+    # non-kinematic coordinates, including when particle counts vary by batch.
+    metric_weights = tf.cast(non_kinematic_mask[:, tf.newaxis], tf.float32)
     eval_metrics_ops = {
         'loss_mse': tf.metrics.mean_squared_error(
-            pred_acceleration, target_acceleration),
+            pred_acceleration, target_acceleration, weights=metric_weights),
         'one_step_position_mse': tf.metrics.mean_squared_error(
-            predicted_next_position, target_next_position)
+            predicted_next_position, target_next_position,
+            weights=metric_weights)
     }
     return tf_estimator.EstimatorSpec(
         mode=mode,
@@ -405,11 +409,18 @@ def get_rollout_estimator_fn(data_path,
 
     num_steps = metadata['sequence_length'] - INPUT_SEQUENCE_LENGTH
     rollout_op = rollout(simulator, features, num_steps=num_steps)
-    squared_error = (rollout_op['predicted_rollout'] -
-                     rollout_op['ground_truth_rollout']) ** 2
-    loss = tf.reduce_mean(squared_error)
+    # Rollouts are [time, particle, coordinate]. Prescribed trajectories must
+    # not dilute the error by contributing zero-error kinematic particles.
+    non_kinematic_mask = tf.logical_not(
+        get_kinematic_mask(features['particle_type']))
+    metric_weights = tf.cast(
+        non_kinematic_mask[tf.newaxis, :, tf.newaxis], tf.float32)
+    loss = tf.losses.mean_squared_error(
+        rollout_op['ground_truth_rollout'], rollout_op['predicted_rollout'],
+        weights=metric_weights)
     eval_ops = {'rollout_error_mse': tf.metrics.mean_squared_error(
-        rollout_op['predicted_rollout'], rollout_op['ground_truth_rollout'])}
+        rollout_op['predicted_rollout'], rollout_op['ground_truth_rollout'],
+        weights=metric_weights)}
 
     # Add a leading axis, since Estimator's predict method insists that all
     # tensors have a shared leading batch axis fo the same dims.
